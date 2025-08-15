@@ -1,0 +1,40 @@
+.crush
+.idea
+.vscode
+.kilocode
+.DS_Store
+dump.rdb
+CRUSH.md
+QWEN.md
+/RedisLib.Benchmarks/BenchmarkDotNet.Artifacts
+*/bin/**
+*/obj/**
+*.user
+# NuGet
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+
+
+ # Visual Studio
+.vs/
+*.suo
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+
+# Test Results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,76 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29515.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLib", "RedisLib\RedisLib.csproj", "{12345678-1234-1234-1234-1234567890AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLib.Example", "RedisLib.Example\RedisLib.Example.csproj", "{23456789-2345-2345-2345-234567890ABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLib.Tests", "RedisLib.Tests\RedisLib.Tests.csproj", "{34567890-3456-3456-3456-34567890ABCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLib.Benchmarks", "RedisLib.Benchmarks\RedisLib.Benchmarks.csproj", "{AEE62A4F-EBBC-4A86-99FF-B149116113CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12345678-1234-1234-1234-1234567890AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|x64.Build.0 = Release|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{12345678-1234-1234-1234-1234567890AB}.Release|x86.Build.0 = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|x64.Build.0 = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Debug|x86.Build.0 = Debug|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|x64.ActiveCfg = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|x64.Build.0 = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|x86.ActiveCfg = Release|Any CPU
+		{23456789-2345-2345-2345-234567890ABC}.Release|x86.Build.0 = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|x64.Build.0 = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{34567890-3456-3456-3456-34567890ABCD}.Release|x86.Build.0 = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|x64.Build.0 = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEE62A4F-EBBC-4A86-99FF-B149116113CB}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
