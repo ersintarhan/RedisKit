@@ -10,7 +10,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **Key Prefixing**: Support for cache key prefixes
 - **Pub/Sub**: Type-safe publishing and subscribing with advanced pattern matching
 - **Streaming**: Redis Streams support with consumer groups and retry mechanisms
-- **Multiple Serializers**: JSON, MessagePack, and MemoryPack support
+- **Multiple Serializers**: JSON, MessagePack support
 - **Dependency Injection**: Full support with .NET DI container
 - **High Performance Logging**: Source generator based logging with EventId support
 - **Async/Await**: Full async/await support with CancellationToken
@@ -185,7 +185,7 @@ services.AddRedisServices(options =>
     options.ConnectionString = "localhost:6379";
     options.DefaultTtl = TimeSpan.FromHours(1);
     options.CacheKeyPrefix = "myapp:";
-    options.Serializer = SerializerType.MessagePack; // or JSON, MemoryPack
+    options.Serializer = SerializerType.MessagePack; // or JSON
 });
 ```
 
@@ -1210,11 +1210,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) for the excellent Redis client
-- [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp) for high-performance serialization
-- [MemoryPack](https://github.com/Cysharp/MemoryPack) for zero-encoding serialization
 
 ## 📚 Documentation
 
