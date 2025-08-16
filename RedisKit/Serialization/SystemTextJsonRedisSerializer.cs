@@ -56,7 +56,7 @@ namespace RedisKit.Serialization
         /// </summary>
         /// <typeparam name="T">The type of object to serialize</typeparam>
         /// <param name="obj">The object to serialize</param>
-        /// <returns>A UTF-8 encoded byte array containing the serialized JSON representation of the object</param>
+        /// <returns>A UTF-8 encoded byte array containing the serialized JSON representation of the object</returns>
         /// <exception cref="ArgumentNullException">Thrown when obj is null</exception>
         /// <exception cref="InvalidOperationException">Thrown when serialization fails due to JSON conversion errors or memory constraints</exception>
         public byte[] Serialize<T>(T obj)
