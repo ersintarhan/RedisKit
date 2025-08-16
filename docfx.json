@@ -31,6 +31,10 @@
           "articles/**/toc.yml",
           "toc.yml",
           "*.md"
+        ],
+        "exclude": [
+          "QWEN.md",
+          "CRUSH.md"
         ]
       }
     ],

@@ -12,26 +12,6 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "CRUSH.md",
-      "output": {
-        ".html": {
-          "relative_path": "CRUSH.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "QWEN.md",
-      "output": {
-        ".html": {
-          "relative_path": "QWEN.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
       "source_relative_path": "README.md",
       "output": {
         ".html": {
