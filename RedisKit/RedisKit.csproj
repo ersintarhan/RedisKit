@@ -12,9 +12,9 @@
     <Product>RedisKit</Product>
     <Description>A production-ready Redis toolkit with advanced caching, pub/sub, and streaming features for .NET 9</Description>
     <Copyright>Copyright (c) Ersin Tarhan 2025</Copyright>
-    <PackageProjectUrl>https://github.com/ersintarhan/redis-lib-csharp</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ersintarhan/RedisKit</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ersintarhan/redis-lib-csharp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ersintarhan/RedisKit</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>redis;cache;pubsub;streams;messagepack;performance;dotnet;csharp</PackageTags>

@@ -1218,7 +1218,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-For more detailed documentation, please visit our [Wiki](https://github.com/yourusername/RedisKit/wiki).
+For more detailed documentation, please visit our [Wiki](https://github.com/ersintarhan/RedisKit/wiki).
 
 ## 🐛 Known Issues
 
