@@ -41,7 +41,9 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "*.png",
+          "*.ico"
         ]
       }
     ],
@@ -62,8 +64,8 @@
       "_appTitle": "RedisKit",
       "_appName": "RedisKit",
       "_appFooter": "RedisKit - High-performance Redis toolkit for .NET",
-      "_appLogoPath": "images/logo.png",
-      "_appFaviconPath": "images/favicon.ico",
+      "_appLogoPath": "logo.png",
+      "_appFaviconPath": "favicon.ico",
       "_enableSearch": true,
       "_gitContribute": {
         "repo": "https://github.com/ersintarhan/RedisKit",
