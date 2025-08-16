@@ -1,4 +1,4 @@
-# RedisLib
+# RedisKit
 
 A production-ready, enterprise-grade Redis library for .NET 9 with advanced caching, pub/sub, and streaming features.
 
@@ -30,7 +30,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 Install the package via NuGet:
 
 ```bash
-dotnet add package RedisLib
+dotnet add package RedisKit
 ```
 
 ## 🎯 Quick Start
@@ -38,7 +38,7 @@ dotnet add package RedisLib
 ### Minimal Setup
 
 ```csharp
-using RedisLib.Extensions;
+using RedisKit.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,8 +65,8 @@ app.Run();
 ### Your First Redis Cache
 
 ```csharp
-using RedisLib.Extensions;
-using RedisLib.Interfaces;
+using RedisKit.Extensions;
+using RedisKit.Interfaces;
 
 // 1. Setup - Add to your Program.cs
 var builder = WebApplication.CreateBuilder(args);
@@ -668,7 +668,7 @@ public class CacheStatistics
 ### Creating a Custom Serializer
 
 ```csharp
-using RedisLib.Serialization;
+using RedisKit.Serialization;
 using ProtoBuf;
 
 // Custom Protobuf serializer
@@ -882,7 +882,7 @@ public class UserService
 
 ## 🎯 Backoff Strategies
 
-RedisLib supports multiple backoff strategies for retry operations:
+RedisKit supports multiple backoff strategies for retry operations:
 
 - **Fixed**: Constant delay between retries
 - **Linear**: Linear increase in delay
@@ -1218,7 +1218,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-For more detailed documentation, please visit our [Wiki](https://github.com/yourusername/RedisLib/wiki).
+For more detailed documentation, please visit our [Wiki](https://github.com/yourusername/RedisKit/wiki).
 
 ## 🐛 Known Issues
 
