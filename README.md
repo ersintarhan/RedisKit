@@ -16,6 +16,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **Async/Await**: Full async/await support with CancellationToken
 
 ### Enterprise Features
+- **🔒 Distributed Locking**: Redlock algorithm implementation with auto-renewal
 - **🔄 Circuit Breaker Pattern**: Automatic failure detection and recovery
 - **📈 Advanced Retry Strategies**: Multiple backoff strategies (Exponential, Decorrelated Jitter, etc.)
 - **🏥 Health Monitoring**: Automatic health checks with auto-reconnection

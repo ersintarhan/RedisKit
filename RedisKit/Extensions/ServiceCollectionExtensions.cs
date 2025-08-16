@@ -64,6 +64,15 @@ namespace RedisKit.Extensions
                 provider.GetRequiredService<ILogger<RedisStreamService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
 
+            // Register Distributed Lock Service
+            services.AddSingleton<IConnectionMultiplexer>(provider =>
+            {
+                var connection = provider.GetRequiredService<RedisConnection>();
+                return connection.GetMultiplexerAsync().GetAwaiter().GetResult();
+            });
+
+            services.AddSingleton<IDistributedLock, RedisDistributedLock>();
+
             return services;
         }
 
@@ -121,6 +130,15 @@ namespace RedisKit.Extensions
                 provider.GetRequiredService<IDatabaseAsync>(),
                 provider.GetRequiredService<ILogger<RedisStreamService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
+
+            // Register Distributed Lock Service
+            services.AddSingleton<IConnectionMultiplexer>(provider =>
+            {
+                var connection = provider.GetRequiredService<RedisConnection>();
+                return connection.GetMultiplexerAsync().GetAwaiter().GetResult();
+            });
+
+            services.AddSingleton<IDistributedLock, RedisDistributedLock>();
 
             return services;
         }

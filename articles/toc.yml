@@ -6,5 +6,7 @@
   href: pubsub-patterns.md
 - name: Stream Processing
   href: stream-processing.md
+- name: Distributed Locking
+  href: distributed-locking.md
 - name: Performance Tuning
   href: performance-tuning.md

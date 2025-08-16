@@ -331,6 +331,14 @@ namespace RedisKit.Services
         }
 
         /// <summary>
+        /// Gets the underlying ConnectionMultiplexer
+        /// </summary>
+        public async Task<IConnectionMultiplexer> GetMultiplexerAsync()
+        {
+            return await GetConnection();
+        }
+
+        /// <summary>
         /// Manually triggers a health check
         /// </summary>
         public async Task<ConnectionHealthStatus> CheckHealthAsync()
