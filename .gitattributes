@@ -1,0 +1,20 @@
+# Linguist overrides - Correct language detection
+*.cs linguist-language=C#
+*.csproj linguist-language=C#
+*.sln linguist-language=C#
+
+# Mark generated/vendor files
+_site/* linguist-generated=true
+api/*.yml linguist-generated=true
+api/*.md linguist-generated=true
+articles/*.html linguist-generated=true
+*.html linguist-generated=true
+
+# Documentation
+*.md linguist-documentation=true
+docfx.json linguist-documentation=true
+
+# Ensure C# is detected as primary language
+*.cs linguist-detectable=true
+*.html linguist-detectable=false
+*.yml linguist-detectable=false
