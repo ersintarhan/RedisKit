@@ -6,10 +6,10 @@ RedisKit is a production-ready, enterprise-grade Redis toolkit for .NET 9 with a
 
 ## Quick Links
 
-- [Getting Started](articles/getting-started.md)
-- [API Documentation](api/index.md)
-- [GitHub Repository](https://github.com/ersintarhan/RedisKit)
-- [NuGet Package](https://www.nuget.org/packages/RedisKit)
+- 📚 **[Getting Started Guide](articles/getting-started.md)** - Learn how to use RedisKit
+- 📖 **[API Documentation](api/RedisKit.html)** - Complete API reference with XML docs
+- 💻 **[GitHub Repository](https://github.com/ersintarhan/RedisKit)** - Source code and issues
+- 📦 **[NuGet Package](https://www.nuget.org/packages/RedisKit)** - Install via NuGet
 
 ## Features
 
