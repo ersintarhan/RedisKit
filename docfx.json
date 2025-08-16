@@ -43,7 +43,8 @@
         "files": [
           "images/**",
           "*.png",
-          "*.ico"
+          "*.ico",
+          "*.svg"
         ]
       }
     ],
@@ -64,7 +65,7 @@
       "_appTitle": "RedisKit",
       "_appName": "RedisKit",
       "_appFooter": "RedisKit - High-performance Redis toolkit for .NET",
-      "_appLogoPath": "logo.png",
+      "_appLogoPath": "logo.svg",
       "_appFaviconPath": "favicon.ico",
       "_enableSearch": true,
       "_gitContribute": {
