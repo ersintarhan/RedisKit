@@ -14,14 +14,14 @@ namespace RedisKit.Tests
     public class PubSubServiceTests
     {
         private readonly Mock<ISubscriber> _mockSubscriber;
-        private readonly Mock<ILogger<PubSubService>> _mockLogger;
+        private readonly Mock<ILogger<RedisPubSubService>> _mockLogger;
         private readonly RedisOptions _options;
-        private readonly PubSubService _pubSubService;
+        private readonly RedisPubSubService _pubSubService;
 
         public PubSubServiceTests()
         {
             _mockSubscriber = new Mock<ISubscriber>();
-            _mockLogger = new Mock<ILogger<PubSubService>>();
+            _mockLogger = new Mock<ILogger<RedisPubSubService>>();
             _options = new RedisOptions
             {
                 ConnectionString = "localhost:6379",
@@ -29,7 +29,7 @@ namespace RedisKit.Tests
                 Serializer = SerializerType.SystemTextJson
             };
             
-            _pubSubService = new PubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
+            _pubSubService = new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
         }
 
         #region Constructor Tests
@@ -39,11 +39,11 @@ namespace RedisKit.Tests
         {
             // Arrange
             var mockSubscriber = new Mock<ISubscriber>();
-            var mockLogger = new Mock<ILogger<PubSubService>>();
+            var mockLogger = new Mock<ILogger<RedisPubSubService>>();
             var redisOptions = new RedisOptions();
 
             // Act & Assert
-            Assert.NotNull(new PubSubService(mockSubscriber.Object, mockLogger.Object, redisOptions));
+            Assert.NotNull(new RedisPubSubService(mockSubscriber.Object, mockLogger.Object, redisOptions));
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
-                new PubSubService(null, _mockLogger.Object, _options));
+                new RedisPubSubService(null, _mockLogger.Object, _options));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
-                new PubSubService(_mockSubscriber.Object, null, _options));
+                new RedisPubSubService(_mockSubscriber.Object, null, _options));
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
-                new PubSubService(_mockSubscriber.Object, _mockLogger.Object, null));
+                new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, null));
         }
 
         #endregion
@@ -367,7 +367,7 @@ namespace RedisKit.Tests
         public void Dispose_DoesNotThrow()
         {
             // Arrange
-            var service = new PubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
+            var service = new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
 
             // Act & Assert
             Assert.NotNull(service);

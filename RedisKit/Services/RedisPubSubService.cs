@@ -10,12 +10,104 @@ using StackExchange.Redis;
 namespace RedisKit.Services
 {
     /// <summary>
-    /// High-performance implementation of IRedisPubSubService with advanced features
+    /// High-performance implementation of IRedisPubSubService with advanced pub/sub messaging features.
+    /// Provides reliable message delivery, pattern matching, and comprehensive subscription management.
     /// </summary>
-    public class PubSubService : IRedisPubSubService, IDisposable
+    /// <remarks>
+    /// This class implements Redis pub/sub messaging with enterprise-grade features:
+    /// - Type-safe message serialization/deserialization
+    /// - Pattern-based subscriptions with glob matching
+    /// - Concurrent handler management with thread safety
+    /// - Automatic cleanup of inactive handlers
+    /// - Comprehensive statistics and monitoring
+    /// - Memory leak prevention through handler timeouts
+    /// 
+    /// Thread Safety: This class is fully thread-safe and designed for singleton usage.
+    /// 
+    /// Key Features:
+    /// - Multiple handlers per channel/pattern
+    /// - Subscription tokens for precise unsubscribe control
+    /// - Channel metadata support (channel name in handler)
+    /// - Pattern matching for dynamic channel subscriptions
+    /// - Statistics tracking for monitoring
+    /// - Automatic cleanup of stale handlers
+    /// 
+    /// Performance Optimizations:
+    /// - Concurrent collections for lock-free reads
+    /// - Semaphore-based subscription synchronization
+    /// - Efficient handler lookup via mapping dictionary
+    /// - Batch unsubscribe operations
+    /// - Lazy Redis unsubscribe (only when last handler removed)
+    /// 
+    /// Message Delivery:
+    /// - Fire-and-forget semantics (no delivery guarantee)
+    /// - At-most-once delivery per subscriber
+    /// - No message persistence or replay
+    /// - Real-time message distribution
+    /// 
+    /// Pattern Matching:
+    /// - Supports Redis glob patterns (* ? [])
+    /// - Dynamic channel discovery
+    /// - Single handler for multiple channels
+    /// - Channel name provided to handler
+    /// 
+    /// Memory Management:
+    /// - Automatic cleanup timer (30-minute intervals)
+    /// - Handler timeout detection (24-hour default)
+    /// - Weak reference support for handlers
+    /// - Proper disposal of resources
+    /// 
+    /// Usage Example:
+    /// <code>
+    /// public class NotificationService
+    /// {
+    ///     private readonly IRedisPubSubService _pubSub;
+    ///     private readonly List&lt;SubscriptionToken&gt; _subscriptions = new();
+    ///     
+    ///     public async Task StartListening()
+    ///     {
+    ///         // Subscribe to user-specific notifications
+    ///         var token = await _pubSub.SubscribeAsync&lt;UserNotification&gt;(
+    ///             "notifications:user:123",
+    ///             async (notification, ct) =>
+    ///             {
+    ///                 await ProcessNotification(notification);
+    ///             });
+    ///         _subscriptions.Add(token);
+    ///         
+    ///         // Subscribe to all system alerts
+    ///         var patternToken = await _pubSub.SubscribePatternAsync&lt;SystemAlert&gt;(
+    ///             "alerts:*",
+    ///             async (alert, ct) =>
+    ///             {
+    ///                 await HandleAlert(alert);
+    ///             });
+    ///         _subscriptions.Add(patternToken);
+    ///     }
+    ///     
+    ///     public async Task SendNotification(int userId, UserNotification notification)
+    ///     {
+    ///         var subscribers = await _pubSub.PublishAsync(
+    ///             $"notifications:user:{userId}",
+    ///             notification);
+    ///         
+    ///         Console.WriteLine($"Delivered to {subscribers} subscribers");
+    ///     }
+    ///     
+    ///     public async Task Cleanup()
+    ///     {
+    ///         foreach (var token in _subscriptions)
+    ///         {
+    ///             await _pubSub.UnsubscribeAsync(token);
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </remarks>
+    public class RedisPubSubService : IRedisPubSubService, IDisposable
     {
         private readonly ISubscriber _subscriber;
-        private readonly ILogger<PubSubService> _logger;
+        private readonly ILogger<RedisPubSubService> _logger;
         private readonly RedisOptions _options;
         private readonly IRedisSerializer _serializer;
         
@@ -41,9 +133,9 @@ namespace RedisKit.Services
         // Disposal
         private bool _disposed;
 
-        public PubSubService(
+        public RedisPubSubService(
             ISubscriber subscriber,
-            ILogger<PubSubService> logger,
+            ILogger<RedisPubSubService> logger,
             RedisOptions options)
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
@@ -682,7 +774,7 @@ namespace RedisKit.Services
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(nameof(PubSubService));
+                throw new ObjectDisposedException(nameof(RedisPubSubService));
             }
         }
 

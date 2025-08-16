@@ -7,8 +7,150 @@ using StackExchange.Redis;
 namespace RedisKit.Services
 {
     /// <summary>
-    /// Implementation of IRedisStreamService using StackExchange.Redis and configurable serialization
+    /// Implementation of IRedisStreamService using StackExchange.Redis with advanced stream operations.
+    /// Provides comprehensive support for Redis Streams including consumer groups, message acknowledgment, and dead letter queues.
     /// </summary>
+    /// <remarks>
+    /// This class implements Redis Streams operations with enterprise-grade features for event sourcing,
+    /// message queuing, and real-time data processing scenarios.
+    /// 
+    /// Thread Safety: This class is fully thread-safe and designed for singleton usage.
+    /// 
+    /// Core Capabilities:
+    /// - Append-only log with automatic ID generation
+    /// - Consumer groups for distributed processing
+    /// - Message acknowledgment and retry mechanisms
+    /// - Dead letter queue support for failed messages
+    /// - Batch operations for high throughput
+    /// - Stream trimming for memory management
+    /// - Pending message recovery
+    /// 
+    /// Stream Features:
+    /// - Auto-generated IDs based on timestamp-sequence format
+    /// - MAXLEN trimming (approximate or exact)
+    /// - Range queries with start/end IDs
+    /// - Consumer group coordination
+    /// - Pending entries list (PEL) management
+    /// - Message claiming for failure recovery
+    /// 
+    /// Consumer Groups:
+    /// - Multiple consumers per group with load balancing
+    /// - At-least-once delivery semantics
+    /// - Message acknowledgment tracking
+    /// - Automatic message assignment
+    /// - Idle message detection and recovery
+    /// - Consumer health monitoring
+    /// 
+    /// Reliability Features:
+    /// - Retry mechanism with exponential backoff
+    /// - Dead letter queue for persistent failures
+    /// - Message claiming from failed consumers
+    /// - Pending message timeout detection
+    /// - Automatic reconnection on failures
+    /// 
+    /// Performance Optimizations:
+    /// - Batch message addition for throughput
+    /// - Efficient serialization with configurable formats
+    /// - Approximate trimming for better performance
+    /// - Parallel message processing support
+    /// - Memory-efficient streaming operations
+    /// 
+    /// Common Use Cases:
+    /// - Event Sourcing: Append-only event log with replay
+    /// - Message Queue: Reliable message delivery with acknowledgment
+    /// - Activity Feed: Real-time updates with consumer groups
+    /// - IoT Data: High-volume sensor data ingestion
+    /// - Audit Log: Immutable audit trail with timestamps
+    /// - CQRS: Command/event separation with streams
+    /// 
+    /// Usage Example:
+    /// <code>
+    /// public class OrderEventProcessor
+    /// {
+    ///     private readonly IRedisStreamService _streamService;
+    ///     
+    ///     // Publishing events
+    ///     public async Task PublishOrderEvent(OrderEvent orderEvent)
+    ///     {
+    ///         var messageId = await _streamService.AddAsync(
+    ///             "orders:events",
+    ///             orderEvent,
+    ///             maxLength: 100000); // Keep last 100k events
+    ///         
+    ///         Console.WriteLine($"Published event: {messageId}");
+    ///     }
+    ///     
+    ///     // Processing events with consumer group
+    ///     public async Task ProcessOrderEvents()
+    ///     {
+    ///         // Create consumer group
+    ///         await _streamService.CreateConsumerGroupAsync(
+    ///             "orders:events",
+    ///             "order-processors");
+    ///         
+    ///         while (!cancellationToken.IsCancellationRequested)
+    ///         {
+    ///             // Read pending messages
+    ///             var messages = await _streamService.ReadGroupAsync&lt;OrderEvent&gt;(
+    ///                 "orders:events",
+    ///                 "order-processors",
+    ///                 "worker-1",
+    ///                 count: 10);
+    ///             
+    ///             foreach (var (messageId, orderEvent) in messages)
+    ///             {
+    ///                 try
+    ///                 {
+    ///                     await ProcessOrder(orderEvent);
+    ///                     
+    ///                     // Acknowledge successful processing
+    ///                     await _streamService.AcknowledgeAsync(
+    ///                         "orders:events",
+    ///                         "order-processors",
+    ///                         messageId);
+    ///                 }
+    ///                 catch (Exception ex)
+    ///                 {
+    ///                     // Move to DLQ after retries
+    ///                     await _streamService.MoveToDeadLetterAsync&lt;OrderEvent&gt;(
+    ///                         "orders:events",
+    ///                         "orders:dlq",
+    ///                         messageId,
+    ///                         ex.Message);
+    ///                 }
+    ///             }
+    ///             
+    ///             await Task.Delay(1000); // Polling interval
+    ///         }
+    ///     }
+    ///     
+    ///     // Claim abandoned messages
+    ///     public async Task RecoverAbandonedMessages()
+    ///     {
+    ///         var pending = await _streamService.GetPendingAsync(
+    ///             "orders:events",
+    ///             "order-processors");
+    ///         
+    ///         var stuckMessages = pending
+    ///             .Where(p => p.IdleTime > TimeSpan.FromMinutes(5))
+    ///             .Select(p => p.MessageId)
+    ///             .ToArray();
+    ///         
+    ///         if (stuckMessages.Any())
+    ///         {
+    ///             var claimed = await _streamService.ClaimAsync&lt;OrderEvent&gt;(
+    ///                 "orders:events",
+    ///                 "order-processors",
+    ///                 "recovery-worker",
+    ///                 300000, // 5 minutes idle time
+    ///                 stuckMessages);
+    ///             
+    ///             // Process claimed messages...
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </remarks>
     public class RedisStreamService : IRedisStreamService
     {
         private readonly IDatabaseAsync _database;

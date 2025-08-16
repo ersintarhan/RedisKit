@@ -53,9 +53,9 @@ namespace RedisKit.Extensions
                 provider.GetRequiredService<ILogger<RedisCacheService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
 
-            services.AddSingleton<IRedisPubSubService>(provider => new PubSubService(
+            services.AddSingleton<IRedisPubSubService>(provider => new RedisPubSubService(
                 provider.GetRequiredService<ISubscriber>(),
-                provider.GetRequiredService<ILogger<PubSubService>>(),
+                provider.GetRequiredService<ILogger<RedisPubSubService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
             
             // Register StreamService
@@ -120,9 +120,9 @@ namespace RedisKit.Extensions
                 provider.GetRequiredService<ILogger<RedisCacheService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
 
-            services.AddSingleton<IRedisPubSubService>(provider => new PubSubService(
+            services.AddSingleton<IRedisPubSubService>(provider => new RedisPubSubService(
                 provider.GetRequiredService<ISubscriber>(),
-                provider.GetRequiredService<ILogger<PubSubService>>(),
+                provider.GetRequiredService<ILogger<RedisPubSubService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
 
             // Register StreamService
