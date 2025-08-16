@@ -9,8 +9,72 @@ using StackExchange.Redis;
 namespace RedisKit.Services
 {
     /// <summary>
-    /// Manages the Redis connection with advanced retry logic, circuit breaker, and health monitoring
+    /// Manages the Redis connection with advanced retry logic, circuit breaker, and health monitoring.
+    /// Provides a robust connection management layer with automatic recovery and health monitoring capabilities.
     /// </summary>
+    /// <remarks>
+    /// This class provides enterprise-grade connection management for Redis with:
+    /// - Automatic retry with configurable backoff strategies
+    /// - Circuit breaker pattern for fault tolerance
+    /// - Health monitoring with auto-reconnection
+    /// - Connection pooling through ConnectionMultiplexer
+    /// - Comprehensive event handling and logging
+    /// 
+    /// Thread Safety: This class is thread-safe and designed to be used as a singleton.
+    /// 
+    /// Key Features:
+    /// - Connection resilience with exponential backoff retry
+    /// - Circuit breaker to prevent cascading failures
+    /// - Health checks with configurable intervals
+    /// - Auto-reconnection on health check failures
+    /// - Connection event monitoring and logging
+    /// - Semaphore-based connection locking for thread safety
+    /// 
+    /// Retry Strategies:
+    /// - Exponential: Delay doubles with each attempt
+    /// - Linear: Fixed delay between attempts
+    /// - Polynomial: Delay grows polynomially
+    /// - ExponentialWithJitter: Exponential with random jitter
+    /// 
+    /// Circuit Breaker States:
+    /// - Closed: Normal operation, requests pass through
+    /// - Open: Failures exceeded threshold, requests blocked
+    /// - HalfOpen: Testing if service recovered
+    /// 
+    /// Health Monitoring:
+    /// - Periodic health checks via PING command
+    /// - Auto-reconnection on consecutive failures
+    /// - Response time tracking
+    /// - Failure rate monitoring
+    /// 
+    /// Usage Pattern:
+    /// <code>
+    /// // Configure connection
+    /// var options = new RedisOptions
+    /// {
+    ///     ConnectionString = "localhost:6379",
+    ///     RetryConfiguration = new RetryConfiguration
+    ///     {
+    ///         MaxAttempts = 5,
+    ///         Strategy = BackoffStrategy.ExponentialWithJitter
+    ///     },
+    ///     CircuitBreaker = new CircuitBreakerOptions
+    ///     {
+    ///         FailureThreshold = 5,
+    ///         BreakDuration = TimeSpan.FromSeconds(30)
+    ///     },
+    ///     HealthMonitoring = new HealthMonitoringOptions
+    ///     {
+    ///         Enabled = true,
+    ///         CheckInterval = TimeSpan.FromMinutes(1),
+    ///         AutoReconnect = true
+    ///     }
+    /// };
+    /// 
+    /// var connection = new RedisConnection(logger, Options.Create(options));
+    /// var db = await connection.GetDatabaseAsync();
+    /// </code>
+    /// </remarks>
     internal class RedisConnection : IDisposable
     {
         private readonly ILogger<RedisConnection> _logger;
@@ -57,13 +121,42 @@ namespace RedisKit.Services
         }
 
         /// <summary>
-        /// Gets the current connection health status
+        /// Gets the current connection health status.
         /// </summary>
+        /// <returns>
+        /// A snapshot of the current health status including:
+        /// - Connection state (healthy/unhealthy)
+        /// - Last check time
+        /// - Response time
+        /// - Circuit breaker state
+        /// - Failure statistics
+        /// </returns>
+        /// <remarks>
+        /// This method returns a snapshot and is safe to call frequently.
+        /// Use this for monitoring dashboards and health endpoints.
+        /// </remarks>
         public ConnectionHealthStatus GetHealthStatus() => _healthStatus;
 
         /// <summary>
-        /// Gets the Redis connection multiplexer with advanced retry and circuit breaker
+        /// Gets the Redis connection multiplexer with advanced retry and circuit breaker protection.
         /// </summary>
+        /// <returns>
+        /// A connected ConnectionMultiplexer instance ready for use.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">Thrown when the connection has been disposed.</exception>
+        /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is open due to failures.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when connection cannot be established after all retries.</exception>
+        /// <remarks>
+        /// This method implements the following behavior:
+        /// 1. Checks circuit breaker state before attempting connection
+        /// 2. Returns existing connection if healthy
+        /// 3. Uses semaphore locking for thread-safe connection creation
+        /// 4. Implements retry logic with configurable backoff
+        /// 5. Records success/failure metrics for circuit breaker
+        /// 6. Sets up event handlers for connection monitoring
+        /// 
+        /// The method is idempotent and safe to call concurrently.
+        /// </remarks>
         public async Task<ConnectionMultiplexer> GetConnection()
         {
             if (_disposed)
@@ -313,8 +406,17 @@ namespace RedisKit.Services
         }
 
         /// <summary>
-        /// Gets the Redis database asynchronously
+        /// Gets the Redis database instance asynchronously.
         /// </summary>
+        /// <returns>
+        /// An IDatabaseAsync instance for executing Redis commands.
+        /// </returns>
+        /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+        /// <remarks>
+        /// This method ensures a healthy connection before returning the database instance.
+        /// The returned database uses the default database index (0) unless configured otherwise.
+        /// </remarks>
         public async Task<IDatabaseAsync> GetDatabaseAsync()
         {
             var connection = await GetConnection();
@@ -322,8 +424,17 @@ namespace RedisKit.Services
         }
 
         /// <summary>
-        /// Gets the Redis subscriber
+        /// Gets the Redis subscriber for pub/sub operations.
         /// </summary>
+        /// <returns>
+        /// An ISubscriber instance for pub/sub operations.
+        /// </returns>
+        /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+        /// <remarks>
+        /// The subscriber is used for pub/sub messaging patterns.
+        /// Multiple calls return the same subscriber instance from the underlying connection.
+        /// </remarks>
         public async Task<ISubscriber> GetSubscriberAsync()
         {
             var connection = await GetConnection();
@@ -331,16 +442,40 @@ namespace RedisKit.Services
         }
 
         /// <summary>
-        /// Gets the underlying ConnectionMultiplexer
+        /// Gets the underlying ConnectionMultiplexer instance.
         /// </summary>
+        /// <returns>
+        /// The IConnectionMultiplexer instance for advanced operations.
+        /// </returns>
+        /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+        /// <remarks>
+        /// Use this method when you need direct access to ConnectionMultiplexer features
+        /// not exposed through the higher-level abstractions.
+        /// The returned instance should not be disposed by the caller.
+        /// </remarks>
         public async Task<IConnectionMultiplexer> GetMultiplexerAsync()
         {
             return await GetConnection();
         }
 
         /// <summary>
-        /// Manually triggers a health check
+        /// Manually triggers a health check and returns the updated status.
         /// </summary>
+        /// <returns>
+        /// The updated ConnectionHealthStatus after performing the health check.
+        /// </returns>
+        /// <remarks>
+        /// This method performs a PING command to verify connectivity.
+        /// Use this for on-demand health verification or custom monitoring.
+        /// The method updates internal health metrics and circuit breaker state.
+        /// 
+        /// Health check includes:
+        /// - Connection state verification
+        /// - PING command execution
+        /// - Response time measurement
+        /// - Health status update
+        /// </remarks>
         public async Task<ConnectionHealthStatus> CheckHealthAsync()
         {
             try
@@ -370,8 +505,17 @@ namespace RedisKit.Services
         }
 
         /// <summary>
-        /// Resets the circuit breaker
+        /// Resets the circuit breaker to closed state, allowing connections to proceed.
         /// </summary>
+        /// <returns>A task representing the asynchronous reset operation.</returns>
+        /// <remarks>
+        /// Use this method to manually recover from circuit breaker open state.
+        /// This is useful when you know the underlying issue has been resolved.
+        /// The circuit breaker will return to closed state and reset all failure counters.
+        /// 
+        /// Warning: Only reset the circuit breaker when you're confident the issue is resolved,
+        /// otherwise it may immediately open again due to continued failures.
+        /// </remarks>
         public async Task ResetCircuitBreakerAsync()
         {
             await _circuitBreaker.ResetAsync();
