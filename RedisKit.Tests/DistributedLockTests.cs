@@ -48,13 +48,12 @@ namespace RedisKit.Tests
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(true);
+                .ReturnsAsync(RedisResult.Create(1));
 
             // Act
             var lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry);
@@ -73,13 +72,12 @@ namespace RedisKit.Tests
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(false);
+                .ReturnsAsync(RedisResult.Create(0));
 
             // Act
             var lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry);
@@ -98,16 +96,15 @@ namespace RedisKit.Tests
             var retry = TimeSpan.FromMilliseconds(100);
             var attempts = 0;
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
                 .ReturnsAsync(() =>
                 {
                     attempts++;
-                    return attempts == 3; // Succeed on third attempt
+                    return RedisResult.Create(attempts == 3 ? 1 : 0); // Succeed on third attempt
                 });
 
             // Act
@@ -128,13 +125,12 @@ namespace RedisKit.Tests
             var wait = TimeSpan.FromMilliseconds(500);
             var retry = TimeSpan.FromMilliseconds(100);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(false);
+                .ReturnsAsync(RedisResult.Create(0));
 
             // Act
             var startTime = DateTime.UtcNow;
@@ -192,13 +188,12 @@ namespace RedisKit.Tests
             var expiry = TimeSpan.FromSeconds(10);
             var newExpiry = TimeSpan.FromSeconds(30);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(true);
+                .ReturnsAsync(RedisResult.Create(1));
 
             _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
                     It.IsAny<string>(),
@@ -224,13 +219,12 @@ namespace RedisKit.Tests
             var resources = new[] { "resource1", "resource2", "resource3" };
             var expiry = TimeSpan.FromSeconds(10);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(true);
+                .ReturnsAsync(RedisResult.Create(1));
 
             // Act
             var multiLock = await _distributedLock.AcquireMultiLockAsync(resources, expiry);
@@ -252,24 +246,15 @@ namespace RedisKit.Tests
             var expiry = TimeSpan.FromSeconds(10);
             var callCount = 0;
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
-                    CommandFlags.DemandMaster))
-                .ReturnsAsync(() =>
-                {
-                    callCount++;
-                    return callCount != 2; // Fail on second resource
-                });
-
-            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+            // Setup for lock acquisition (different script for acquire vs release)
+            _mockDatabase.SetupSequence(db => db.ScriptEvaluateAsync(
                     It.IsAny<string>(),
                     It.IsAny<RedisKey[]>(),
                     It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(RedisResult.Create(1));
+                .ReturnsAsync(RedisResult.Create(1))    // First resource succeeds
+                .ReturnsAsync(RedisResult.Create(0))    // Second resource fails
+                .ReturnsAsync(RedisResult.Create(1));   // Release of first resource
 
             // Act
             var multiLock = await _distributedLock.AcquireMultiLockAsync(resources, expiry);
@@ -326,13 +311,12 @@ namespace RedisKit.Tests
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
             
-            _mockDatabase.Setup(db => db.StringSetAsync(
-                    It.IsAny<RedisKey>(),
-                    It.IsAny<RedisValue>(),
-                    It.IsAny<TimeSpan?>(),
-                    When.NotExists,
+            _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<RedisKey[]>(),
+                    It.IsAny<RedisValue[]>(),
                     CommandFlags.DemandMaster))
-                .ReturnsAsync(true);
+                .ReturnsAsync(RedisResult.Create(1));
 
             _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
                     It.IsAny<string>(),
