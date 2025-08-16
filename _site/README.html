@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>RedisKit | RedisKit </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="RedisKit | RedisKit ">
+      
+      
+      <link rel="icon" href="images/favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/ersintarhan/RedisKit/blob/main/README.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="images/logo.png" alt="RedisKit">
+            RedisKit
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="rediskit">RedisKit</h1>
+
+<p>A production-ready, enterprise-grade Redis library for .NET 9 with advanced caching, pub/sub, and streaming features.</p>
+<h2 id="-features">🚀 Features</h2>
+<h3 id="core-features">Core Features</h3>
+<ul>
+<li><strong>Caching</strong>: Generic Get, Set, Delete operations with TTL support</li>
+<li><strong>Batch Operations</strong>: GetMany and SetMany for improved performance</li>
+<li><strong>Key Prefixing</strong>: Support for cache key prefixes</li>
+<li><strong>Pub/Sub</strong>: Type-safe publishing and subscribing with advanced pattern matching</li>
+<li><strong>Streaming</strong>: Redis Streams support with consumer groups and retry mechanisms</li>
+<li><strong>Multiple Serializers</strong>: JSON, MessagePack support</li>
+<li><strong>Dependency Injection</strong>: Full support with .NET DI container</li>
+<li><strong>High Performance Logging</strong>: Source generator based logging with EventId support</li>
+<li><strong>Async/Await</strong>: Full async/await support with CancellationToken</li>
+</ul>
+<h3 id="enterprise-features">Enterprise Features</h3>
+<ul>
+<li><strong>🔄 Circuit Breaker Pattern</strong>: Automatic failure detection and recovery</li>
+<li><strong>📈 Advanced Retry Strategies</strong>: Multiple backoff strategies (Exponential, Decorrelated Jitter, etc.)</li>
+<li><strong>🏥 Health Monitoring</strong>: Automatic health checks with auto-reconnection</li>
+<li><strong>🎯 Pattern Matching</strong>: Redis glob pattern support (<code>*</code>, <code>?</code>, <code>[abc]</code>, <code>[^abc]</code>, <code>[a-z]</code>)</li>
+<li><strong>🧹 Memory Leak Prevention</strong>: Automatic cleanup of inactive handlers</li>
+<li><strong>📊 Statistics &amp; Monitoring</strong>: Built-in metrics for subscriptions and connections</li>
+<li><strong>⚡ High Performance</strong>: Optimized with concurrent collections and minimal allocations</li>
+<li><strong>🔐 Thread Safety</strong>: All operations are thread-safe</li>
+</ul>
+<h2 id="-installation">📦 Installation</h2>
+<p>Install the package via NuGet:</p>
+<pre><code class="lang-bash">dotnet add package RedisKit
+</code></pre>
+<h2 id="-quick-start">🎯 Quick Start</h2>
+<h3 id="minimal-setup">Minimal Setup</h3>
+<pre><code class="lang-csharp">using RedisKit.Extensions;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Redis services with minimal configuration
+builder.Services.AddRedisServices(options =&gt;
+{
+    options.ConnectionString = &quot;localhost:6379&quot;;
+});
+
+var app = builder.Build();
+
+// Use in your controllers or services
+app.MapGet(&quot;/cache/{key}&quot;, async (string key, IRedisCacheService cache) =&gt;
+{
+    var value = await cache.GetAsync&lt;string&gt;(key);
+    return value ?? &quot;Not found&quot;;
+});
+
+app.Run();
+</code></pre>
+<h2 id="-getting-started---hello-redis">👶 Getting Started - Hello Redis!</h2>
+<h3 id="your-first-redis-cache">Your First Redis Cache</h3>
+<pre><code class="lang-csharp">using RedisKit.Extensions;
+using RedisKit.Interfaces;
+
+// 1. Setup - Add to your Program.cs
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRedisServices(options =&gt;
+{
+    options.ConnectionString = &quot;localhost:6379&quot;;
+});
+
+var app = builder.Build();
+
+// 2. Simple String Cache
+app.MapPost(&quot;/hello/{name}&quot;, async (string name, IRedisCacheService cache) =&gt;
+{
+    // Store a simple string
+    await cache.SetAsync($&quot;greeting:{name}&quot;, $&quot;Hello, {name}!&quot;, TimeSpan.FromMinutes(5));
+    return $&quot;Greeting saved for {name}&quot;;
+});
+
+app.MapGet(&quot;/hello/{name}&quot;, async (string name, IRedisCacheService cache) =&gt;
+{
+    // Retrieve the string
+    var greeting = await cache.GetAsync&lt;string&gt;($&quot;greeting:{name}&quot;);
+    return greeting ?? &quot;No greeting found&quot;;
+});
+
+app.Run();
+</code></pre>
+<h3 id="counter-example---increment-values">Counter Example - Increment Values</h3>
+<pre><code class="lang-csharp">public class CounterService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public CounterService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    public async Task&lt;int&gt; IncrementVisitCountAsync(string page)
+    {
+        var key = $&quot;visits:{page}&quot;;
+        
+        // Get current count
+        var currentCount = await _cache.GetAsync&lt;int?&gt;(key) ?? 0;
+        
+        // Increment and save
+        currentCount++;
+        await _cache.SetAsync(key, currentCount, TimeSpan.FromDays(30));
+        
+        return currentCount;
+    }
+}
+</code></pre>
+<h3 id="simple-user-session">Simple User Session</h3>
+<pre><code class="lang-csharp">public class SessionService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public SessionService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    // Store user session
+    public async Task CreateSessionAsync(string sessionId, string userId, string userName)
+    {
+        var session = new UserSession 
+        { 
+            UserId = userId, 
+            UserName = userName, 
+            LoginTime = DateTime.UtcNow 
+        };
+        
+        // Session expires in 20 minutes
+        await _cache.SetAsync($&quot;session:{sessionId}&quot;, session, TimeSpan.FromMinutes(20));
+    }
+    
+    // Get user session
+    public async Task&lt;UserSession?&gt; GetSessionAsync(string sessionId)
+    {
+        return await _cache.GetAsync&lt;UserSession&gt;($&quot;session:{sessionId}&quot;);
+    }
+    
+    // Extend session
+    public async Task ExtendSessionAsync(string sessionId)
+    {
+        var session = await GetSessionAsync(sessionId);
+        if (session != null)
+        {
+            // Reset expiration to 20 minutes
+            await _cache.ExpireAsync($&quot;session:{sessionId}&quot;, TimeSpan.FromMinutes(20));
+        }
+    }
+}
+
+public class UserSession
+{
+    public string UserId { get; set; }
+    public string UserName { get; set; }
+    public DateTime LoginTime { get; set; }
+}
+</code></pre>
+<h2 id="-configuration">🔧 Configuration</h2>
+<h3 id="basic-configuration">Basic Configuration</h3>
+<pre><code class="lang-csharp">services.AddRedisServices(options =&gt;
+{
+    options.ConnectionString = &quot;localhost:6379&quot;;
+    options.DefaultTtl = TimeSpan.FromHours(1);
+    options.CacheKeyPrefix = &quot;myapp:&quot;;
+    options.Serializer = SerializerType.MessagePack; // or JSON
+});
+</code></pre>
+<h3 id="advanced-configuration">Advanced Configuration</h3>
+<pre><code class="lang-csharp">services.AddRedisServices(options =&gt;
+{
+    options.ConnectionString = &quot;localhost:6379&quot;;
+    options.DefaultTtl = TimeSpan.FromHours(1);
+    options.CacheKeyPrefix = &quot;myapp:&quot;;
+    
+    // Retry Configuration
+    options.RetryConfiguration = new RetryConfiguration
+    {
+        MaxAttempts = 3,
+        Strategy = BackoffStrategy.ExponentialWithJitter,
+        InitialDelay = TimeSpan.FromSeconds(1),
+        MaxDelay = TimeSpan.FromSeconds(30),
+        JitterFactor = 0.2 // 20% jitter
+    };
+    
+    // Circuit Breaker
+    options.CircuitBreaker = new CircuitBreakerSettings
+    {
+        Enabled = true,
+        FailureThreshold = 5,
+        BreakDuration = TimeSpan.FromSeconds(30),
+        SuccessThreshold = 2
+    };
+    
+    // Health Monitoring
+    options.HealthMonitoring = new HealthMonitoringSettings
+    {
+        Enabled = true,
+        CheckInterval = TimeSpan.FromSeconds(30),
+        AutoReconnect = true,
+        ConsecutiveFailuresThreshold = 3
+    };
+    
+    // Connection Timeouts
+    options.TimeoutSettings = new ConnectionTimeoutSettings
+    {
+        ConnectTimeout = TimeSpan.FromSeconds(5),
+        SyncTimeout = TimeSpan.FromSeconds(5),
+        AsyncTimeout = TimeSpan.FromSeconds(5),
+        KeepAlive = TimeSpan.FromSeconds(60)
+    };
+});
+</code></pre>
+<h2 id="-basic-usage-examples">📚 Basic Usage Examples</h2>
+<h3 id="simple-caching">Simple Caching</h3>
+<pre><code class="lang-csharp">public class ProductService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public ProductService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    public async Task&lt;Product?&gt; GetProductAsync(int productId)
+    {
+        var cacheKey = $&quot;product:{productId}&quot;;
+        
+        // Try to get from cache
+        var cached = await _cache.GetAsync&lt;Product&gt;(cacheKey);
+        if (cached != null)
+            return cached;
+        
+        // Load from database
+        var product = await LoadFromDatabaseAsync(productId);
+        
+        // Cache for 1 hour
+        if (product != null)
+        {
+            await _cache.SetAsync(cacheKey, product, TimeSpan.FromHours(1));
+        }
+        
+        return product;
+    }
+    
+    public async Task InvalidateProductAsync(int productId)
+    {
+        await _cache.DeleteAsync($&quot;product:{productId}&quot;);
+    }
+}
+</code></pre>
+<h3 id="basic-pubsub">Basic Pub/Sub</h3>
+<pre><code class="lang-csharp">public class NotificationService
+{
+    private readonly IRedisPubSubService _pubSub;
+    private readonly ILogger&lt;NotificationService&gt; _logger;
+    
+    public NotificationService(IRedisPubSubService pubSub, ILogger&lt;NotificationService&gt; logger)
+    {
+        _pubSub = pubSub;
+        _logger = logger;
+    }
+    
+    // Publisher
+    public async Task SendNotificationAsync(string userId, string message)
+    {
+        var notification = new UserNotification
+        {
+            UserId = userId,
+            Message = message,
+            Timestamp = DateTime.UtcNow
+        };
+        
+        await _pubSub.PublishAsync($&quot;notifications:{userId}&quot;, notification);
+    }
+    
+    // Subscriber
+    public async Task StartListeningAsync(string userId)
+    {
+        await _pubSub.SubscribeAsync&lt;UserNotification&gt;(
+            $&quot;notifications:{userId}&quot;,
+            async (notification, ct) =&gt;
+            {
+                _logger.LogInformation(&quot;Received notification for user {UserId}: {Message}&quot;,
+                    notification.UserId, notification.Message);
+                
+                // Process notification
+                await ProcessNotificationAsync(notification);
+            });
+    }
+}
+
+public class UserNotification
+{
+    public string UserId { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public DateTime Timestamp { get; set; }
+}
+</code></pre>
+<h3 id="batch-operations">Batch Operations</h3>
+<pre><code class="lang-csharp">public class BulkOperationService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public BulkOperationService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    public async Task&lt;Dictionary&lt;int, Product?&gt;&gt; GetProductsAsync(int[] productIds)
+    {
+        // Generate cache keys
+        var keys = productIds.Select(id =&gt; $&quot;product:{id}&quot;);
+        
+        // Get all products in one operation
+        var cached = await _cache.GetManyAsync&lt;Product&gt;(keys);
+        
+        var result = new Dictionary&lt;int, Product?&gt;();
+        var missingIds = new List&lt;int&gt;();
+        
+        // Check what we found in cache
+        foreach (var productId in productIds)
+        {
+            var key = $&quot;product:{productId}&quot;;
+            if (cached.TryGetValue(key, out var product) &amp;&amp; product != null)
+            {
+                result[productId] = product;
+            }
+            else
+            {
+                missingIds.Add(productId);
+            }
+        }
+        
+        // Load missing from database
+        if (missingIds.Any())
+        {
+            var products = await LoadProductsFromDatabaseAsync(missingIds);
+            
+            // Cache them
+            var toCache = new Dictionary&lt;string, Product&gt;();
+            foreach (var product in products)
+            {
+                result[product.Id] = product;
+                toCache[$&quot;product:{product.Id}&quot;] = product;
+            }
+            
+            await _cache.SetManyAsync(toCache, TimeSpan.FromHours(1));
+        }
+        
+        return result;
+    }
+}
+</code></pre>
+<h2 id="-advanced-usage-examples">🚀 Advanced Usage Examples</h2>
+<h3 id="pattern-based-subscriptions">Pattern-Based Subscriptions</h3>
+<pre><code class="lang-csharp">public class GameEventService
+{
+    private readonly IRedisPubSubService _pubSub;
+    private readonly ILogger&lt;GameEventService&gt; _logger;
+    private SubscriptionToken? _token;
+    
+    public GameEventService(IRedisPubSubService pubSub, ILogger&lt;GameEventService&gt; logger)
+    {
+        _pubSub = pubSub;
+        _logger = logger;
+    }
+    
+    public async Task StartMonitoringAsync()
+    {
+        // Subscribe to all game events using pattern
+        _token = await _pubSub.SubscribePatternAsync&lt;GameEvent&gt;(
+            &quot;game:*:events&quot;,
+            async (gameEvent, ct) =&gt;
+            {
+                _logger.LogInformation(&quot;Game {GameId} - Event: {EventType}&quot;, 
+                    gameEvent.GameId, gameEvent.EventType);
+                
+                switch (gameEvent.EventType)
+                {
+                    case &quot;player_joined&quot;:
+                        await HandlePlayerJoinedAsync(gameEvent);
+                        break;
+                    case &quot;game_started&quot;:
+                        await HandleGameStartedAsync(gameEvent);
+                        break;
+                    case &quot;game_ended&quot;:
+                        await HandleGameEndedAsync(gameEvent);
+                        break;
+                }
+            });
+            
+        // You can also subscribe with channel metadata
+        await _pubSub.SubscribePatternWithChannelAsync&lt;GameEvent&gt;(
+            &quot;game:*:critical&quot;,
+            async (gameEvent, channel, ct) =&gt;
+            {
+                // Extract game ID from channel name
+                var parts = channel.Split(':');
+                var gameId = parts[1];
+                
+                _logger.LogCritical(&quot;Critical event in game {GameId}: {Message}&quot;, 
+                    gameId, gameEvent.Message);
+                    
+                await SendAlertAsync(gameId, gameEvent);
+            });
+    }
+    
+    public async Task StopMonitoringAsync()
+    {
+        if (_token != null)
+        {
+            await _token.UnsubscribeAsync();
+        }
+    }
+}
+</code></pre>
+<h3 id="redis-streams-with-consumer-groups">Redis Streams with Consumer Groups</h3>
+<pre><code class="lang-csharp">public class OrderProcessingService : BackgroundService
+{
+    private readonly IRedisStreamService _streams;
+    private readonly ILogger&lt;OrderProcessingService&gt; _logger;
+    
+    public OrderProcessingService(IRedisStreamService streams, ILogger&lt;OrderProcessingService&gt; logger)
+    {
+        _streams = streams;
+        _logger = logger;
+    }
+    
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // Create consumer group
+        await _streams.CreateConsumerGroupAsync(&quot;orders&quot;, &quot;order-processors&quot;);
+        
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                // Read messages from stream
+                var messages = await _streams.ReadGroupAsync&lt;Order&gt;(
+                    &quot;orders&quot;,
+                    &quot;order-processors&quot;,
+                    &quot;processor-1&quot;,
+                    count: 10,
+                    cancellationToken: stoppingToken);
+                
+                foreach (var message in messages)
+                {
+                    try
+                    {
+                        await ProcessOrderAsync(message.Data);
+                        
+                        // Acknowledge message
+                        await _streams.AcknowledgeAsync(&quot;orders&quot;, &quot;order-processors&quot;, message.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, &quot;Failed to process order {OrderId}&quot;, message.Data?.OrderId);
+                        // Message will be retried
+                    }
+                }
+                
+                // Process pending messages (retry failed ones)
+                var retryResult = await _streams.RetryPendingMessagesAsync&lt;Order&gt;(
+                    &quot;orders&quot;,
+                    &quot;order-processors&quot;,
+                    &quot;processor-1&quot;,
+                    async (order) =&gt;
+                    {
+                        await ProcessOrderAsync(order);
+                        return true; // Success
+                    },
+                    cancellationToken: stoppingToken);
+                
+                if (retryResult.FailureCount &gt; 0)
+                {
+                    _logger.LogWarning(&quot;Failed to process {Count} orders, moved to DLQ&quot;, 
+                        retryResult.DeadLetterCount);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, &quot;Error in order processing loop&quot;);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            }
+        }
+    }
+    
+    private async Task ProcessOrderAsync(Order? order)
+    {
+        if (order == null) return;
+        
+        _logger.LogInformation(&quot;Processing order {OrderId}&quot;, order.OrderId);
+        
+        // Process the order
+        await Task.Delay(100); // Simulate work
+        
+        // Publish completion event
+        await _pubSub.PublishAsync($&quot;orders:{order.OrderId}:completed&quot;, new OrderCompleted
+        {
+            OrderId = order.OrderId,
+            CompletedAt = DateTime.UtcNow
+        });
+    }
+}
+</code></pre>
+<h3 id="cache-aside-pattern-with-statistics">Cache-Aside Pattern with Statistics</h3>
+<pre><code class="lang-csharp">public class CachedRepository&lt;T&gt; where T : class, IEntity
+{
+    private readonly IRedisCacheService _cache;
+    private readonly ILogger&lt;CachedRepository&lt;T&gt;&gt; _logger;
+    private readonly string _entityName;
+    private long _hits = 0;
+    private long _misses = 0;
+    
+    public CachedRepository(IRedisCacheService cache, ILogger&lt;CachedRepository&lt;T&gt;&gt; logger)
+    {
+        _cache = cache;
+        _logger = logger;
+        _entityName = typeof(T).Name.ToLower();
+    }
+    
+    public async Task&lt;T?&gt; GetByIdAsync(string id, Func&lt;Task&lt;T?&gt;&gt; dataLoader)
+    {
+        var key = $&quot;{_entityName}:{id}&quot;;
+        
+        // Try cache first
+        var cached = await _cache.GetAsync&lt;T&gt;(key);
+        if (cached != null)
+        {
+            Interlocked.Increment(ref _hits);
+            return cached;
+        }
+        
+        Interlocked.Increment(ref _misses);
+        
+        // Load from source
+        var entity = await dataLoader();
+        if (entity != null)
+        {
+            // Cache with sliding expiration
+            await _cache.SetAsync(key, entity, TimeSpan.FromMinutes(15));
+        }
+        
+        return entity;
+    }
+    
+    public async Task&lt;T&gt; GetOrCreateAsync(string id, Func&lt;Task&lt;T&gt;&gt; factory)
+    {
+        var key = $&quot;{_entityName}:{id}&quot;;
+        
+        var cached = await _cache.GetAsync&lt;T&gt;(key);
+        if (cached != null)
+        {
+            Interlocked.Increment(ref _hits);
+            return cached;
+        }
+        
+        Interlocked.Increment(ref _misses);
+        
+        // Use distributed lock to prevent cache stampede
+        var lockKey = $&quot;lock:{key}&quot;;
+        var lockAcquired = await _cache.SetAsync(
+            lockKey, 
+            &quot;locked&quot;, 
+            TimeSpan.FromSeconds(30), 
+            when: When.NotExists);
+        
+        if (lockAcquired)
+        {
+            try
+            {
+                // Double-check after acquiring lock
+                cached = await _cache.GetAsync&lt;T&gt;(key);
+                if (cached != null)
+                    return cached;
+                
+                // Create new entity
+                var entity = await factory();
+                await _cache.SetAsync(key, entity, TimeSpan.FromMinutes(15));
+                return entity;
+            }
+            finally
+            {
+                await _cache.DeleteAsync(lockKey);
+            }
+        }
+        else
+        {
+            // Wait for other thread to populate cache
+            await Task.Delay(100);
+            return await GetByIdAsync(id, factory) ?? await factory();
+        }
+    }
+    
+    public CacheStatistics GetStatistics()
+    {
+        var total = _hits + _misses;
+        return new CacheStatistics
+        {
+            Hits = _hits,
+            Misses = _misses,
+            HitRate = total &gt; 0 ? (double)_hits / total : 0
+        };
+    }
+}
+
+public interface IEntity
+{
+    string Id { get; }
+}
+
+public class CacheStatistics
+{
+    public long Hits { get; set; }
+    public long Misses { get; set; }
+    public double HitRate { get; set; }
+}
+</code></pre>
+<h2 id="-custom-serializer-implementation">🎨 Custom Serializer Implementation</h2>
+<h3 id="creating-a-custom-serializer">Creating a Custom Serializer</h3>
+<pre><code class="lang-csharp">using RedisKit.Serialization;
+using ProtoBuf;
+
+// Custom Protobuf serializer
+public class ProtobufRedisSerializer : IRedisSerializer
+{
+    public string Name =&gt; &quot;Protobuf&quot;;
+    
+    public Task&lt;byte[]&gt; SerializeAsync&lt;T&gt;(T value, CancellationToken cancellationToken = default) 
+        where T : class
+    {
+        if (value == null)
+            return Task.FromResult(Array.Empty&lt;byte&gt;());
+        
+        using var stream = new MemoryStream();
+        Serializer.Serialize(stream, value);
+        return Task.FromResult(stream.ToArray());
+    }
+    
+    public Task&lt;T?&gt; DeserializeAsync&lt;T&gt;(byte[] data, CancellationToken cancellationToken = default) 
+        where T : class
+    {
+        if (data == null || data.Length == 0)
+            return Task.FromResult&lt;T?&gt;(null);
+        
+        using var stream = new MemoryStream(data);
+        var result = Serializer.Deserialize&lt;T&gt;(stream);
+        return Task.FromResult&lt;T?&gt;(result);
+    }
+    
+    public Task&lt;object?&gt; DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default)
+    {
+        if (data == null || data.Length == 0)
+            return Task.FromResult&lt;object?&gt;(null);
+        
+        using var stream = new MemoryStream(data);
+        var result = Serializer.Deserialize(type, stream);
+        return Task.FromResult(result);
+    }
+}
+
+// Register custom serializer
+public class CustomSerializerFactory : IRedisSerializerFactory
+{
+    public IRedisSerializer Create(SerializerType type)
+    {
+        return type switch
+        {
+            SerializerType.Custom =&gt; new ProtobufRedisSerializer(),
+            _ =&gt; RedisSerializerFactory.Create(type)
+        };
+    }
+}
+</code></pre>
+<h3 id="using-custom-serializer">Using Custom Serializer</h3>
+<pre><code class="lang-csharp">// Option 1: Register globally
+services.AddRedisServices(options =&gt;
+{
+    options.ConnectionString = &quot;localhost:6379&quot;;
+    options.Serializer = SerializerType.Custom;
+    options.CustomSerializerFactory = new CustomSerializerFactory();
+});
+
+// Option 2: Use for specific service
+services.AddSingleton&lt;IRedisSerializer, ProtobufRedisSerializer&gt;();
+services.AddSingleton&lt;IRedisCacheService&gt;(provider =&gt;
+{
+    var database = provider.GetRequiredService&lt;IDatabase&gt;();
+    var logger = provider.GetRequiredService&lt;ILogger&lt;RedisCacheService&gt;&gt;();
+    var options = provider.GetRequiredService&lt;IOptions&lt;RedisOptions&gt;&gt;();
+    var serializer = provider.GetRequiredService&lt;ProtobufRedisSerializer&gt;();
+    
+    return new RedisCacheService(database, logger, options.Value, serializer);
+});
+</code></pre>
+<h3 id="compression-serializer-wrapper">Compression Serializer Wrapper</h3>
+<pre><code class="lang-csharp">using System.IO.Compression;
+
+public class CompressedSerializer : IRedisSerializer
+{
+    private readonly IRedisSerializer _innerSerializer;
+    private readonly CompressionLevel _compressionLevel;
+    
+    public CompressedSerializer(
+        IRedisSerializer innerSerializer, 
+        CompressionLevel compressionLevel = CompressionLevel.Optimal)
+    {
+        _innerSerializer = innerSerializer;
+        _compressionLevel = compressionLevel;
+    }
+    
+    public string Name =&gt; $&quot;Compressed_{_innerSerializer.Name}&quot;;
+    
+    public async Task&lt;byte[]&gt; SerializeAsync&lt;T&gt;(T value, CancellationToken cancellationToken = default) 
+        where T : class
+    {
+        var data = await _innerSerializer.SerializeAsync(value, cancellationToken);
+        
+        using var output = new MemoryStream();
+        using (var gzip = new GZipStream(output, _compressionLevel))
+        {
+            await gzip.WriteAsync(data, 0, data.Length, cancellationToken);
+        }
+        
+        return output.ToArray();
+    }
+    
+    public async Task&lt;T?&gt; DeserializeAsync&lt;T&gt;(byte[] data, CancellationToken cancellationToken = default) 
+        where T : class
+    {
+        using var input = new MemoryStream(data);
+        using var gzip = new GZipStream(input, CompressionMode.Decompress);
+        using var output = new MemoryStream();
+        
+        await gzip.CopyToAsync(output, cancellationToken);
+        var decompressed = output.ToArray();
+        
+        return await _innerSerializer.DeserializeAsync&lt;T&gt;(decompressed, cancellationToken);
+    }
+    
+    public async Task&lt;object?&gt; DeserializeAsync(
+        byte[] data, 
+        Type type, 
+        CancellationToken cancellationToken = default)
+    {
+        using var input = new MemoryStream(data);
+        using var gzip = new GZipStream(input, CompressionMode.Decompress);
+        using var output = new MemoryStream();
+        
+        await gzip.CopyToAsync(output, cancellationToken);
+        var decompressed = output.ToArray();
+        
+        return await _innerSerializer.DeserializeAsync(decompressed, type, cancellationToken);
+    }
+}
+
+// Usage
+services.AddSingleton&lt;IRedisSerializer&gt;(provider =&gt;
+{
+    var innerSerializer = RedisSerializerFactory.Create(SerializerType.MessagePack);
+    return new CompressedSerializer(innerSerializer, CompressionLevel.Fastest);
+});
+</code></pre>
+<h2 id="-dependency-injection">🏗️ Dependency Injection</h2>
+<pre><code class="lang-csharp">// In your Program.cs or Startup.cs:
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Redis services with configuration from appsettings.json
+builder.Services.Configure&lt;RedisOptions&gt;(
+    builder.Configuration.GetSection(&quot;Redis&quot;));
+
+builder.Services.AddRedisServices(options =&gt;
+{
+    builder.Configuration.GetSection(&quot;Redis&quot;).Bind(options);
+});
+
+// In your services:
+public class UserService
+{
+    private readonly IRedisCacheService _cache;
+    private readonly IRedisPubSubService _pubSub;
+    private readonly IRedisStreamService _stream;
+    private readonly ILogger&lt;UserService&gt; _logger;
+
+    public UserService(
+        IRedisCacheService cache, 
+        IRedisPubSubService pubSub,
+        IRedisStreamService stream,
+        ILogger&lt;UserService&gt; logger)
+    {
+        _cache = cache;
+        _pubSub = pubSub;
+        _stream = stream;
+        _logger = logger;
+    }
+
+    public async Task&lt;User?&gt; GetUserAsync(string userId)
+    {
+        // Try cache first
+        var cached = await _cache.GetAsync&lt;User&gt;($&quot;user:{userId}&quot;);
+        if (cached != null)
+            return cached;
+
+        // Load from database
+        var user = await LoadFromDatabaseAsync(userId);
+        
+        // Cache for future requests
+        if (user != null)
+        {
+            await _cache.SetAsync($&quot;user:{userId}&quot;, user, TimeSpan.FromHours(1));
+            
+            // Publish update event
+            await _pubSub.PublishAsync(&quot;user-updates&quot;, new UserLoadedEvent 
+            { 
+                UserId = userId 
+            });
+        }
+
+        return user;
+    }
+}
+</code></pre>
+<h2 id="-backoff-strategies">🎯 Backoff Strategies</h2>
+<p>RedisKit supports multiple backoff strategies for retry operations:</p>
+<ul>
+<li><strong>Fixed</strong>: Constant delay between retries</li>
+<li><strong>Linear</strong>: Linear increase in delay</li>
+<li><strong>Exponential</strong>: Exponential increase in delay</li>
+<li><strong>ExponentialWithJitter</strong>: Exponential with random jitter to prevent thundering herd</li>
+<li><strong>DecorrelatedJitter</strong>: AWS-recommended strategy with decorrelated jitter</li>
+</ul>
+<pre><code class="lang-csharp">options.RetryConfiguration = new RetryConfiguration
+{
+    Strategy = BackoffStrategy.DecorrelatedJitter,
+    MaxAttempts = 5,
+    InitialDelay = TimeSpan.FromMilliseconds(100),
+    MaxDelay = TimeSpan.FromSeconds(10)
+};
+</code></pre>
+<h2 id="-performance-tips--best-practices">🚀 Performance Tips &amp; Best Practices</h2>
+<h3 id="1-connection-management">1. <strong>Connection Management</strong></h3>
+<pre><code class="lang-csharp">// ❌ DON'T: Create new connections for each operation
+public async Task BadExample()
+{
+    var connection = await ConnectionMultiplexer.ConnectAsync(&quot;localhost&quot;);
+    var db = connection.GetDatabase();
+    await db.StringSetAsync(&quot;key&quot;, &quot;value&quot;);
+    connection.Dispose(); // Connection closed!
+}
+
+// ✅ DO: Use dependency injection and connection pooling
+public class GoodExample
+{
+    private readonly IRedisCacheService _cache; // Injected, pooled connection
+    
+    public async Task SetValueAsync()
+    {
+        await _cache.SetAsync(&quot;key&quot;, &quot;value&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-batch-operations-for-better-performance">2. <strong>Batch Operations for Better Performance</strong></h3>
+<pre><code class="lang-csharp">// ❌ DON'T: Multiple round trips
+public async Task SlowApproach(string[] userIds)
+{
+    var users = new List&lt;User&gt;();
+    foreach (var id in userIds)
+    {
+        var user = await _cache.GetAsync&lt;User&gt;($&quot;user:{id}&quot;);
+        if (user != null) users.Add(user);
+    }
+}
+
+// ✅ DO: Single batch operation
+public async Task FastApproach(string[] userIds)
+{
+    var keys = userIds.Select(id =&gt; $&quot;user:{id}&quot;);
+    var results = await _cache.GetManyAsync&lt;User&gt;(keys);
+    var users = results.Values.Where(u =&gt; u != null).ToList();
+}
+</code></pre>
+<h3 id="3-big-key-handling">3. <strong>Big Key Handling</strong></h3>
+<pre><code class="lang-csharp">// ❌ DON'T: Store huge objects as single keys
+public async Task BadBigKey()
+{
+    var hugeList = new List&lt;Item&gt;(1_000_000); // 1 million items!
+    await _cache.SetAsync(&quot;huge:list&quot;, hugeList); // This blocks Redis!
+}
+
+// ✅ DO: Split large datasets
+public async Task GoodBigKeyHandling()
+{
+    var items = GetLargeDataset();
+    var chunks = items.Chunk(1000); // Split into chunks of 1000
+    
+    var tasks = chunks.Select((chunk, index) =&gt; 
+        _cache.SetAsync($&quot;items:chunk:{index}&quot;, chunk.ToList(), TimeSpan.FromHours(1))
+    );
+    
+    await Task.WhenAll(tasks);
+}
+
+// ✅ DO: Use Redis Streams for large datasets
+public async Task StreamApproach(List&lt;Item&gt; items)
+{
+    foreach (var batch in items.Chunk(100))
+    {
+        foreach (var item in batch)
+        {
+            await _streamService.AddAsync(&quot;items:stream&quot;, item);
+        }
+    }
+}
+</code></pre>
+<h3 id="4-pipeline-usage">4. <strong>Pipeline Usage</strong></h3>
+<pre><code class="lang-csharp">// ❌ DON'T: Sequential operations
+public async Task SlowSequential()
+{
+    await _cache.SetAsync(&quot;key1&quot;, &quot;value1&quot;);
+    await _cache.SetAsync(&quot;key2&quot;, &quot;value2&quot;);
+    await _cache.SetAsync(&quot;key3&quot;, &quot;value3&quot;);
+    // 3 round trips to Redis
+}
+
+// ✅ DO: Use batch/pipeline operations
+public async Task FastPipeline()
+{
+    var items = new Dictionary&lt;string, string&gt;
+    {
+        [&quot;key1&quot;] = &quot;value1&quot;,
+        [&quot;key2&quot;] = &quot;value2&quot;,
+        [&quot;key3&quot;] = &quot;value3&quot;
+    };
+    
+    await _cache.SetManyAsync(items, TimeSpan.FromHours(1));
+    // Single round trip!
+}
+</code></pre>
+<h3 id="5-memory-optimization">5. <strong>Memory Optimization</strong></h3>
+<pre><code class="lang-csharp">// ✅ Use appropriate serializers
+services.AddRedisServices(options =&gt;
+{
+    // MessagePack: Fastest and smallest
+    options.Serializer = SerializerType.MessagePack;
+    
+    // JSON: Human readable, larger size
+    // options.Serializer = SerializerType.SystemTextJson;
+});
+
+// ✅ Compress large objects
+public class CompressedCacheService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public async Task SetCompressedAsync&lt;T&gt;(string key, T value) where T : class
+    {
+        if (value is string str &amp;&amp; str.Length &gt; 1000)
+        {
+            // Compress strings larger than 1KB
+            var compressed = Compress(str);
+            await _cache.SetAsync($&quot;{key}:compressed&quot;, compressed);
+        }
+        else
+        {
+            await _cache.SetAsync(key, value);
+        }
+    }
+}
+</code></pre>
+<h3 id="6-key-expiration-strategies">6. <strong>Key Expiration Strategies</strong></h3>
+<pre><code class="lang-csharp">// ✅ Use sliding expiration for frequently accessed data
+public async Task&lt;T?&gt; GetWithSlidingExpirationAsync&lt;T&gt;(string key) where T : class
+{
+    var value = await _cache.GetAsync&lt;T&gt;(key);
+    if (value != null)
+    {
+        // Reset expiration on each access
+        await _cache.ExpireAsync(key, TimeSpan.FromMinutes(30));
+    }
+    return value;
+}
+
+// ✅ Use absolute expiration for time-sensitive data
+public async Task SetDailyReportAsync(Report report)
+{
+    var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+    var ttl = tomorrow - DateTime.UtcNow;
+    
+    await _cache.SetAsync($&quot;report:{DateTime.UtcNow:yyyy-MM-dd}&quot;, report, ttl);
+}
+</code></pre>
+<h3 id="7-avoid-hot-keys">7. <strong>Avoid Hot Keys</strong></h3>
+<pre><code class="lang-csharp">// ❌ DON'T: Single key for global counter
+public async Task IncrementGlobalCounter()
+{
+    var count = await _cache.GetAsync&lt;int&gt;(&quot;global:counter&quot;);
+    await _cache.SetAsync(&quot;global:counter&quot;, count + 1);
+    // This key becomes a bottleneck!
+}
+
+// ✅ DO: Distribute load across multiple keys
+public async Task IncrementDistributedCounter()
+{
+    var shard = Random.Shared.Next(0, 10); // 10 shards
+    var key = $&quot;counter:shard:{shard}&quot;;
+    
+    var count = await _cache.GetAsync&lt;int&gt;(key);
+    await _cache.SetAsync(key, count + 1);
+}
+
+public async Task&lt;int&gt; GetTotalCount()
+{
+    var tasks = Enumerable.Range(0, 10)
+        .Select(i =&gt; _cache.GetAsync&lt;int&gt;($&quot;counter:shard:{i}&quot;));
+    
+    var counts = await Task.WhenAll(tasks);
+    return counts.Sum();
+}
+</code></pre>
+<h3 id="8-circuit-breaker-for-resilience">8. <strong>Circuit Breaker for Resilience</strong></h3>
+<pre><code class="lang-csharp">// ✅ Configure circuit breaker to prevent cascade failures
+services.AddRedisServices(options =&gt;
+{
+    options.CircuitBreaker = new CircuitBreakerSettings
+    {
+        Enabled = true,
+        FailureThreshold = 5,        // Open after 5 failures
+        BreakDuration = TimeSpan.FromSeconds(30),  // Stay open for 30s
+        SuccessThreshold = 2          // Need 2 successes to close
+    };
+});
+</code></pre>
+<h3 id="9-monitoring--metrics">9. <strong>Monitoring &amp; Metrics</strong></h3>
+<pre><code class="lang-csharp">// ✅ Track cache hit rates
+public class MetricsCacheService
+{
+    private readonly IRedisCacheService _cache;
+    private readonly IMetrics _metrics;
+    
+    public async Task&lt;T?&gt; GetWithMetricsAsync&lt;T&gt;(string key) where T : class
+    {
+        var value = await _cache.GetAsync&lt;T&gt;(key);
+        
+        if (value != null)
+            _metrics.Increment(&quot;cache.hits&quot;);
+        else
+            _metrics.Increment(&quot;cache.misses&quot;);
+            
+        return value;
+    }
+}
+</code></pre>
+<h3 id="10-pubsub-performance">10. <strong>Pub/Sub Performance</strong></h3>
+<pre><code class="lang-csharp">// ✅ Use pattern subscriptions wisely
+public class EfficientPubSub
+{
+    private readonly IRedisPubSubService _pubSub;
+    
+    public async Task SubscribeEfficiently()
+    {
+        // Instead of subscribing to many individual channels
+        // Use pattern subscription
+        await _pubSub.SubscribePatternAsync&lt;Event&gt;(
+            &quot;events:*&quot;,  // Single pattern subscription
+            async (evt, ct) =&gt; await ProcessEventAsync(evt, ct)
+        );
+    }
+}
+</code></pre>
+<h2 id="-performance-benchmarks">📊 Performance Benchmarks</h2>
+<h3 id="serializer-performance-comparison">Serializer Performance Comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>JSON (ns)</th>
+<th>MessagePack (ns)</th>
+<th>Speed Improvement</th>
+<th>Memory Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Small Object Serialize</strong></td>
+<td>331.8</td>
+<td>143.2</td>
+<td><strong>2.3x faster</strong></td>
+<td><strong>5.6x less memory</strong></td>
+</tr>
+<tr>
+<td><strong>Large Object Serialize</strong></td>
+<td>3,569.1</td>
+<td>1,940.7</td>
+<td><strong>1.8x faster</strong></td>
+<td><strong>Similar memory</strong></td>
+</tr>
+<tr>
+<td><strong>Array Serialize (100 items)</strong></td>
+<td>28,143.8</td>
+<td>11,556.8</td>
+<td><strong>2.4x faster</strong></td>
+<td><strong>3.2x less memory</strong></td>
+</tr>
+<tr>
+<td><strong>Small Object Deserialize</strong></td>
+<td>628.0</td>
+<td>256.5</td>
+<td><strong>2.4x faster</strong></td>
+<td><strong>2.1x less memory</strong></td>
+</tr>
+<tr>
+<td><strong>Async Serialize</strong></td>
+<td>355.9</td>
+<td>173.8</td>
+<td><strong>2.0x faster</strong></td>
+<td><strong>2.8x less memory</strong></td>
+</tr>
+<tr>
+<td><strong>Async Deserialize</strong></td>
+<td>823.8</td>
+<td>290.0</td>
+<td><strong>2.8x faster</strong></td>
+<td><strong>2.0x less memory</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Recommendation</strong>: Use MessagePack for production workloads requiring high performance and low memory usage.</p>
+</blockquote>
+<h3 id="redis-operations-performance">Redis Operations Performance</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Single Item</th>
+<th>Batch (100 items)</th>
+<th>Batch (1000 items)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Set</td>
+<td>~1ms</td>
+<td>~5ms</td>
+<td>~40ms</td>
+</tr>
+<tr>
+<td>Get</td>
+<td>~0.8ms</td>
+<td>~4ms</td>
+<td>~35ms</td>
+</tr>
+<tr>
+<td>Pub/Sub</td>
+<td>~0.5ms</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Stream Add</td>
+<td>~1.2ms</td>
+<td>~8ms</td>
+<td>~70ms</td>
+</tr>
+</tbody>
+</table>
+<p><em>Benchmarks on local Redis, actual performance depends on network latency and Redis server specs</em></p>
+<h2 id="-performance-considerations">📊 Performance Considerations</h2>
+<ul>
+<li><strong>Connection Pooling</strong>: Connections are automatically pooled and reused</li>
+<li><strong>Pipelining</strong>: Commands are automatically pipelined for better throughput</li>
+<li><strong>Memory Efficiency</strong>: Uses ArrayPool and MemoryPool to minimize allocations</li>
+<li><strong>Concurrent Operations</strong>: Thread-safe operations with minimal locking</li>
+<li><strong>Circuit Breaker</strong>: Prevents cascading failures in distributed systems</li>
+<li><strong>Automatic Cleanup</strong>: Inactive handlers are automatically cleaned up to prevent memory leaks</li>
+</ul>
+<h2 id="-testing">🧪 Testing</h2>
+<p>The library includes comprehensive unit tests with 100% coverage of critical paths:</p>
+<pre><code class="lang-bash">dotnet test
+
+# Results
+Passed!  - Failed: 0, Passed: 124, Skipped: 7, Total: 131
+</code></pre>
+<h2 id="-requirements">📋 Requirements</h2>
+<ul>
+<li>.NET 9.0 or higher</li>
+<li>Redis Server 5.0 or higher (6.0+ recommended for Streams support)</li>
+</ul>
+<h2 id="-contributing">🤝 Contributing</h2>
+<p>Contributions are welcome! Please feel free to submit a Pull Request.</p>
+<h2 id="-license">📄 License</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<h2 id="-documentation">📚 Documentation</h2>
+<p>For more detailed documentation, please visit our <a href="https://github.com/ersintarhan/RedisKit/wiki">Wiki</a>.</p>
+<h2 id="-known-issues">🐛 Known Issues</h2>
+<ul>
+<li>Stream service tests are currently skipped as they require a real Redis instance</li>
+<li>PUBSUB NUMSUB command returns local handler count only (StackExchange.Redis limitation)</li>
+</ul>
+<h2 id="-roadmap">🚦 Roadmap</h2>
+<ul>
+<li>[ ] Redis Sentinel support</li>
+<li>[ ] Redis Cluster support</li>
+<li>[ ] Distributed locking primitives</li>
+<li>[ ] Geo-spatial operations</li>
+<li>[ ] Time-series data support</li>
+<li>[ ] OpenTelemetry integration</li>
+<li>[ ] Prometheus metrics export</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/ersintarhan/RedisKit/blob/main/README.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          RedisKit - High-performance Redis toolkit for .NET
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,205 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.BackoffStrategy
+  commentId: T:RedisKit.Models.BackoffStrategy
+  id: BackoffStrategy
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.BackoffStrategy.DecorrelatedJitter
+  - RedisKit.Models.BackoffStrategy.Exponential
+  - RedisKit.Models.BackoffStrategy.ExponentialWithJitter
+  - RedisKit.Models.BackoffStrategy.Fixed
+  - RedisKit.Models.BackoffStrategy.Linear
+  langs:
+  - csharp
+  - vb
+  name: BackoffStrategy
+  nameWithType: BackoffStrategy
+  fullName: RedisKit.Models.BackoffStrategy
+  type: Enum
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: BackoffStrategy
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Backoff strategy for retry logic
+  example: []
+  syntax:
+    content: public enum BackoffStrategy
+    content.vb: Public Enum BackoffStrategy
+- uid: RedisKit.Models.BackoffStrategy.Fixed
+  commentId: F:RedisKit.Models.BackoffStrategy.Fixed
+  id: Fixed
+  parent: RedisKit.Models.BackoffStrategy
+  langs:
+  - csharp
+  - vb
+  name: Fixed
+  nameWithType: BackoffStrategy.Fixed
+  fullName: RedisKit.Models.BackoffStrategy.Fixed
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Fixed
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Fixed delay between retries
+  example: []
+  syntax:
+    content: Fixed = 0
+    return:
+      type: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.BackoffStrategy.Linear
+  commentId: F:RedisKit.Models.BackoffStrategy.Linear
+  id: Linear
+  parent: RedisKit.Models.BackoffStrategy
+  langs:
+  - csharp
+  - vb
+  name: Linear
+  nameWithType: BackoffStrategy.Linear
+  fullName: RedisKit.Models.BackoffStrategy.Linear
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Linear
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Linear increase in delay
+  example: []
+  syntax:
+    content: Linear = 1
+    return:
+      type: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.BackoffStrategy.Exponential
+  commentId: F:RedisKit.Models.BackoffStrategy.Exponential
+  id: Exponential
+  parent: RedisKit.Models.BackoffStrategy
+  langs:
+  - csharp
+  - vb
+  name: Exponential
+  nameWithType: BackoffStrategy.Exponential
+  fullName: RedisKit.Models.BackoffStrategy.Exponential
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Exponential
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 20
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Exponential increase in delay
+  example: []
+  syntax:
+    content: Exponential = 2
+    return:
+      type: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.BackoffStrategy.ExponentialWithJitter
+  commentId: F:RedisKit.Models.BackoffStrategy.ExponentialWithJitter
+  id: ExponentialWithJitter
+  parent: RedisKit.Models.BackoffStrategy
+  langs:
+  - csharp
+  - vb
+  name: ExponentialWithJitter
+  nameWithType: BackoffStrategy.ExponentialWithJitter
+  fullName: RedisKit.Models.BackoffStrategy.ExponentialWithJitter
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: ExponentialWithJitter
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 25
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Exponential with random jitter to prevent thundering herd
+  example: []
+  syntax:
+    content: ExponentialWithJitter = 3
+    return:
+      type: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.BackoffStrategy.DecorrelatedJitter
+  commentId: F:RedisKit.Models.BackoffStrategy.DecorrelatedJitter
+  id: DecorrelatedJitter
+  parent: RedisKit.Models.BackoffStrategy
+  langs:
+  - csharp
+  - vb
+  name: DecorrelatedJitter
+  nameWithType: BackoffStrategy.DecorrelatedJitter
+  fullName: RedisKit.Models.BackoffStrategy.DecorrelatedJitter
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/BackoffStrategy.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DecorrelatedJitter
+    path: RedisKit/Models/BackoffStrategy.cs
+    startLine: 30
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Decorrelated jitter backoff (AWS recommended)
+  example: []
+  syntax:
+    content: DecorrelatedJitter = 4
+    return:
+      type: RedisKit.Models.BackoffStrategy
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Models.BackoffStrategy
+  commentId: T:RedisKit.Models.BackoffStrategy
+  parent: RedisKit.Models
+  href: RedisKit.Models.BackoffStrategy.html
+  name: BackoffStrategy
+  nameWithType: BackoffStrategy
+  fullName: RedisKit.Models.BackoffStrategy

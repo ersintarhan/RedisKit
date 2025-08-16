@@ -1,0 +1,114 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.SubscriptionType
+  commentId: T:RedisKit.Models.SubscriptionType
+  id: SubscriptionType
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.SubscriptionType.Channel
+  - RedisKit.Models.SubscriptionType.Pattern
+  langs:
+  - csharp
+  - vb
+  name: SubscriptionType
+  nameWithType: SubscriptionType
+  fullName: RedisKit.Models.SubscriptionType
+  type: Enum
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscriptionType
+    path: RedisKit/Models/SubscriptionType.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Type of subscription
+  example: []
+  syntax:
+    content: public enum SubscriptionType
+    content.vb: Public Enum SubscriptionType
+- uid: RedisKit.Models.SubscriptionType.Channel
+  commentId: F:RedisKit.Models.SubscriptionType.Channel
+  id: Channel
+  parent: RedisKit.Models.SubscriptionType
+  langs:
+  - csharp
+  - vb
+  name: Channel
+  nameWithType: SubscriptionType.Channel
+  fullName: RedisKit.Models.SubscriptionType.Channel
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Channel
+    path: RedisKit/Models/SubscriptionType.cs
+    startLine: 7
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: Channel = 0
+    return:
+      type: RedisKit.Models.SubscriptionType
+- uid: RedisKit.Models.SubscriptionType.Pattern
+  commentId: F:RedisKit.Models.SubscriptionType.Pattern
+  id: Pattern
+  parent: RedisKit.Models.SubscriptionType
+  langs:
+  - csharp
+  - vb
+  name: Pattern
+  nameWithType: SubscriptionType.Pattern
+  fullName: RedisKit.Models.SubscriptionType.Pattern
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Pattern
+    path: RedisKit/Models/SubscriptionType.cs
+    startLine: 8
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: Pattern = 1
+    return:
+      type: RedisKit.Models.SubscriptionType
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Models.SubscriptionType
+  commentId: T:RedisKit.Models.SubscriptionType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionType.html
+  name: SubscriptionType
+  nameWithType: SubscriptionType
+  fullName: RedisKit.Models.SubscriptionType

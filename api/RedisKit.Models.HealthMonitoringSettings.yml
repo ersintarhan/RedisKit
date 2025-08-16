@@ -1,0 +1,520 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.HealthMonitoringSettings
+  commentId: T:RedisKit.Models.HealthMonitoringSettings
+  id: HealthMonitoringSettings
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+  - RedisKit.Models.HealthMonitoringSettings.CheckInterval
+  - RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+  - RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  - RedisKit.Models.HealthMonitoringSettings.Enabled
+  langs:
+  - csharp
+  - vb
+  name: HealthMonitoringSettings
+  nameWithType: HealthMonitoringSettings
+  fullName: RedisKit.Models.HealthMonitoringSettings
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: HealthMonitoringSettings
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Connection health monitoring settings
+  example: []
+  syntax:
+    content: public class HealthMonitoringSettings
+    content.vb: Public Class HealthMonitoringSettings
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Models.HealthMonitoringSettings.Enabled
+  commentId: P:RedisKit.Models.HealthMonitoringSettings.Enabled
+  id: Enabled
+  parent: RedisKit.Models.HealthMonitoringSettings
+  langs:
+  - csharp
+  - vb
+  name: Enabled
+  nameWithType: HealthMonitoringSettings.Enabled
+  fullName: RedisKit.Models.HealthMonitoringSettings.Enabled
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Enabled
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Enable health monitoring
+  example: []
+  syntax:
+    content: public bool Enabled { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property Enabled As Boolean
+  overload: RedisKit.Models.HealthMonitoringSettings.Enabled*
+- uid: RedisKit.Models.HealthMonitoringSettings.CheckInterval
+  commentId: P:RedisKit.Models.HealthMonitoringSettings.CheckInterval
+  id: CheckInterval
+  parent: RedisKit.Models.HealthMonitoringSettings
+  langs:
+  - csharp
+  - vb
+  name: CheckInterval
+  nameWithType: HealthMonitoringSettings.CheckInterval
+  fullName: RedisKit.Models.HealthMonitoringSettings.CheckInterval
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CheckInterval
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Interval for health checks
+  example: []
+  syntax:
+    content: public TimeSpan CheckInterval { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property CheckInterval As TimeSpan
+  overload: RedisKit.Models.HealthMonitoringSettings.CheckInterval*
+- uid: RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+  commentId: P:RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+  id: CheckTimeout
+  parent: RedisKit.Models.HealthMonitoringSettings
+  langs:
+  - csharp
+  - vb
+  name: CheckTimeout
+  nameWithType: HealthMonitoringSettings.CheckTimeout
+  fullName: RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CheckTimeout
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 20
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Timeout for health check operations
+  example: []
+  syntax:
+    content: public TimeSpan CheckTimeout { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property CheckTimeout As TimeSpan
+  overload: RedisKit.Models.HealthMonitoringSettings.CheckTimeout*
+- uid: RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+  commentId: P:RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+  id: AutoReconnect
+  parent: RedisKit.Models.HealthMonitoringSettings
+  langs:
+  - csharp
+  - vb
+  name: AutoReconnect
+  nameWithType: HealthMonitoringSettings.AutoReconnect
+  fullName: RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: AutoReconnect
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 25
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Enable automatic reconnection on health failure
+  example: []
+  syntax:
+    content: public bool AutoReconnect { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property AutoReconnect As Boolean
+  overload: RedisKit.Models.HealthMonitoringSettings.AutoReconnect*
+- uid: RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  commentId: P:RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  id: ConsecutiveFailuresThreshold
+  parent: RedisKit.Models.HealthMonitoringSettings
+  langs:
+  - csharp
+  - vb
+  name: ConsecutiveFailuresThreshold
+  nameWithType: HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  fullName: RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/HealthMonitoringSettings.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: ConsecutiveFailuresThreshold
+    path: RedisKit/Models/HealthMonitoringSettings.cs
+    startLine: 30
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Number of consecutive failures before marking unhealthy
+  example: []
+  syntax:
+    content: public int ConsecutiveFailuresThreshold { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property ConsecutiveFailuresThreshold As Integer
+  overload: RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold*
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Models.HealthMonitoringSettings.Enabled*
+  commentId: Overload:RedisKit.Models.HealthMonitoringSettings.Enabled
+  href: RedisKit.Models.HealthMonitoringSettings.html#RedisKit_Models_HealthMonitoringSettings_Enabled
+  name: Enabled
+  nameWithType: HealthMonitoringSettings.Enabled
+  fullName: RedisKit.Models.HealthMonitoringSettings.Enabled
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: RedisKit.Models.HealthMonitoringSettings.CheckInterval*
+  commentId: Overload:RedisKit.Models.HealthMonitoringSettings.CheckInterval
+  href: RedisKit.Models.HealthMonitoringSettings.html#RedisKit_Models_HealthMonitoringSettings_CheckInterval
+  name: CheckInterval
+  nameWithType: HealthMonitoringSettings.CheckInterval
+  fullName: RedisKit.Models.HealthMonitoringSettings.CheckInterval
+- uid: System.TimeSpan
+  commentId: T:System.TimeSpan
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan
+  nameWithType: TimeSpan
+  fullName: System.TimeSpan
+- uid: RedisKit.Models.HealthMonitoringSettings.CheckTimeout*
+  commentId: Overload:RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+  href: RedisKit.Models.HealthMonitoringSettings.html#RedisKit_Models_HealthMonitoringSettings_CheckTimeout
+  name: CheckTimeout
+  nameWithType: HealthMonitoringSettings.CheckTimeout
+  fullName: RedisKit.Models.HealthMonitoringSettings.CheckTimeout
+- uid: RedisKit.Models.HealthMonitoringSettings.AutoReconnect*
+  commentId: Overload:RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+  href: RedisKit.Models.HealthMonitoringSettings.html#RedisKit_Models_HealthMonitoringSettings_AutoReconnect
+  name: AutoReconnect
+  nameWithType: HealthMonitoringSettings.AutoReconnect
+  fullName: RedisKit.Models.HealthMonitoringSettings.AutoReconnect
+- uid: RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold*
+  commentId: Overload:RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  href: RedisKit.Models.HealthMonitoringSettings.html#RedisKit_Models_HealthMonitoringSettings_ConsecutiveFailuresThreshold
+  name: ConsecutiveFailuresThreshold
+  nameWithType: HealthMonitoringSettings.ConsecutiveFailuresThreshold
+  fullName: RedisKit.Models.HealthMonitoringSettings.ConsecutiveFailuresThreshold
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

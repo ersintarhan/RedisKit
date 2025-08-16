@@ -1,0 +1,199 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  id: RedisKit.Models
+  children:
+  - RedisKit.Models.BackoffStrategy
+  - RedisKit.Models.CircuitBreakerSettings
+  - RedisKit.Models.CircuitState
+  - RedisKit.Models.ConnectionHealthStatus
+  - RedisKit.Models.ConnectionTimeoutSettings
+  - RedisKit.Models.DeadLetterMessage`1
+  - RedisKit.Models.HealthMonitoringSettings
+  - RedisKit.Models.RedisOptions
+  - RedisKit.Models.RetryConfiguration
+  - RedisKit.Models.RetryResult`1
+  - RedisKit.Models.SerializerType
+  - RedisKit.Models.StreamHealthInfo
+  - RedisKit.Models.StreamMetrics
+  - RedisKit.Models.SubscriptionStats
+  - RedisKit.Models.SubscriptionToken
+  - RedisKit.Models.SubscriptionType
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Models.BackoffStrategy
+  commentId: T:RedisKit.Models.BackoffStrategy
+  parent: RedisKit.Models
+  href: RedisKit.Models.BackoffStrategy.html
+  name: BackoffStrategy
+  nameWithType: BackoffStrategy
+  fullName: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.CircuitBreakerSettings
+  commentId: T:RedisKit.Models.CircuitBreakerSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.CircuitBreakerSettings.html
+  name: CircuitBreakerSettings
+  nameWithType: CircuitBreakerSettings
+  fullName: RedisKit.Models.CircuitBreakerSettings
+- uid: RedisKit.Models.CircuitState
+  commentId: T:RedisKit.Models.CircuitState
+  parent: RedisKit.Models
+  href: RedisKit.Models.CircuitState.html
+  name: CircuitState
+  nameWithType: CircuitState
+  fullName: RedisKit.Models.CircuitState
+- uid: RedisKit.Models.ConnectionHealthStatus
+  commentId: T:RedisKit.Models.ConnectionHealthStatus
+  href: RedisKit.Models.ConnectionHealthStatus.html
+  name: ConnectionHealthStatus
+  nameWithType: ConnectionHealthStatus
+  fullName: RedisKit.Models.ConnectionHealthStatus
+- uid: RedisKit.Models.ConnectionTimeoutSettings
+  commentId: T:RedisKit.Models.ConnectionTimeoutSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.ConnectionTimeoutSettings.html
+  name: ConnectionTimeoutSettings
+  nameWithType: ConnectionTimeoutSettings
+  fullName: RedisKit.Models.ConnectionTimeoutSettings
+- uid: RedisKit.Models.DeadLetterMessage`1
+  commentId: T:RedisKit.Models.DeadLetterMessage`1
+  href: RedisKit.Models.DeadLetterMessage-1.html
+  name: DeadLetterMessage<T>
+  nameWithType: DeadLetterMessage<T>
+  fullName: RedisKit.Models.DeadLetterMessage<T>
+  nameWithType.vb: DeadLetterMessage(Of T)
+  fullName.vb: RedisKit.Models.DeadLetterMessage(Of T)
+  name.vb: DeadLetterMessage(Of T)
+  spec.csharp:
+  - uid: RedisKit.Models.DeadLetterMessage`1
+    name: DeadLetterMessage
+    href: RedisKit.Models.DeadLetterMessage-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: RedisKit.Models.DeadLetterMessage`1
+    name: DeadLetterMessage
+    href: RedisKit.Models.DeadLetterMessage-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: RedisKit.Models.HealthMonitoringSettings
+  commentId: T:RedisKit.Models.HealthMonitoringSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.HealthMonitoringSettings.html
+  name: HealthMonitoringSettings
+  nameWithType: HealthMonitoringSettings
+  fullName: RedisKit.Models.HealthMonitoringSettings
+- uid: RedisKit.Models.RedisOptions
+  commentId: T:RedisKit.Models.RedisOptions
+  parent: RedisKit.Models
+  href: RedisKit.Models.RedisOptions.html
+  name: RedisOptions
+  nameWithType: RedisOptions
+  fullName: RedisKit.Models.RedisOptions
+- uid: RedisKit.Models.RetryConfiguration
+  commentId: T:RedisKit.Models.RetryConfiguration
+  parent: RedisKit.Models
+  href: RedisKit.Models.RetryConfiguration.html
+  name: RetryConfiguration
+  nameWithType: RetryConfiguration
+  fullName: RedisKit.Models.RetryConfiguration
+- uid: RedisKit.Models.RetryResult`1
+  commentId: T:RedisKit.Models.RetryResult`1
+  href: RedisKit.Models.RetryResult-1.html
+  name: RetryResult<T>
+  nameWithType: RetryResult<T>
+  fullName: RedisKit.Models.RetryResult<T>
+  nameWithType.vb: RetryResult(Of T)
+  fullName.vb: RedisKit.Models.RetryResult(Of T)
+  name.vb: RetryResult(Of T)
+  spec.csharp:
+  - uid: RedisKit.Models.RetryResult`1
+    name: RetryResult
+    href: RedisKit.Models.RetryResult-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: RedisKit.Models.RetryResult`1
+    name: RetryResult
+    href: RedisKit.Models.RetryResult-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: RedisKit.Models.SerializerType
+  commentId: T:RedisKit.Models.SerializerType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SerializerType.html
+  name: SerializerType
+  nameWithType: SerializerType
+  fullName: RedisKit.Models.SerializerType
+- uid: RedisKit.Models.StreamHealthInfo
+  commentId: T:RedisKit.Models.StreamHealthInfo
+  href: RedisKit.Models.StreamHealthInfo.html
+  name: StreamHealthInfo
+  nameWithType: StreamHealthInfo
+  fullName: RedisKit.Models.StreamHealthInfo
+- uid: RedisKit.Models.StreamMetrics
+  commentId: T:RedisKit.Models.StreamMetrics
+  href: RedisKit.Models.StreamMetrics.html
+  name: StreamMetrics
+  nameWithType: StreamMetrics
+  fullName: RedisKit.Models.StreamMetrics
+- uid: RedisKit.Models.SubscriptionStats
+  commentId: T:RedisKit.Models.SubscriptionStats
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionStats.html
+  name: SubscriptionStats
+  nameWithType: SubscriptionStats
+  fullName: RedisKit.Models.SubscriptionStats
+- uid: RedisKit.Models.SubscriptionToken
+  commentId: T:RedisKit.Models.SubscriptionToken
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionToken.html
+  name: SubscriptionToken
+  nameWithType: SubscriptionToken
+  fullName: RedisKit.Models.SubscriptionToken
+- uid: RedisKit.Models.SubscriptionType
+  commentId: T:RedisKit.Models.SubscriptionType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionType.html
+  name: SubscriptionType
+  nameWithType: SubscriptionType
+  fullName: RedisKit.Models.SubscriptionType
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html

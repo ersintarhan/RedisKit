@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class PubSubService | RedisKit </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class PubSubService | RedisKit ">
+      
+      <meta name="description" content="High-performance implementation of IRedisPubSubService with advanced features">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/ersintarhan/RedisKit/new/main/apiSpec/new?filename=RedisKit_Services_PubSubService.md&amp;value=---%0Auid%3A%20RedisKit.Services.PubSubService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.png" alt="RedisKit">
+            RedisKit
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="RedisKit.Services.PubSubService">
+
+
+
+  <h1 id="RedisKit_Services_PubSubService" data-uid="RedisKit.Services.PubSubService" class="text-break">
+Class PubSubService  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L15"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="RedisKit.html">RedisKit</a>.<a class="xref" href="RedisKit.Services.html">Services</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>RedisKit.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>High-performance implementation of IRedisPubSubService with advanced features</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class PubSubService : IRedisPubSubService, IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">PubSubService</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="RedisKit.Interfaces.IRedisPubSubService.html">IRedisPubSubService</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="RedisKit_Services_PubSubService__ctor_" data-uid="RedisKit.Services.PubSubService.#ctor*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService__ctor_StackExchange_Redis_ISubscriber_Microsoft_Extensions_Logging_ILogger_RedisKit_Services_PubSubService__RedisKit_Models_RedisOptions_" data-uid="RedisKit.Services.PubSubService.#ctor(StackExchange.Redis.ISubscriber,Microsoft.Extensions.Logging.ILogger{RedisKit.Services.PubSubService},RedisKit.Models.RedisOptions)">
+  PubSubService(ISubscriber, ILogger&lt;PubSubService&gt;, RedisOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PubSubService(ISubscriber subscriber, ILogger&lt;PubSubService&gt; logger, RedisOptions options)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>subscriber</code> <span class="xref">ISubscriber</span></dt>
+    <dd></dd>
+    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="RedisKit.Services.PubSubService.html">PubSubService</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>options</code> <a class="xref" href="RedisKit.Models.RedisOptions.html">RedisOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="RedisKit_Services_PubSubService_Dispose_" data-uid="RedisKit.Services.PubSubService.Dispose*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_Dispose" data-uid="RedisKit.Services.PubSubService.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L651"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_Dispose_" data-uid="RedisKit.Services.PubSubService.Dispose*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_Dispose_System_Boolean_" data-uid="RedisKit.Services.PubSubService.Dispose(System.Boolean)">
+  Dispose(bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L657"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void Dispose(bool disposing)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>disposing</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_GetStatistics_" data-uid="RedisKit.Services.PubSubService.GetStatistics*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_GetStatistics" data-uid="RedisKit.Services.PubSubService.GetStatistics">
+  GetStatistics()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L572"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyDictionary&lt;string, SubscriptionStats&gt; GetStatistics()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="RedisKit.Models.SubscriptionStats.html">SubscriptionStats</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_GetStatistics_" data-uid="RedisKit.Services.PubSubService.GetStatistics*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_GetStatistics_System_String_" data-uid="RedisKit.Services.PubSubService.GetStatistics(System.String)">
+  GetStatistics(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L577"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SubscriptionStats? GetStatistics(string channelOrPattern)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channelOrPattern</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="RedisKit.Models.SubscriptionStats.html">SubscriptionStats</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_GetSubscriberCountAsync_" data-uid="RedisKit.Services.PubSubService.GetSubscriberCountAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_GetSubscriberCountAsync_System_String_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.GetSubscriberCountAsync(System.String,System.Threading.CancellationToken)">
+  GetSubscriberCountAsync(string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L632"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the number of subscribers for a channel</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;int&gt; GetSubscriberCountAsync(string channel, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_GetSubscriptionStatsAsync_" data-uid="RedisKit.Services.PubSubService.GetSubscriptionStatsAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_GetSubscriptionStatsAsync_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.GetSubscriptionStatsAsync(System.Threading.CancellationToken)">
+  GetSubscriptionStatsAsync(CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L617"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets statistics about current subscriptions</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionStats[]&gt; GetSubscriptionStatsAsync(CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionStats.html">SubscriptionStats</a>[]&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_HasSubscribersAsync_" data-uid="RedisKit.Services.PubSubService.HasSubscribersAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_HasSubscribersAsync_System_String_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.HasSubscribersAsync(System.String,System.Threading.CancellationToken)">
+  HasSubscribersAsync(string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L623"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Checks if a channel has any active subscriptions</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; HasSubscribersAsync(string channel, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_PublishAsync_" data-uid="RedisKit.Services.PubSubService.PublishAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_PublishAsync__1_System_String___0_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.PublishAsync``1(System.String,``0,System.Threading.CancellationToken)">
+  PublishAsync&lt;T&gt;(string, T, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Publishes a message to a channel</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;long&gt; PublishAsync&lt;T&gt;(string channel, T message, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>message</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_SubscribeAsync_" data-uid="RedisKit.Services.PubSubService.SubscribeAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_SubscribeAsync__1_System_String_System_Func___0_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.SubscribeAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+  SubscribeAsync&lt;T&gt;(string, Func&lt;T, CancellationToken, Task&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L234"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Subscribes to a channel and registers a handler for messages</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionToken&gt; SubscribeAsync&lt;T&gt;(string channel, Func&lt;T, CancellationToken, Task&gt; handler, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>handler</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a>&gt;</dt>
+    <dd><p>Subscription token that can be used to unsubscribe</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_SubscribePatternAsync_" data-uid="RedisKit.Services.PubSubService.SubscribePatternAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_SubscribePatternAsync__1_System_String_System_Func___0_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.SubscribePatternAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+  SubscribePatternAsync&lt;T&gt;(string, Func&lt;T, CancellationToken, Task&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L260"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Subscribes to channels matching a pattern and registers a handler for messages</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionToken&gt; SubscribePatternAsync&lt;T&gt;(string pattern, Func&lt;T, CancellationToken, Task&gt; handler, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pattern</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>handler</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a>&gt;</dt>
+    <dd><p>Subscription token that can be used to unsubscribe</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_SubscribePatternWithChannelAsync_" data-uid="RedisKit.Services.PubSubService.SubscribePatternWithChannelAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_SubscribePatternWithChannelAsync__1_System_String_System_Func___0_System_String_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.SubscribePatternWithChannelAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+  SubscribePatternWithChannelAsync&lt;T&gt;(string, Func&lt;T, string, CancellationToken, Task&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L609"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Subscribes to channels matching a pattern with channel name included</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionToken&gt; SubscribePatternWithChannelAsync&lt;T&gt;(string pattern, Func&lt;T, string, CancellationToken, Task&gt; handler, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pattern</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>handler</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-4">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a>&gt;</dt>
+    <dd><p>Subscription token that can be used to unsubscribe</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_SubscribePatternWithMetadataAsync_" data-uid="RedisKit.Services.PubSubService.SubscribePatternWithMetadataAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_SubscribePatternWithMetadataAsync__1_System_String_System_Func___0_System_String_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.SubscribePatternWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+  SubscribePatternWithMetadataAsync&lt;T&gt;(string, Func&lt;T, string, CancellationToken, Task&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L268"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionToken&gt; SubscribePatternWithMetadataAsync&lt;T&gt;(string pattern, Func&lt;T, string, CancellationToken, Task&gt; handler, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pattern</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>handler</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-4">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_SubscribeWithMetadataAsync_" data-uid="RedisKit.Services.PubSubService.SubscribeWithMetadataAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_SubscribeWithMetadataAsync__1_System_String_System_Func___0_System_String_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.SubscribeWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+  SubscribeWithMetadataAsync&lt;T&gt;(string, Func&lt;T, string, CancellationToken, Task&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L242"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Subscribes to a channel with message metadata (channel name, publish time, etc.)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SubscriptionToken&gt; SubscribeWithMetadataAsync&lt;T&gt;(string channel, Func&lt;T, string, CancellationToken, Task&gt; handler, CancellationToken cancellationToken = default) where T : class</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>handler</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-4">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a>&gt;</dt>
+    <dd><p>Subscription token that can be used to unsubscribe</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_UnsubscribeAllAsync_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAllAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_UnsubscribeAllAsync_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAllAsync(System.Threading.CancellationToken)">
+  UnsubscribeAllAsync(CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L474"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task UnsubscribeAllAsync(CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_UnsubscribeAsync_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_UnsubscribeAsync_RedisKit_Models_SubscriptionToken_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAsync(RedisKit.Models.SubscriptionToken,System.Threading.CancellationToken)">
+  UnsubscribeAsync(SubscriptionToken, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L601"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unsubscribes a specific handler from a channel</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task UnsubscribeAsync(SubscriptionToken token, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>token</code> <a class="xref" href="RedisKit.Models.SubscriptionToken.html">SubscriptionToken</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_UnsubscribeAsync_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_UnsubscribeAsync_System_String_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.UnsubscribeAsync(System.String,System.Threading.CancellationToken)">
+  UnsubscribeAsync(string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L387"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unsubscribes from a channel</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>channel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="RedisKit_Services_PubSubService_UnsubscribePatternAsync_" data-uid="RedisKit.Services.PubSubService.UnsubscribePatternAsync*"></a>
+
+  <h3 id="RedisKit_Services_PubSubService_UnsubscribePatternAsync_System_String_System_Threading_CancellationToken_" data-uid="RedisKit.Services.PubSubService.UnsubscribePatternAsync(System.String,System.Threading.CancellationToken)">
+  UnsubscribePatternAsync(string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L392"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unsubscribes from a channel pattern</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pattern</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/ersintarhan/RedisKit/blob/master/RedisKit/Services/PubSubService.cs/#L15" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          RedisKit - High-performance Redis toolkit for .NET
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

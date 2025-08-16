@@ -1,0 +1,815 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.RetryConfiguration
+  commentId: T:RedisKit.Models.RetryConfiguration
+  id: RetryConfiguration
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.RetryConfiguration.BackoffMultiplier
+  - RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+  - RedisKit.Models.RetryConfiguration.IdleTimeout
+  - RedisKit.Models.RetryConfiguration.InitialDelay
+  - RedisKit.Models.RetryConfiguration.JitterFactor
+  - RedisKit.Models.RetryConfiguration.MaxAttempts
+  - RedisKit.Models.RetryConfiguration.MaxDelay
+  - RedisKit.Models.RetryConfiguration.MaxRetries
+  - RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+  - RedisKit.Models.RetryConfiguration.RetryDelay
+  - RedisKit.Models.RetryConfiguration.Strategy
+  - RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+  langs:
+  - csharp
+  - vb
+  name: RetryConfiguration
+  nameWithType: RetryConfiguration
+  fullName: RedisKit.Models.RetryConfiguration
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RetryConfiguration
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Retry configuration with advanced backoff strategies
+  example: []
+  syntax:
+    content: public class RetryConfiguration
+    content.vb: Public Class RetryConfiguration
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Models.RetryConfiguration.MaxAttempts
+  commentId: P:RedisKit.Models.RetryConfiguration.MaxAttempts
+  id: MaxAttempts
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: MaxAttempts
+  nameWithType: RetryConfiguration.MaxAttempts
+  fullName: RedisKit.Models.RetryConfiguration.MaxAttempts
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MaxAttempts
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Maximum number of retry attempts
+  example: []
+  syntax:
+    content: public int MaxAttempts { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property MaxAttempts As Integer
+  overload: RedisKit.Models.RetryConfiguration.MaxAttempts*
+- uid: RedisKit.Models.RetryConfiguration.InitialDelay
+  commentId: P:RedisKit.Models.RetryConfiguration.InitialDelay
+  id: InitialDelay
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: InitialDelay
+  nameWithType: RetryConfiguration.InitialDelay
+  fullName: RedisKit.Models.RetryConfiguration.InitialDelay
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: InitialDelay
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Initial delay between retries
+  example: []
+  syntax:
+    content: public TimeSpan InitialDelay { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property InitialDelay As TimeSpan
+  overload: RedisKit.Models.RetryConfiguration.InitialDelay*
+- uid: RedisKit.Models.RetryConfiguration.MaxDelay
+  commentId: P:RedisKit.Models.RetryConfiguration.MaxDelay
+  id: MaxDelay
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: MaxDelay
+  nameWithType: RetryConfiguration.MaxDelay
+  fullName: RedisKit.Models.RetryConfiguration.MaxDelay
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MaxDelay
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 20
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Maximum delay between retries
+  example: []
+  syntax:
+    content: public TimeSpan MaxDelay { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property MaxDelay As TimeSpan
+  overload: RedisKit.Models.RetryConfiguration.MaxDelay*
+- uid: RedisKit.Models.RetryConfiguration.Strategy
+  commentId: P:RedisKit.Models.RetryConfiguration.Strategy
+  id: Strategy
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: Strategy
+  nameWithType: RetryConfiguration.Strategy
+  fullName: RedisKit.Models.RetryConfiguration.Strategy
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Strategy
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 25
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Backoff strategy to use
+  example: []
+  syntax:
+    content: public BackoffStrategy Strategy { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.BackoffStrategy
+    content.vb: Public Property Strategy As BackoffStrategy
+  overload: RedisKit.Models.RetryConfiguration.Strategy*
+- uid: RedisKit.Models.RetryConfiguration.BackoffMultiplier
+  commentId: P:RedisKit.Models.RetryConfiguration.BackoffMultiplier
+  id: BackoffMultiplier
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: BackoffMultiplier
+  nameWithType: RetryConfiguration.BackoffMultiplier
+  fullName: RedisKit.Models.RetryConfiguration.BackoffMultiplier
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: BackoffMultiplier
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 30
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Multiplier for exponential backoff
+  example: []
+  syntax:
+    content: public double BackoffMultiplier { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+    content.vb: Public Property BackoffMultiplier As Double
+  overload: RedisKit.Models.RetryConfiguration.BackoffMultiplier*
+- uid: RedisKit.Models.RetryConfiguration.JitterFactor
+  commentId: P:RedisKit.Models.RetryConfiguration.JitterFactor
+  id: JitterFactor
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: JitterFactor
+  nameWithType: RetryConfiguration.JitterFactor
+  fullName: RedisKit.Models.RetryConfiguration.JitterFactor
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: JitterFactor
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 35
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Maximum jitter percentage (0.0 to 1.0)
+  example: []
+  syntax:
+    content: public double JitterFactor { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+    content.vb: Public Property JitterFactor As Double
+  overload: RedisKit.Models.RetryConfiguration.JitterFactor*
+- uid: RedisKit.Models.RetryConfiguration.MaxRetries
+  commentId: P:RedisKit.Models.RetryConfiguration.MaxRetries
+  id: MaxRetries
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: MaxRetries
+  nameWithType: RetryConfiguration.MaxRetries
+  fullName: RedisKit.Models.RetryConfiguration.MaxRetries
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MaxRetries
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 42
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Alias for MaxAttempts (for backward compatibility)
+  example: []
+  syntax:
+    content: public int MaxRetries { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property MaxRetries As Integer
+  overload: RedisKit.Models.RetryConfiguration.MaxRetries*
+- uid: RedisKit.Models.RetryConfiguration.RetryDelay
+  commentId: P:RedisKit.Models.RetryConfiguration.RetryDelay
+  id: RetryDelay
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: RetryDelay
+  nameWithType: RetryConfiguration.RetryDelay
+  fullName: RedisKit.Models.RetryConfiguration.RetryDelay
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RetryDelay
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 51
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Alias for InitialDelay (for backward compatibility)
+  example: []
+  syntax:
+    content: public TimeSpan RetryDelay { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property RetryDelay As TimeSpan
+  overload: RedisKit.Models.RetryConfiguration.RetryDelay*
+- uid: RedisKit.Models.RetryConfiguration.IdleTimeout
+  commentId: P:RedisKit.Models.RetryConfiguration.IdleTimeout
+  id: IdleTimeout
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: IdleTimeout
+  nameWithType: RetryConfiguration.IdleTimeout
+  fullName: RedisKit.Models.RetryConfiguration.IdleTimeout
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IdleTimeout
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 60
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Idle timeout for pending messages (Stream-specific)
+  example: []
+  syntax:
+    content: public TimeSpan IdleTimeout { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property IdleTimeout As TimeSpan
+  overload: RedisKit.Models.RetryConfiguration.IdleTimeout*
+- uid: RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+  commentId: P:RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+  id: UseExponentialBackoff
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: UseExponentialBackoff
+  nameWithType: RetryConfiguration.UseExponentialBackoff
+  fullName: RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: UseExponentialBackoff
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 65
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Use exponential backoff for retries (Stream-specific)
+  example: []
+  syntax:
+    content: public bool UseExponentialBackoff { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseExponentialBackoff As Boolean
+  overload: RedisKit.Models.RetryConfiguration.UseExponentialBackoff*
+- uid: RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+  commentId: P:RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+  id: MoveToDeadLetterQueue
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: MoveToDeadLetterQueue
+  nameWithType: RetryConfiguration.MoveToDeadLetterQueue
+  fullName: RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MoveToDeadLetterQueue
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 74
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Move to dead letter queue after max retries (Stream-specific)
+  example: []
+  syntax:
+    content: public bool MoveToDeadLetterQueue { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property MoveToDeadLetterQueue As Boolean
+  overload: RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue*
+- uid: RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+  commentId: P:RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+  id: DeadLetterSuffix
+  parent: RedisKit.Models.RetryConfiguration
+  langs:
+  - csharp
+  - vb
+  name: DeadLetterSuffix
+  nameWithType: RetryConfiguration.DeadLetterSuffix
+  fullName: RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RetryConfiguration.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DeadLetterSuffix
+    path: RedisKit/Models/RetryConfiguration.cs
+    startLine: 79
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Dead letter queue suffix (Stream-specific)
+  example: []
+  syntax:
+    content: public string DeadLetterSuffix { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property DeadLetterSuffix As String
+  overload: RedisKit.Models.RetryConfiguration.DeadLetterSuffix*
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Models.RetryConfiguration.MaxAttempts*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.MaxAttempts
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_MaxAttempts
+  name: MaxAttempts
+  nameWithType: RetryConfiguration.MaxAttempts
+  fullName: RedisKit.Models.RetryConfiguration.MaxAttempts
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: RedisKit.Models.RetryConfiguration.InitialDelay*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.InitialDelay
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_InitialDelay
+  name: InitialDelay
+  nameWithType: RetryConfiguration.InitialDelay
+  fullName: RedisKit.Models.RetryConfiguration.InitialDelay
+- uid: System.TimeSpan
+  commentId: T:System.TimeSpan
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan
+  nameWithType: TimeSpan
+  fullName: System.TimeSpan
+- uid: RedisKit.Models.RetryConfiguration.MaxDelay*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.MaxDelay
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_MaxDelay
+  name: MaxDelay
+  nameWithType: RetryConfiguration.MaxDelay
+  fullName: RedisKit.Models.RetryConfiguration.MaxDelay
+- uid: RedisKit.Models.RetryConfiguration.Strategy*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.Strategy
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_Strategy
+  name: Strategy
+  nameWithType: RetryConfiguration.Strategy
+  fullName: RedisKit.Models.RetryConfiguration.Strategy
+- uid: RedisKit.Models.BackoffStrategy
+  commentId: T:RedisKit.Models.BackoffStrategy
+  parent: RedisKit.Models
+  href: RedisKit.Models.BackoffStrategy.html
+  name: BackoffStrategy
+  nameWithType: BackoffStrategy
+  fullName: RedisKit.Models.BackoffStrategy
+- uid: RedisKit.Models.RetryConfiguration.BackoffMultiplier*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.BackoffMultiplier
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_BackoffMultiplier
+  name: BackoffMultiplier
+  nameWithType: RetryConfiguration.BackoffMultiplier
+  fullName: RedisKit.Models.RetryConfiguration.BackoffMultiplier
+- uid: System.Double
+  commentId: T:System.Double
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.double
+  name: double
+  nameWithType: double
+  fullName: double
+  nameWithType.vb: Double
+  fullName.vb: Double
+  name.vb: Double
+- uid: RedisKit.Models.RetryConfiguration.JitterFactor*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.JitterFactor
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_JitterFactor
+  name: JitterFactor
+  nameWithType: RetryConfiguration.JitterFactor
+  fullName: RedisKit.Models.RetryConfiguration.JitterFactor
+- uid: RedisKit.Models.RetryConfiguration.MaxRetries*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.MaxRetries
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_MaxRetries
+  name: MaxRetries
+  nameWithType: RetryConfiguration.MaxRetries
+  fullName: RedisKit.Models.RetryConfiguration.MaxRetries
+- uid: RedisKit.Models.RetryConfiguration.RetryDelay*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.RetryDelay
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_RetryDelay
+  name: RetryDelay
+  nameWithType: RetryConfiguration.RetryDelay
+  fullName: RedisKit.Models.RetryConfiguration.RetryDelay
+- uid: RedisKit.Models.RetryConfiguration.IdleTimeout*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.IdleTimeout
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_IdleTimeout
+  name: IdleTimeout
+  nameWithType: RetryConfiguration.IdleTimeout
+  fullName: RedisKit.Models.RetryConfiguration.IdleTimeout
+- uid: RedisKit.Models.RetryConfiguration.UseExponentialBackoff*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_UseExponentialBackoff
+  name: UseExponentialBackoff
+  nameWithType: RetryConfiguration.UseExponentialBackoff
+  fullName: RedisKit.Models.RetryConfiguration.UseExponentialBackoff
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_MoveToDeadLetterQueue
+  name: MoveToDeadLetterQueue
+  nameWithType: RetryConfiguration.MoveToDeadLetterQueue
+  fullName: RedisKit.Models.RetryConfiguration.MoveToDeadLetterQueue
+- uid: RedisKit.Models.RetryConfiguration.DeadLetterSuffix*
+  commentId: Overload:RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+  href: RedisKit.Models.RetryConfiguration.html#RedisKit_Models_RetryConfiguration_DeadLetterSuffix
+  name: DeadLetterSuffix
+  nameWithType: RetryConfiguration.DeadLetterSuffix
+  fullName: RedisKit.Models.RetryConfiguration.DeadLetterSuffix
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String

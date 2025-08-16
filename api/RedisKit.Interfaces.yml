@@ -1,0 +1,62 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Interfaces
+  commentId: N:RedisKit.Interfaces
+  id: RedisKit.Interfaces
+  children:
+  - RedisKit.Interfaces.IRedisCacheService
+  - RedisKit.Interfaces.IRedisPubSubService
+  - RedisKit.Interfaces.IRedisStreamService
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Interfaces
+  nameWithType: RedisKit.Interfaces
+  fullName: RedisKit.Interfaces
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Interfaces.IRedisCacheService
+  commentId: T:RedisKit.Interfaces.IRedisCacheService
+  parent: RedisKit.Interfaces
+  href: RedisKit.Interfaces.IRedisCacheService.html
+  name: IRedisCacheService
+  nameWithType: IRedisCacheService
+  fullName: RedisKit.Interfaces.IRedisCacheService
+- uid: RedisKit.Interfaces.IRedisPubSubService
+  commentId: T:RedisKit.Interfaces.IRedisPubSubService
+  parent: RedisKit.Interfaces
+  href: RedisKit.Interfaces.IRedisPubSubService.html
+  name: IRedisPubSubService
+  nameWithType: IRedisPubSubService
+  fullName: RedisKit.Interfaces.IRedisPubSubService
+- uid: RedisKit.Interfaces.IRedisStreamService
+  commentId: T:RedisKit.Interfaces.IRedisStreamService
+  parent: RedisKit.Interfaces
+  href: RedisKit.Interfaces.IRedisStreamService.html
+  name: IRedisStreamService
+  nameWithType: IRedisStreamService
+  fullName: RedisKit.Interfaces.IRedisStreamService
+- uid: RedisKit.Interfaces
+  commentId: N:RedisKit.Interfaces
+  href: RedisKit.html
+  name: RedisKit.Interfaces
+  nameWithType: RedisKit.Interfaces
+  fullName: RedisKit.Interfaces
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html

@@ -1,0 +1,596 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Serialization.IRedisSerializer
+  commentId: T:RedisKit.Serialization.IRedisSerializer
+  id: IRedisSerializer
+  parent: RedisKit.Serialization
+  children:
+  - RedisKit.Serialization.IRedisSerializer.DeserializeAsync(System.Byte[],System.Type,System.Threading.CancellationToken)
+  - RedisKit.Serialization.IRedisSerializer.DeserializeAsync``1(System.Byte[],System.Threading.CancellationToken)
+  - RedisKit.Serialization.IRedisSerializer.Deserialize``1(System.Byte[])
+  - RedisKit.Serialization.IRedisSerializer.Name
+  - RedisKit.Serialization.IRedisSerializer.SerializeAsync``1(``0,System.Threading.CancellationToken)
+  - RedisKit.Serialization.IRedisSerializer.Serialize``1(``0)
+  langs:
+  - csharp
+  - vb
+  name: IRedisSerializer
+  nameWithType: IRedisSerializer
+  fullName: RedisKit.Serialization.IRedisSerializer
+  type: Interface
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IRedisSerializer
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Interface for Redis serialization operations supporting both sync and async methods
+  example: []
+  syntax:
+    content: public interface IRedisSerializer
+    content.vb: Public Interface IRedisSerializer
+- uid: RedisKit.Serialization.IRedisSerializer.Name
+  commentId: P:RedisKit.Serialization.IRedisSerializer.Name
+  id: Name
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: Name
+  nameWithType: IRedisSerializer.Name
+  fullName: RedisKit.Serialization.IRedisSerializer.Name
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Name
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Gets the name of the serializer (e.g., "MessagePack", "SystemTextJson")
+  example: []
+  syntax:
+    content: string Name { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property Name As String
+  overload: RedisKit.Serialization.IRedisSerializer.Name*
+- uid: RedisKit.Serialization.IRedisSerializer.Serialize``1(``0)
+  commentId: M:RedisKit.Serialization.IRedisSerializer.Serialize``1(``0)
+  id: Serialize``1(``0)
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: Serialize<T>(T)
+  nameWithType: IRedisSerializer.Serialize<T>(T)
+  fullName: RedisKit.Serialization.IRedisSerializer.Serialize<T>(T)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Serialize
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 18
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Serializes an object to byte array (synchronous)
+  example: []
+  syntax:
+    content: byte[] Serialize<T>(T obj)
+    parameters:
+    - id: obj
+      type: '{T}'
+      description: Object to serialize
+    typeParameters:
+    - id: T
+      description: Type of object to serialize
+    return:
+      type: System.Byte[]
+      description: Serialized byte array
+    content.vb: Function Serialize(Of T)(obj As T) As Byte()
+  overload: RedisKit.Serialization.IRedisSerializer.Serialize*
+  nameWithType.vb: IRedisSerializer.Serialize(Of T)(T)
+  fullName.vb: RedisKit.Serialization.IRedisSerializer.Serialize(Of T)(T)
+  name.vb: Serialize(Of T)(T)
+- uid: RedisKit.Serialization.IRedisSerializer.Deserialize``1(System.Byte[])
+  commentId: M:RedisKit.Serialization.IRedisSerializer.Deserialize``1(System.Byte[])
+  id: Deserialize``1(System.Byte[])
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: Deserialize<T>(byte[])
+  nameWithType: IRedisSerializer.Deserialize<T>(byte[])
+  fullName: RedisKit.Serialization.IRedisSerializer.Deserialize<T>(byte[])
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Deserialize
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 26
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Deserializes a byte array to an object (synchronous)
+  example: []
+  syntax:
+    content: T? Deserialize<T>(byte[] data)
+    parameters:
+    - id: data
+      type: System.Byte[]
+      description: Byte array data to deserialize
+    typeParameters:
+    - id: T
+      description: Type of object to deserialize
+    return:
+      type: '{T}'
+      description: Deserialized object or null if deserialization fails
+    content.vb: Function Deserialize(Of T)(data As Byte()) As T
+  overload: RedisKit.Serialization.IRedisSerializer.Deserialize*
+  nameWithType.vb: IRedisSerializer.Deserialize(Of T)(Byte())
+  fullName.vb: RedisKit.Serialization.IRedisSerializer.Deserialize(Of T)(Byte())
+  name.vb: Deserialize(Of T)(Byte())
+- uid: RedisKit.Serialization.IRedisSerializer.SerializeAsync``1(``0,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Serialization.IRedisSerializer.SerializeAsync``1(``0,System.Threading.CancellationToken)
+  id: SerializeAsync``1(``0,System.Threading.CancellationToken)
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: SerializeAsync<T>(T, CancellationToken)
+  nameWithType: IRedisSerializer.SerializeAsync<T>(T, CancellationToken)
+  fullName: RedisKit.Serialization.IRedisSerializer.SerializeAsync<T>(T, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SerializeAsync
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 35
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Serializes an object to byte array (asynchronous)
+  example: []
+  syntax:
+    content: Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default)
+    parameters:
+    - id: obj
+      type: '{T}'
+      description: Object to serialize
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+      description: Cancellation token
+    typeParameters:
+    - id: T
+      description: Type of object to serialize
+    return:
+      type: System.Threading.Tasks.Task{System.Byte[]}
+      description: Task representing the serialized byte array
+    content.vb: Function SerializeAsync(Of T)(obj As T, cancellationToken As CancellationToken = Nothing) As Task(Of Byte())
+  overload: RedisKit.Serialization.IRedisSerializer.SerializeAsync*
+  nameWithType.vb: IRedisSerializer.SerializeAsync(Of T)(T, CancellationToken)
+  fullName.vb: RedisKit.Serialization.IRedisSerializer.SerializeAsync(Of T)(T, System.Threading.CancellationToken)
+  name.vb: SerializeAsync(Of T)(T, CancellationToken)
+- uid: RedisKit.Serialization.IRedisSerializer.DeserializeAsync``1(System.Byte[],System.Threading.CancellationToken)
+  commentId: M:RedisKit.Serialization.IRedisSerializer.DeserializeAsync``1(System.Byte[],System.Threading.CancellationToken)
+  id: DeserializeAsync``1(System.Byte[],System.Threading.CancellationToken)
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: DeserializeAsync<T>(byte[], CancellationToken)
+  nameWithType: IRedisSerializer.DeserializeAsync<T>(byte[], CancellationToken)
+  fullName: RedisKit.Serialization.IRedisSerializer.DeserializeAsync<T>(byte[], System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DeserializeAsync
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 44
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Deserializes a byte array to an object (asynchronous)
+  example: []
+  syntax:
+    content: Task<T?> DeserializeAsync<T>(byte[] data, CancellationToken cancellationToken = default)
+    parameters:
+    - id: data
+      type: System.Byte[]
+      description: Byte array data to deserialize
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+      description: Cancellation token
+    typeParameters:
+    - id: T
+      description: Type of object to deserialize
+    return:
+      type: System.Threading.Tasks.Task{{T}}
+      description: Task representing the deserialized object or null if deserialization fails
+    content.vb: Function DeserializeAsync(Of T)(data As Byte(), cancellationToken As CancellationToken = Nothing) As Task(Of T)
+  overload: RedisKit.Serialization.IRedisSerializer.DeserializeAsync*
+  nameWithType.vb: IRedisSerializer.DeserializeAsync(Of T)(Byte(), CancellationToken)
+  fullName.vb: RedisKit.Serialization.IRedisSerializer.DeserializeAsync(Of T)(Byte(), System.Threading.CancellationToken)
+  name.vb: DeserializeAsync(Of T)(Byte(), CancellationToken)
+- uid: RedisKit.Serialization.IRedisSerializer.DeserializeAsync(System.Byte[],System.Type,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Serialization.IRedisSerializer.DeserializeAsync(System.Byte[],System.Type,System.Threading.CancellationToken)
+  id: DeserializeAsync(System.Byte[],System.Type,System.Threading.CancellationToken)
+  parent: RedisKit.Serialization.IRedisSerializer
+  langs:
+  - csharp
+  - vb
+  name: DeserializeAsync(byte[], Type, CancellationToken)
+  nameWithType: IRedisSerializer.DeserializeAsync(byte[], Type, CancellationToken)
+  fullName: RedisKit.Serialization.IRedisSerializer.DeserializeAsync(byte[], System.Type, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Serialization/IRedisSerializer.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DeserializeAsync
+    path: RedisKit/Serialization/IRedisSerializer.cs
+    startLine: 53
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Serialization
+  summary: Deserializes a byte array to an object using runtime type (asynchronous)
+  example: []
+  syntax:
+    content: Task<object?> DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default)
+    parameters:
+    - id: data
+      type: System.Byte[]
+      description: Byte array data to deserialize
+    - id: type
+      type: System.Type
+      description: Target type for deserialization
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+      description: Cancellation token
+    return:
+      type: System.Threading.Tasks.Task{System.Object}
+      description: Task representing the deserialized object or null if deserialization fails
+    content.vb: Function DeserializeAsync(data As Byte(), type As Type, cancellationToken As CancellationToken = Nothing) As Task(Of Object)
+  overload: RedisKit.Serialization.IRedisSerializer.DeserializeAsync*
+  nameWithType.vb: IRedisSerializer.DeserializeAsync(Byte(), Type, CancellationToken)
+  fullName.vb: RedisKit.Serialization.IRedisSerializer.DeserializeAsync(Byte(), System.Type, System.Threading.CancellationToken)
+  name.vb: DeserializeAsync(Byte(), Type, CancellationToken)
+references:
+- uid: RedisKit.Serialization
+  commentId: N:RedisKit.Serialization
+  href: RedisKit.html
+  name: RedisKit.Serialization
+  nameWithType: RedisKit.Serialization
+  fullName: RedisKit.Serialization
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Serialization
+    name: Serialization
+    href: RedisKit.Serialization.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Serialization
+    name: Serialization
+    href: RedisKit.Serialization.html
+- uid: RedisKit.Serialization.IRedisSerializer.Name*
+  commentId: Overload:RedisKit.Serialization.IRedisSerializer.Name
+  href: RedisKit.Serialization.IRedisSerializer.html#RedisKit_Serialization_IRedisSerializer_Name
+  name: Name
+  nameWithType: IRedisSerializer.Name
+  fullName: RedisKit.Serialization.IRedisSerializer.Name
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Serialization.IRedisSerializer.Serialize*
+  commentId: Overload:RedisKit.Serialization.IRedisSerializer.Serialize
+  href: RedisKit.Serialization.IRedisSerializer.html#RedisKit_Serialization_IRedisSerializer_Serialize__1___0_
+  name: Serialize
+  nameWithType: IRedisSerializer.Serialize
+  fullName: RedisKit.Serialization.IRedisSerializer.Serialize
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Byte[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.byte
+  name: byte[]
+  nameWithType: byte[]
+  fullName: byte[]
+  nameWithType.vb: Byte()
+  fullName.vb: Byte()
+  name.vb: Byte()
+  spec.csharp:
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.byte
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.byte
+  - name: (
+  - name: )
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: RedisKit.Serialization.IRedisSerializer.Deserialize*
+  commentId: Overload:RedisKit.Serialization.IRedisSerializer.Deserialize
+  href: RedisKit.Serialization.IRedisSerializer.html#RedisKit_Serialization_IRedisSerializer_Deserialize__1_System_Byte___
+  name: Deserialize
+  nameWithType: IRedisSerializer.Deserialize
+  fullName: RedisKit.Serialization.IRedisSerializer.Deserialize
+- uid: RedisKit.Serialization.IRedisSerializer.SerializeAsync*
+  commentId: Overload:RedisKit.Serialization.IRedisSerializer.SerializeAsync
+  href: RedisKit.Serialization.IRedisSerializer.html#RedisKit_Serialization_IRedisSerializer_SerializeAsync__1___0_System_Threading_CancellationToken_
+  name: SerializeAsync
+  nameWithType: IRedisSerializer.SerializeAsync
+  fullName: RedisKit.Serialization.IRedisSerializer.SerializeAsync
+- uid: System.Threading.CancellationToken
+  commentId: T:System.Threading.CancellationToken
+  parent: System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  name: CancellationToken
+  nameWithType: CancellationToken
+  fullName: System.Threading.CancellationToken
+- uid: System.Threading.Tasks.Task{System.Byte[]}
+  commentId: T:System.Threading.Tasks.Task{System.Byte[]}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<byte[]>
+  nameWithType: Task<byte[]>
+  fullName: System.Threading.Tasks.Task<byte[]>
+  nameWithType.vb: Task(Of Byte())
+  fullName.vb: System.Threading.Tasks.Task(Of Byte())
+  name.vb: Task(Of Byte())
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.byte
+  - name: '['
+  - name: ']'
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.byte
+  - name: (
+  - name: )
+  - name: )
+- uid: System.Threading
+  commentId: N:System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading
+  nameWithType: System.Threading
+  fullName: System.Threading
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+- uid: System.Threading.Tasks.Task`1
+  commentId: T:System.Threading.Tasks.Task`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<TResult>
+  nameWithType: Task<TResult>
+  fullName: System.Threading.Tasks.Task<TResult>
+  nameWithType.vb: Task(Of TResult)
+  fullName.vb: System.Threading.Tasks.Task(Of TResult)
+  name.vb: Task(Of TResult)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Threading.Tasks
+  commentId: N:System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading.Tasks
+  nameWithType: System.Threading.Tasks
+  fullName: System.Threading.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+- uid: RedisKit.Serialization.IRedisSerializer.DeserializeAsync*
+  commentId: Overload:RedisKit.Serialization.IRedisSerializer.DeserializeAsync
+  href: RedisKit.Serialization.IRedisSerializer.html#RedisKit_Serialization_IRedisSerializer_DeserializeAsync__1_System_Byte___System_Threading_CancellationToken_
+  name: DeserializeAsync
+  nameWithType: IRedisSerializer.DeserializeAsync
+  fullName: RedisKit.Serialization.IRedisSerializer.DeserializeAsync
+- uid: System.Threading.Tasks.Task{{T}}
+  commentId: T:System.Threading.Tasks.Task{``0}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<T>
+  nameWithType: Task<T>
+  fullName: System.Threading.Tasks.Task<T>
+  nameWithType.vb: Task(Of T)
+  fullName.vb: System.Threading.Tasks.Task(Of T)
+  name.vb: Task(Of T)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Type
+  commentId: T:System.Type
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.type
+  name: Type
+  nameWithType: Type
+  fullName: System.Type
+- uid: System.Threading.Tasks.Task{System.Object}
+  commentId: T:System.Threading.Tasks.Task{System.Object}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<object>
+  nameWithType: Task<object>
+  fullName: System.Threading.Tasks.Task<object>
+  nameWithType.vb: Task(Of Object)
+  fullName.vb: System.Threading.Tasks.Task(Of Object)
+  name.vb: Task(Of Object)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )

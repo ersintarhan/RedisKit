@@ -1,0 +1,656 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.StreamMetrics
+  commentId: T:RedisKit.Models.StreamMetrics
+  id: StreamMetrics
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.StreamMetrics.AverageProcessingTime
+  - RedisKit.Models.StreamMetrics.CollectedAt
+  - RedisKit.Models.StreamMetrics.DeadLetterCount
+  - RedisKit.Models.StreamMetrics.MeasurementWindow
+  - RedisKit.Models.StreamMetrics.MessagesPerSecond
+  - RedisKit.Models.StreamMetrics.PendingMessages
+  - RedisKit.Models.StreamMetrics.TotalConsumers
+  - RedisKit.Models.StreamMetrics.TotalMessages
+  langs:
+  - csharp
+  - vb
+  name: StreamMetrics
+  nameWithType: StreamMetrics
+  fullName: RedisKit.Models.StreamMetrics
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: StreamMetrics
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Contains metrics about stream operations
+  example: []
+  syntax:
+    content: public class StreamMetrics
+    content.vb: Public Class StreamMetrics
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Models.StreamMetrics.TotalMessages
+  commentId: P:RedisKit.Models.StreamMetrics.TotalMessages
+  id: TotalMessages
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: TotalMessages
+  nameWithType: StreamMetrics.TotalMessages
+  fullName: RedisKit.Models.StreamMetrics.TotalMessages
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: TotalMessages
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Total number of messages in the stream
+  example: []
+  syntax:
+    content: public long TotalMessages { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property TotalMessages As Long
+  overload: RedisKit.Models.StreamMetrics.TotalMessages*
+- uid: RedisKit.Models.StreamMetrics.PendingMessages
+  commentId: P:RedisKit.Models.StreamMetrics.PendingMessages
+  id: PendingMessages
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: PendingMessages
+  nameWithType: StreamMetrics.PendingMessages
+  fullName: RedisKit.Models.StreamMetrics.PendingMessages
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: PendingMessages
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Number of pending messages
+  example: []
+  syntax:
+    content: public long PendingMessages { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property PendingMessages As Long
+  overload: RedisKit.Models.StreamMetrics.PendingMessages*
+- uid: RedisKit.Models.StreamMetrics.TotalConsumers
+  commentId: P:RedisKit.Models.StreamMetrics.TotalConsumers
+  id: TotalConsumers
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: TotalConsumers
+  nameWithType: StreamMetrics.TotalConsumers
+  fullName: RedisKit.Models.StreamMetrics.TotalConsumers
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: TotalConsumers
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 20
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Number of consumers in all groups
+  example: []
+  syntax:
+    content: public int TotalConsumers { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property TotalConsumers As Integer
+  overload: RedisKit.Models.StreamMetrics.TotalConsumers*
+- uid: RedisKit.Models.StreamMetrics.MessagesPerSecond
+  commentId: P:RedisKit.Models.StreamMetrics.MessagesPerSecond
+  id: MessagesPerSecond
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: MessagesPerSecond
+  nameWithType: StreamMetrics.MessagesPerSecond
+  fullName: RedisKit.Models.StreamMetrics.MessagesPerSecond
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagesPerSecond
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 25
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Messages processed per second (calculated over a time window)
+  example: []
+  syntax:
+    content: public double MessagesPerSecond { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+    content.vb: Public Property MessagesPerSecond As Double
+  overload: RedisKit.Models.StreamMetrics.MessagesPerSecond*
+- uid: RedisKit.Models.StreamMetrics.AverageProcessingTime
+  commentId: P:RedisKit.Models.StreamMetrics.AverageProcessingTime
+  id: AverageProcessingTime
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: AverageProcessingTime
+  nameWithType: StreamMetrics.AverageProcessingTime
+  fullName: RedisKit.Models.StreamMetrics.AverageProcessingTime
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: AverageProcessingTime
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 30
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Average time messages spend in pending state
+  example: []
+  syntax:
+    content: public TimeSpan AverageProcessingTime { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property AverageProcessingTime As TimeSpan
+  overload: RedisKit.Models.StreamMetrics.AverageProcessingTime*
+- uid: RedisKit.Models.StreamMetrics.DeadLetterCount
+  commentId: P:RedisKit.Models.StreamMetrics.DeadLetterCount
+  id: DeadLetterCount
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: DeadLetterCount
+  nameWithType: StreamMetrics.DeadLetterCount
+  fullName: RedisKit.Models.StreamMetrics.DeadLetterCount
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DeadLetterCount
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 35
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Number of messages in the dead letter queue
+  example: []
+  syntax:
+    content: public long DeadLetterCount { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property DeadLetterCount As Long
+  overload: RedisKit.Models.StreamMetrics.DeadLetterCount*
+- uid: RedisKit.Models.StreamMetrics.MeasurementWindow
+  commentId: P:RedisKit.Models.StreamMetrics.MeasurementWindow
+  id: MeasurementWindow
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: MeasurementWindow
+  nameWithType: StreamMetrics.MeasurementWindow
+  fullName: RedisKit.Models.StreamMetrics.MeasurementWindow
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MeasurementWindow
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 40
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Time window used for rate calculations
+  example: []
+  syntax:
+    content: public TimeSpan MeasurementWindow { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property MeasurementWindow As TimeSpan
+  overload: RedisKit.Models.StreamMetrics.MeasurementWindow*
+- uid: RedisKit.Models.StreamMetrics.CollectedAt
+  commentId: P:RedisKit.Models.StreamMetrics.CollectedAt
+  id: CollectedAt
+  parent: RedisKit.Models.StreamMetrics
+  langs:
+  - csharp
+  - vb
+  name: CollectedAt
+  nameWithType: StreamMetrics.CollectedAt
+  fullName: RedisKit.Models.StreamMetrics.CollectedAt
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/StreamMetrics.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CollectedAt
+    path: RedisKit/Models/StreamMetrics.cs
+    startLine: 45
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Timestamp of the metrics collection
+  example: []
+  syntax:
+    content: public DateTime CollectedAt { get; set; }
+    parameters: []
+    return:
+      type: System.DateTime
+    content.vb: Public Property CollectedAt As Date
+  overload: RedisKit.Models.StreamMetrics.CollectedAt*
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Models.StreamMetrics.TotalMessages*
+  commentId: Overload:RedisKit.Models.StreamMetrics.TotalMessages
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_TotalMessages
+  name: TotalMessages
+  nameWithType: StreamMetrics.TotalMessages
+  fullName: RedisKit.Models.StreamMetrics.TotalMessages
+- uid: System.Int64
+  commentId: T:System.Int64
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int64
+  name: long
+  nameWithType: long
+  fullName: long
+  nameWithType.vb: Long
+  fullName.vb: Long
+  name.vb: Long
+- uid: RedisKit.Models.StreamMetrics.PendingMessages*
+  commentId: Overload:RedisKit.Models.StreamMetrics.PendingMessages
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_PendingMessages
+  name: PendingMessages
+  nameWithType: StreamMetrics.PendingMessages
+  fullName: RedisKit.Models.StreamMetrics.PendingMessages
+- uid: RedisKit.Models.StreamMetrics.TotalConsumers*
+  commentId: Overload:RedisKit.Models.StreamMetrics.TotalConsumers
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_TotalConsumers
+  name: TotalConsumers
+  nameWithType: StreamMetrics.TotalConsumers
+  fullName: RedisKit.Models.StreamMetrics.TotalConsumers
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: RedisKit.Models.StreamMetrics.MessagesPerSecond*
+  commentId: Overload:RedisKit.Models.StreamMetrics.MessagesPerSecond
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_MessagesPerSecond
+  name: MessagesPerSecond
+  nameWithType: StreamMetrics.MessagesPerSecond
+  fullName: RedisKit.Models.StreamMetrics.MessagesPerSecond
+- uid: System.Double
+  commentId: T:System.Double
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.double
+  name: double
+  nameWithType: double
+  fullName: double
+  nameWithType.vb: Double
+  fullName.vb: Double
+  name.vb: Double
+- uid: RedisKit.Models.StreamMetrics.AverageProcessingTime*
+  commentId: Overload:RedisKit.Models.StreamMetrics.AverageProcessingTime
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_AverageProcessingTime
+  name: AverageProcessingTime
+  nameWithType: StreamMetrics.AverageProcessingTime
+  fullName: RedisKit.Models.StreamMetrics.AverageProcessingTime
+- uid: System.TimeSpan
+  commentId: T:System.TimeSpan
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan
+  nameWithType: TimeSpan
+  fullName: System.TimeSpan
+- uid: RedisKit.Models.StreamMetrics.DeadLetterCount*
+  commentId: Overload:RedisKit.Models.StreamMetrics.DeadLetterCount
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_DeadLetterCount
+  name: DeadLetterCount
+  nameWithType: StreamMetrics.DeadLetterCount
+  fullName: RedisKit.Models.StreamMetrics.DeadLetterCount
+- uid: RedisKit.Models.StreamMetrics.MeasurementWindow*
+  commentId: Overload:RedisKit.Models.StreamMetrics.MeasurementWindow
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_MeasurementWindow
+  name: MeasurementWindow
+  nameWithType: StreamMetrics.MeasurementWindow
+  fullName: RedisKit.Models.StreamMetrics.MeasurementWindow
+- uid: RedisKit.Models.StreamMetrics.CollectedAt*
+  commentId: Overload:RedisKit.Models.StreamMetrics.CollectedAt
+  href: RedisKit.Models.StreamMetrics.html#RedisKit_Models_StreamMetrics_CollectedAt
+  name: CollectedAt
+  nameWithType: StreamMetrics.CollectedAt
+  fullName: RedisKit.Models.StreamMetrics.CollectedAt
+- uid: System.DateTime
+  commentId: T:System.DateTime
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.datetime
+  name: DateTime
+  nameWithType: DateTime
+  fullName: System.DateTime
+  nameWithType.vb: Date
+  fullName.vb: Date
+  name.vb: Date

@@ -1,0 +1,786 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.SubscriptionStats
+  commentId: T:RedisKit.Models.SubscriptionStats
+  id: SubscriptionStats
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.SubscriptionStats.AverageProcessingTime
+  - RedisKit.Models.SubscriptionStats.ChannelOrPattern
+  - RedisKit.Models.SubscriptionStats.HandlerCount
+  - RedisKit.Models.SubscriptionStats.IncrementMessagesFailed
+  - RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed
+  - RedisKit.Models.SubscriptionStats.IncrementMessagesReceived
+  - RedisKit.Models.SubscriptionStats.LastMessageAt
+  - RedisKit.Models.SubscriptionStats.MessagesFailed
+  - RedisKit.Models.SubscriptionStats.MessagesProcessed
+  - RedisKit.Models.SubscriptionStats.MessagesReceived
+  - RedisKit.Models.SubscriptionStats.Type
+  langs:
+  - csharp
+  - vb
+  name: SubscriptionStats
+  nameWithType: SubscriptionStats
+  fullName: RedisKit.Models.SubscriptionStats
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscriptionStats
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Subscription statistics
+  example: []
+  syntax:
+    content: public class SubscriptionStats
+    content.vb: Public Class SubscriptionStats
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Models.SubscriptionStats.ChannelOrPattern
+  commentId: P:RedisKit.Models.SubscriptionStats.ChannelOrPattern
+  id: ChannelOrPattern
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: ChannelOrPattern
+  nameWithType: SubscriptionStats.ChannelOrPattern
+  fullName: RedisKit.Models.SubscriptionStats.ChannelOrPattern
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: ChannelOrPattern
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 11
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public string ChannelOrPattern { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ChannelOrPattern As String
+  overload: RedisKit.Models.SubscriptionStats.ChannelOrPattern*
+- uid: RedisKit.Models.SubscriptionStats.Type
+  commentId: P:RedisKit.Models.SubscriptionStats.Type
+  id: Type
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: Type
+  nameWithType: SubscriptionStats.Type
+  fullName: RedisKit.Models.SubscriptionStats.Type
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Type
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 12
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public SubscriptionType Type { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.SubscriptionType
+    content.vb: Public Property Type As SubscriptionType
+  overload: RedisKit.Models.SubscriptionStats.Type*
+- uid: RedisKit.Models.SubscriptionStats.HandlerCount
+  commentId: P:RedisKit.Models.SubscriptionStats.HandlerCount
+  id: HandlerCount
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: HandlerCount
+  nameWithType: SubscriptionStats.HandlerCount
+  fullName: RedisKit.Models.SubscriptionStats.HandlerCount
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: HandlerCount
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 13
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public int HandlerCount { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property HandlerCount As Integer
+  overload: RedisKit.Models.SubscriptionStats.HandlerCount*
+- uid: RedisKit.Models.SubscriptionStats.MessagesReceived
+  commentId: P:RedisKit.Models.SubscriptionStats.MessagesReceived
+  id: MessagesReceived
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: MessagesReceived
+  nameWithType: SubscriptionStats.MessagesReceived
+  fullName: RedisKit.Models.SubscriptionStats.MessagesReceived
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagesReceived
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public long MessagesReceived { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property MessagesReceived As Long
+  overload: RedisKit.Models.SubscriptionStats.MessagesReceived*
+- uid: RedisKit.Models.SubscriptionStats.MessagesProcessed
+  commentId: P:RedisKit.Models.SubscriptionStats.MessagesProcessed
+  id: MessagesProcessed
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: MessagesProcessed
+  nameWithType: SubscriptionStats.MessagesProcessed
+  fullName: RedisKit.Models.SubscriptionStats.MessagesProcessed
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagesProcessed
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 21
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public long MessagesProcessed { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property MessagesProcessed As Long
+  overload: RedisKit.Models.SubscriptionStats.MessagesProcessed*
+- uid: RedisKit.Models.SubscriptionStats.MessagesFailed
+  commentId: P:RedisKit.Models.SubscriptionStats.MessagesFailed
+  id: MessagesFailed
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: MessagesFailed
+  nameWithType: SubscriptionStats.MessagesFailed
+  fullName: RedisKit.Models.SubscriptionStats.MessagesFailed
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagesFailed
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 27
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public long MessagesFailed { get; set; }
+    parameters: []
+    return:
+      type: System.Int64
+    content.vb: Public Property MessagesFailed As Long
+  overload: RedisKit.Models.SubscriptionStats.MessagesFailed*
+- uid: RedisKit.Models.SubscriptionStats.LastMessageAt
+  commentId: P:RedisKit.Models.SubscriptionStats.LastMessageAt
+  id: LastMessageAt
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: LastMessageAt
+  nameWithType: SubscriptionStats.LastMessageAt
+  fullName: RedisKit.Models.SubscriptionStats.LastMessageAt
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: LastMessageAt
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 33
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public DateTime? LastMessageAt { get; set; }
+    parameters: []
+    return:
+      type: System.Nullable{System.DateTime}
+    content.vb: Public Property LastMessageAt As Date?
+  overload: RedisKit.Models.SubscriptionStats.LastMessageAt*
+- uid: RedisKit.Models.SubscriptionStats.AverageProcessingTime
+  commentId: P:RedisKit.Models.SubscriptionStats.AverageProcessingTime
+  id: AverageProcessingTime
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: AverageProcessingTime
+  nameWithType: SubscriptionStats.AverageProcessingTime
+  fullName: RedisKit.Models.SubscriptionStats.AverageProcessingTime
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: AverageProcessingTime
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 34
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public TimeSpan AverageProcessingTime { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property AverageProcessingTime As TimeSpan
+  overload: RedisKit.Models.SubscriptionStats.AverageProcessingTime*
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesReceived
+  commentId: M:RedisKit.Models.SubscriptionStats.IncrementMessagesReceived
+  id: IncrementMessagesReceived
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: IncrementMessagesReceived()
+  nameWithType: SubscriptionStats.IncrementMessagesReceived()
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesReceived()
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IncrementMessagesReceived
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 36
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public void IncrementMessagesReceived()
+    content.vb: Public Sub IncrementMessagesReceived()
+  overload: RedisKit.Models.SubscriptionStats.IncrementMessagesReceived*
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed
+  commentId: M:RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed
+  id: IncrementMessagesProcessed
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: IncrementMessagesProcessed()
+  nameWithType: SubscriptionStats.IncrementMessagesProcessed()
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed()
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IncrementMessagesProcessed
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 37
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public void IncrementMessagesProcessed()
+    content.vb: Public Sub IncrementMessagesProcessed()
+  overload: RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed*
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesFailed
+  commentId: M:RedisKit.Models.SubscriptionStats.IncrementMessagesFailed
+  id: IncrementMessagesFailed
+  parent: RedisKit.Models.SubscriptionStats
+  langs:
+  - csharp
+  - vb
+  name: IncrementMessagesFailed()
+  nameWithType: SubscriptionStats.IncrementMessagesFailed()
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesFailed()
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Models/SubscriptionStats.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IncrementMessagesFailed
+    path: RedisKit/Models/SubscriptionStats.cs
+    startLine: 38
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: public void IncrementMessagesFailed()
+    content.vb: Public Sub IncrementMessagesFailed()
+  overload: RedisKit.Models.SubscriptionStats.IncrementMessagesFailed*
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Models.SubscriptionStats.ChannelOrPattern*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.ChannelOrPattern
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_ChannelOrPattern
+  name: ChannelOrPattern
+  nameWithType: SubscriptionStats.ChannelOrPattern
+  fullName: RedisKit.Models.SubscriptionStats.ChannelOrPattern
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: RedisKit.Models.SubscriptionStats.Type*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.Type
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_Type
+  name: Type
+  nameWithType: SubscriptionStats.Type
+  fullName: RedisKit.Models.SubscriptionStats.Type
+- uid: RedisKit.Models.SubscriptionType
+  commentId: T:RedisKit.Models.SubscriptionType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionType.html
+  name: SubscriptionType
+  nameWithType: SubscriptionType
+  fullName: RedisKit.Models.SubscriptionType
+- uid: RedisKit.Models.SubscriptionStats.HandlerCount*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.HandlerCount
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_HandlerCount
+  name: HandlerCount
+  nameWithType: SubscriptionStats.HandlerCount
+  fullName: RedisKit.Models.SubscriptionStats.HandlerCount
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: RedisKit.Models.SubscriptionStats.MessagesReceived*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.MessagesReceived
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_MessagesReceived
+  name: MessagesReceived
+  nameWithType: SubscriptionStats.MessagesReceived
+  fullName: RedisKit.Models.SubscriptionStats.MessagesReceived
+- uid: System.Int64
+  commentId: T:System.Int64
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int64
+  name: long
+  nameWithType: long
+  fullName: long
+  nameWithType.vb: Long
+  fullName.vb: Long
+  name.vb: Long
+- uid: RedisKit.Models.SubscriptionStats.MessagesProcessed*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.MessagesProcessed
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_MessagesProcessed
+  name: MessagesProcessed
+  nameWithType: SubscriptionStats.MessagesProcessed
+  fullName: RedisKit.Models.SubscriptionStats.MessagesProcessed
+- uid: RedisKit.Models.SubscriptionStats.MessagesFailed*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.MessagesFailed
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_MessagesFailed
+  name: MessagesFailed
+  nameWithType: SubscriptionStats.MessagesFailed
+  fullName: RedisKit.Models.SubscriptionStats.MessagesFailed
+- uid: RedisKit.Models.SubscriptionStats.LastMessageAt*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.LastMessageAt
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_LastMessageAt
+  name: LastMessageAt
+  nameWithType: SubscriptionStats.LastMessageAt
+  fullName: RedisKit.Models.SubscriptionStats.LastMessageAt
+- uid: System.Nullable{System.DateTime}
+  commentId: T:System.Nullable{System.DateTime}
+  parent: System
+  definition: System.Nullable`1
+  href: https://learn.microsoft.com/dotnet/api/system.datetime
+  name: DateTime?
+  nameWithType: DateTime?
+  fullName: System.DateTime?
+  nameWithType.vb: Date?
+  fullName.vb: Date?
+  name.vb: Date?
+  spec.csharp:
+  - uid: System.DateTime
+    name: DateTime
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.datetime
+  - name: '?'
+  spec.vb:
+  - uid: System.DateTime
+    name: Date
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.datetime
+  - name: '?'
+- uid: System.Nullable`1
+  commentId: T:System.Nullable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  name: Nullable<T>
+  nameWithType: Nullable<T>
+  fullName: System.Nullable<T>
+  nameWithType.vb: Nullable(Of T)
+  fullName.vb: System.Nullable(Of T)
+  name.vb: Nullable(Of T)
+  spec.csharp:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: RedisKit.Models.SubscriptionStats.AverageProcessingTime*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.AverageProcessingTime
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_AverageProcessingTime
+  name: AverageProcessingTime
+  nameWithType: SubscriptionStats.AverageProcessingTime
+  fullName: RedisKit.Models.SubscriptionStats.AverageProcessingTime
+- uid: System.TimeSpan
+  commentId: T:System.TimeSpan
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan
+  nameWithType: TimeSpan
+  fullName: System.TimeSpan
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesReceived*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.IncrementMessagesReceived
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_IncrementMessagesReceived
+  name: IncrementMessagesReceived
+  nameWithType: SubscriptionStats.IncrementMessagesReceived
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesReceived
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_IncrementMessagesProcessed
+  name: IncrementMessagesProcessed
+  nameWithType: SubscriptionStats.IncrementMessagesProcessed
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesProcessed
+- uid: RedisKit.Models.SubscriptionStats.IncrementMessagesFailed*
+  commentId: Overload:RedisKit.Models.SubscriptionStats.IncrementMessagesFailed
+  href: RedisKit.Models.SubscriptionStats.html#RedisKit_Models_SubscriptionStats_IncrementMessagesFailed
+  name: IncrementMessagesFailed
+  nameWithType: SubscriptionStats.IncrementMessagesFailed
+  fullName: RedisKit.Models.SubscriptionStats.IncrementMessagesFailed

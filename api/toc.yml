@@ -1,0 +1,105 @@
+### YamlMime:TableOfContent
+items:
+- uid: RedisKit.Exceptions
+  name: RedisKit.Exceptions
+  type: Namespace
+  items:
+  - uid: RedisKit.Exceptions.RedisCircuitOpenException
+    name: RedisCircuitOpenException
+    type: Class
+- uid: RedisKit.Extensions
+  name: RedisKit.Extensions
+  type: Namespace
+  items:
+  - uid: RedisKit.Extensions.ServiceCollectionExtensions
+    name: ServiceCollectionExtensions
+    type: Class
+- uid: RedisKit.Interfaces
+  name: RedisKit.Interfaces
+  type: Namespace
+  items:
+  - uid: RedisKit.Interfaces.IRedisCacheService
+    name: IRedisCacheService
+    type: Interface
+  - uid: RedisKit.Interfaces.IRedisPubSubService
+    name: IRedisPubSubService
+    type: Interface
+  - uid: RedisKit.Interfaces.IRedisStreamService
+    name: IRedisStreamService
+    type: Interface
+- uid: RedisKit.Models
+  name: RedisKit.Models
+  type: Namespace
+  items:
+  - uid: RedisKit.Models.BackoffStrategy
+    name: BackoffStrategy
+    type: Enum
+  - uid: RedisKit.Models.CircuitBreakerSettings
+    name: CircuitBreakerSettings
+    type: Class
+  - uid: RedisKit.Models.CircuitState
+    name: CircuitState
+    type: Enum
+  - uid: RedisKit.Models.ConnectionHealthStatus
+    name: ConnectionHealthStatus
+    type: Class
+  - uid: RedisKit.Models.ConnectionTimeoutSettings
+    name: ConnectionTimeoutSettings
+    type: Class
+  - uid: RedisKit.Models.DeadLetterMessage`1
+    name: DeadLetterMessage<T>
+    type: Class
+  - uid: RedisKit.Models.HealthMonitoringSettings
+    name: HealthMonitoringSettings
+    type: Class
+  - uid: RedisKit.Models.RedisOptions
+    name: RedisOptions
+    type: Class
+  - uid: RedisKit.Models.RetryConfiguration
+    name: RetryConfiguration
+    type: Class
+  - uid: RedisKit.Models.RetryResult`1
+    name: RetryResult<T>
+    type: Class
+  - uid: RedisKit.Models.SerializerType
+    name: SerializerType
+    type: Enum
+  - uid: RedisKit.Models.StreamHealthInfo
+    name: StreamHealthInfo
+    type: Class
+  - uid: RedisKit.Models.StreamMetrics
+    name: StreamMetrics
+    type: Class
+  - uid: RedisKit.Models.SubscriptionStats
+    name: SubscriptionStats
+    type: Class
+  - uid: RedisKit.Models.SubscriptionToken
+    name: SubscriptionToken
+    type: Class
+  - uid: RedisKit.Models.SubscriptionType
+    name: SubscriptionType
+    type: Enum
+- uid: RedisKit.Serialization
+  name: RedisKit.Serialization
+  type: Namespace
+  items:
+  - uid: RedisKit.Serialization.IRedisSerializer
+    name: IRedisSerializer
+    type: Interface
+  - uid: RedisKit.Serialization.RedisSerializerFactory
+    name: RedisSerializerFactory
+    type: Class
+- uid: RedisKit.Services
+  name: RedisKit.Services
+  type: Namespace
+  items:
+  - uid: RedisKit.Services.PubSubService
+    name: PubSubService
+    type: Class
+  - uid: RedisKit.Services.RedisCacheService
+    name: RedisCacheService
+    type: Class
+  - uid: RedisKit.Services.RedisStreamService
+    name: RedisStreamService
+    type: Class
+memberLayout: SamePage

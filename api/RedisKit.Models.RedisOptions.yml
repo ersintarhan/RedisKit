@@ -1,0 +1,917 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.RedisOptions
+  commentId: T:RedisKit.Models.RedisOptions
+  id: RedisOptions
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.RedisOptions.CacheKeyPrefix
+  - RedisKit.Models.RedisOptions.CircuitBreaker
+  - RedisKit.Models.RedisOptions.ConnectionString
+  - RedisKit.Models.RedisOptions.DefaultTtl
+  - RedisKit.Models.RedisOptions.HealthMonitoring
+  - RedisKit.Models.RedisOptions.JsonOptions
+  - RedisKit.Models.RedisOptions.MessagePackOptions
+  - RedisKit.Models.RedisOptions.OperationTimeout
+  - RedisKit.Models.RedisOptions.RetryAttempts
+  - RedisKit.Models.RedisOptions.RetryConfiguration
+  - RedisKit.Models.RedisOptions.RetryDelay
+  - RedisKit.Models.RedisOptions.Serializer
+  - RedisKit.Models.RedisOptions.TimeoutSettings
+  langs:
+  - csharp
+  - vb
+  name: RedisOptions
+  nameWithType: RedisOptions
+  fullName: RedisKit.Models.RedisOptions
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RedisOptions
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 8
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Configuration options for Redis connection and operations
+  example: []
+  syntax:
+    content: public class RedisOptions
+    content.vb: Public Class RedisOptions
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Models.RedisOptions.ConnectionString
+  commentId: P:RedisKit.Models.RedisOptions.ConnectionString
+  id: ConnectionString
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: ConnectionString
+  nameWithType: RedisOptions.ConnectionString
+  fullName: RedisKit.Models.RedisOptions.ConnectionString
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: ConnectionString
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 13
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Connection string for Redis server
+  example: []
+  syntax:
+    content: public string ConnectionString { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ConnectionString As String
+  overload: RedisKit.Models.RedisOptions.ConnectionString*
+- uid: RedisKit.Models.RedisOptions.DefaultTtl
+  commentId: P:RedisKit.Models.RedisOptions.DefaultTtl
+  id: DefaultTtl
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: DefaultTtl
+  nameWithType: RedisOptions.DefaultTtl
+  fullName: RedisKit.Models.RedisOptions.DefaultTtl
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DefaultTtl
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 18
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Default TTL for cache entries (if not specified)
+  example: []
+  syntax:
+    content: public TimeSpan DefaultTtl { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property DefaultTtl As TimeSpan
+  overload: RedisKit.Models.RedisOptions.DefaultTtl*
+- uid: RedisKit.Models.RedisOptions.CacheKeyPrefix
+  commentId: P:RedisKit.Models.RedisOptions.CacheKeyPrefix
+  id: CacheKeyPrefix
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: CacheKeyPrefix
+  nameWithType: RedisOptions.CacheKeyPrefix
+  fullName: RedisKit.Models.RedisOptions.CacheKeyPrefix
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CacheKeyPrefix
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 23
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Prefix for all cache keys
+  example: []
+  syntax:
+    content: public string CacheKeyPrefix { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property CacheKeyPrefix As String
+  overload: RedisKit.Models.RedisOptions.CacheKeyPrefix*
+- uid: RedisKit.Models.RedisOptions.RetryAttempts
+  commentId: P:RedisKit.Models.RedisOptions.RetryAttempts
+  id: RetryAttempts
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: RetryAttempts
+  nameWithType: RedisOptions.RetryAttempts
+  fullName: RedisKit.Models.RedisOptions.RetryAttempts
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RetryAttempts
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 28
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Number of retry attempts for failed operations
+  example: []
+  syntax:
+    content: public int RetryAttempts { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property RetryAttempts As Integer
+  overload: RedisKit.Models.RedisOptions.RetryAttempts*
+- uid: RedisKit.Models.RedisOptions.RetryDelay
+  commentId: P:RedisKit.Models.RedisOptions.RetryDelay
+  id: RetryDelay
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: RetryDelay
+  nameWithType: RedisOptions.RetryDelay
+  fullName: RedisKit.Models.RedisOptions.RetryDelay
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RetryDelay
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 33
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Delay between retry attempts
+  example: []
+  syntax:
+    content: public TimeSpan RetryDelay { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property RetryDelay As TimeSpan
+  overload: RedisKit.Models.RedisOptions.RetryDelay*
+- uid: RedisKit.Models.RedisOptions.OperationTimeout
+  commentId: P:RedisKit.Models.RedisOptions.OperationTimeout
+  id: OperationTimeout
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: OperationTimeout
+  nameWithType: RedisOptions.OperationTimeout
+  fullName: RedisKit.Models.RedisOptions.OperationTimeout
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: OperationTimeout
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 38
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Timeout for Redis operations
+  example: []
+  syntax:
+    content: public TimeSpan OperationTimeout { get; set; }
+    parameters: []
+    return:
+      type: System.TimeSpan
+    content.vb: Public Property OperationTimeout As TimeSpan
+  overload: RedisKit.Models.RedisOptions.OperationTimeout*
+- uid: RedisKit.Models.RedisOptions.Serializer
+  commentId: P:RedisKit.Models.RedisOptions.Serializer
+  id: Serializer
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: Serializer
+  nameWithType: RedisOptions.Serializer
+  fullName: RedisKit.Models.RedisOptions.Serializer
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Serializer
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 43
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Serializer type to use for serialization
+  example: []
+  syntax:
+    content: public SerializerType Serializer { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.SerializerType
+    content.vb: Public Property Serializer As SerializerType
+  overload: RedisKit.Models.RedisOptions.Serializer*
+- uid: RedisKit.Models.RedisOptions.JsonOptions
+  commentId: P:RedisKit.Models.RedisOptions.JsonOptions
+  id: JsonOptions
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: JsonOptions
+  nameWithType: RedisOptions.JsonOptions
+  fullName: RedisKit.Models.RedisOptions.JsonOptions
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: JsonOptions
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 48
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: JSON serializer options (used when Serializer is SystemTextJson)
+  example: []
+  syntax:
+    content: public JsonSerializerOptions? JsonOptions { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Json.JsonSerializerOptions
+    content.vb: Public Property JsonOptions As JsonSerializerOptions
+  overload: RedisKit.Models.RedisOptions.JsonOptions*
+- uid: RedisKit.Models.RedisOptions.MessagePackOptions
+  commentId: P:RedisKit.Models.RedisOptions.MessagePackOptions
+  id: MessagePackOptions
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: MessagePackOptions
+  nameWithType: RedisOptions.MessagePackOptions
+  fullName: RedisKit.Models.RedisOptions.MessagePackOptions
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagePackOptions
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 53
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: MessagePack serializer options (used when Serializer is MessagePack)
+  example: []
+  syntax:
+    content: public MessagePackSerializerOptions? MessagePackOptions { get; set; }
+    parameters: []
+    return:
+      type: MessagePack.MessagePackSerializerOptions
+    content.vb: Public Property MessagePackOptions As MessagePackSerializerOptions
+  overload: RedisKit.Models.RedisOptions.MessagePackOptions*
+- uid: RedisKit.Models.RedisOptions.TimeoutSettings
+  commentId: P:RedisKit.Models.RedisOptions.TimeoutSettings
+  id: TimeoutSettings
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: TimeoutSettings
+  nameWithType: RedisOptions.TimeoutSettings
+  fullName: RedisKit.Models.RedisOptions.TimeoutSettings
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: TimeoutSettings
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 58
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Advanced connection timeout settings
+  example: []
+  syntax:
+    content: public ConnectionTimeoutSettings TimeoutSettings { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.ConnectionTimeoutSettings
+    content.vb: Public Property TimeoutSettings As ConnectionTimeoutSettings
+  overload: RedisKit.Models.RedisOptions.TimeoutSettings*
+- uid: RedisKit.Models.RedisOptions.RetryConfiguration
+  commentId: P:RedisKit.Models.RedisOptions.RetryConfiguration
+  id: RetryConfiguration
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: RetryConfiguration
+  nameWithType: RedisOptions.RetryConfiguration
+  fullName: RedisKit.Models.RedisOptions.RetryConfiguration
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RetryConfiguration
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 63
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Retry configuration with backoff strategies
+  example: []
+  syntax:
+    content: public RetryConfiguration RetryConfiguration { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.RetryConfiguration
+    content.vb: Public Property RetryConfiguration As RetryConfiguration
+  overload: RedisKit.Models.RedisOptions.RetryConfiguration*
+- uid: RedisKit.Models.RedisOptions.CircuitBreaker
+  commentId: P:RedisKit.Models.RedisOptions.CircuitBreaker
+  id: CircuitBreaker
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: CircuitBreaker
+  nameWithType: RedisOptions.CircuitBreaker
+  fullName: RedisKit.Models.RedisOptions.CircuitBreaker
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CircuitBreaker
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 68
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Circuit breaker settings
+  example: []
+  syntax:
+    content: public CircuitBreakerSettings CircuitBreaker { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.CircuitBreakerSettings
+    content.vb: Public Property CircuitBreaker As CircuitBreakerSettings
+  overload: RedisKit.Models.RedisOptions.CircuitBreaker*
+- uid: RedisKit.Models.RedisOptions.HealthMonitoring
+  commentId: P:RedisKit.Models.RedisOptions.HealthMonitoring
+  id: HealthMonitoring
+  parent: RedisKit.Models.RedisOptions
+  langs:
+  - csharp
+  - vb
+  name: HealthMonitoring
+  nameWithType: RedisOptions.HealthMonitoring
+  fullName: RedisKit.Models.RedisOptions.HealthMonitoring
+  type: Property
+  source:
+    remote:
+      path: RedisKit/Models/RedisOptions.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: HealthMonitoring
+    path: RedisKit/Models/RedisOptions.cs
+    startLine: 73
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Health monitoring settings
+  example: []
+  syntax:
+    content: public HealthMonitoringSettings HealthMonitoring { get; set; }
+    parameters: []
+    return:
+      type: RedisKit.Models.HealthMonitoringSettings
+    content.vb: Public Property HealthMonitoring As HealthMonitoringSettings
+  overload: RedisKit.Models.RedisOptions.HealthMonitoring*
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Models.RedisOptions.ConnectionString*
+  commentId: Overload:RedisKit.Models.RedisOptions.ConnectionString
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_ConnectionString
+  name: ConnectionString
+  nameWithType: RedisOptions.ConnectionString
+  fullName: RedisKit.Models.RedisOptions.ConnectionString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: RedisKit.Models.RedisOptions.DefaultTtl*
+  commentId: Overload:RedisKit.Models.RedisOptions.DefaultTtl
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_DefaultTtl
+  name: DefaultTtl
+  nameWithType: RedisOptions.DefaultTtl
+  fullName: RedisKit.Models.RedisOptions.DefaultTtl
+- uid: System.TimeSpan
+  commentId: T:System.TimeSpan
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan
+  nameWithType: TimeSpan
+  fullName: System.TimeSpan
+- uid: RedisKit.Models.RedisOptions.CacheKeyPrefix*
+  commentId: Overload:RedisKit.Models.RedisOptions.CacheKeyPrefix
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_CacheKeyPrefix
+  name: CacheKeyPrefix
+  nameWithType: RedisOptions.CacheKeyPrefix
+  fullName: RedisKit.Models.RedisOptions.CacheKeyPrefix
+- uid: RedisKit.Models.RedisOptions.RetryAttempts*
+  commentId: Overload:RedisKit.Models.RedisOptions.RetryAttempts
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_RetryAttempts
+  name: RetryAttempts
+  nameWithType: RedisOptions.RetryAttempts
+  fullName: RedisKit.Models.RedisOptions.RetryAttempts
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: RedisKit.Models.RedisOptions.RetryDelay*
+  commentId: Overload:RedisKit.Models.RedisOptions.RetryDelay
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_RetryDelay
+  name: RetryDelay
+  nameWithType: RedisOptions.RetryDelay
+  fullName: RedisKit.Models.RedisOptions.RetryDelay
+- uid: RedisKit.Models.RedisOptions.OperationTimeout*
+  commentId: Overload:RedisKit.Models.RedisOptions.OperationTimeout
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_OperationTimeout
+  name: OperationTimeout
+  nameWithType: RedisOptions.OperationTimeout
+  fullName: RedisKit.Models.RedisOptions.OperationTimeout
+- uid: RedisKit.Models.RedisOptions.Serializer*
+  commentId: Overload:RedisKit.Models.RedisOptions.Serializer
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_Serializer
+  name: Serializer
+  nameWithType: RedisOptions.Serializer
+  fullName: RedisKit.Models.RedisOptions.Serializer
+- uid: RedisKit.Models.SerializerType
+  commentId: T:RedisKit.Models.SerializerType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SerializerType.html
+  name: SerializerType
+  nameWithType: SerializerType
+  fullName: RedisKit.Models.SerializerType
+- uid: RedisKit.Models.RedisOptions.JsonOptions*
+  commentId: Overload:RedisKit.Models.RedisOptions.JsonOptions
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_JsonOptions
+  name: JsonOptions
+  nameWithType: RedisOptions.JsonOptions
+  fullName: RedisKit.Models.RedisOptions.JsonOptions
+- uid: System.Text.Json.JsonSerializerOptions
+  commentId: T:System.Text.Json.JsonSerializerOptions
+  parent: System.Text.Json
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions
+  name: JsonSerializerOptions
+  nameWithType: JsonSerializerOptions
+  fullName: System.Text.Json.JsonSerializerOptions
+- uid: System.Text.Json
+  commentId: N:System.Text.Json
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text.Json
+  nameWithType: System.Text.Json
+  fullName: System.Text.Json
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  - name: .
+  - uid: System.Text.Json
+    name: Json
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.json
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  - name: .
+  - uid: System.Text.Json
+    name: Json
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.json
+- uid: RedisKit.Models.RedisOptions.MessagePackOptions*
+  commentId: Overload:RedisKit.Models.RedisOptions.MessagePackOptions
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_MessagePackOptions
+  name: MessagePackOptions
+  nameWithType: RedisOptions.MessagePackOptions
+  fullName: RedisKit.Models.RedisOptions.MessagePackOptions
+- uid: MessagePack.MessagePackSerializerOptions
+  commentId: T:MessagePack.MessagePackSerializerOptions
+  parent: MessagePack
+  isExternal: true
+  name: MessagePackSerializerOptions
+  nameWithType: MessagePackSerializerOptions
+  fullName: MessagePack.MessagePackSerializerOptions
+- uid: MessagePack
+  commentId: N:MessagePack
+  isExternal: true
+  name: MessagePack
+  nameWithType: MessagePack
+  fullName: MessagePack
+- uid: RedisKit.Models.RedisOptions.TimeoutSettings*
+  commentId: Overload:RedisKit.Models.RedisOptions.TimeoutSettings
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_TimeoutSettings
+  name: TimeoutSettings
+  nameWithType: RedisOptions.TimeoutSettings
+  fullName: RedisKit.Models.RedisOptions.TimeoutSettings
+- uid: RedisKit.Models.ConnectionTimeoutSettings
+  commentId: T:RedisKit.Models.ConnectionTimeoutSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.ConnectionTimeoutSettings.html
+  name: ConnectionTimeoutSettings
+  nameWithType: ConnectionTimeoutSettings
+  fullName: RedisKit.Models.ConnectionTimeoutSettings
+- uid: RedisKit.Models.RedisOptions.RetryConfiguration*
+  commentId: Overload:RedisKit.Models.RedisOptions.RetryConfiguration
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_RetryConfiguration
+  name: RetryConfiguration
+  nameWithType: RedisOptions.RetryConfiguration
+  fullName: RedisKit.Models.RedisOptions.RetryConfiguration
+- uid: RedisKit.Models.RetryConfiguration
+  commentId: T:RedisKit.Models.RetryConfiguration
+  parent: RedisKit.Models
+  href: RedisKit.Models.RetryConfiguration.html
+  name: RetryConfiguration
+  nameWithType: RetryConfiguration
+  fullName: RedisKit.Models.RetryConfiguration
+- uid: RedisKit.Models.RedisOptions.CircuitBreaker*
+  commentId: Overload:RedisKit.Models.RedisOptions.CircuitBreaker
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_CircuitBreaker
+  name: CircuitBreaker
+  nameWithType: RedisOptions.CircuitBreaker
+  fullName: RedisKit.Models.RedisOptions.CircuitBreaker
+- uid: RedisKit.Models.CircuitBreakerSettings
+  commentId: T:RedisKit.Models.CircuitBreakerSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.CircuitBreakerSettings.html
+  name: CircuitBreakerSettings
+  nameWithType: CircuitBreakerSettings
+  fullName: RedisKit.Models.CircuitBreakerSettings
+- uid: RedisKit.Models.RedisOptions.HealthMonitoring*
+  commentId: Overload:RedisKit.Models.RedisOptions.HealthMonitoring
+  href: RedisKit.Models.RedisOptions.html#RedisKit_Models_RedisOptions_HealthMonitoring
+  name: HealthMonitoring
+  nameWithType: RedisOptions.HealthMonitoring
+  fullName: RedisKit.Models.RedisOptions.HealthMonitoring
+- uid: RedisKit.Models.HealthMonitoringSettings
+  commentId: T:RedisKit.Models.HealthMonitoringSettings
+  parent: RedisKit.Models
+  href: RedisKit.Models.HealthMonitoringSettings.html
+  name: HealthMonitoringSettings
+  nameWithType: HealthMonitoringSettings
+  fullName: RedisKit.Models.HealthMonitoringSettings

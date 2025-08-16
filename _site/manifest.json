@@ -1,0 +1,533 @@
+{
+  "source_base_path": "/Users/ersin/Projects/redis-lib-csharp",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "CRUSH.md",
+      "output": {
+        ".html": {
+          "relative_path": "CRUSH.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "QWEN.md",
+      "output": {
+        ".html": {
+          "relative_path": "QWEN.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "README.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Exceptions.RedisCircuitOpenException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Exceptions.RedisCircuitOpenException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Exceptions.RedisCircuitOpenException",
+      "Summary": "<p sourcefile=\"api/RedisKit.Exceptions.RedisCircuitOpenException.yml\" sourcestartlinenumber=\"1\">Exception thrown when circuit is open</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Exceptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Exceptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Exceptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Extensions.ServiceCollectionExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Extensions.ServiceCollectionExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Extensions.ServiceCollectionExtensions",
+      "Summary": "<p sourcefile=\"api/RedisKit.Extensions.ServiceCollectionExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods for configuring Redis services in dependency injection container</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Extensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Extensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Extensions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Interfaces.IRedisCacheService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Interfaces.IRedisCacheService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Interfaces.IRedisCacheService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Interfaces.IRedisCacheService.yml\" sourcestartlinenumber=\"1\">Interface for Redis caching operations with generic support</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Interfaces.IRedisPubSubService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Interfaces.IRedisPubSubService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Interfaces.IRedisPubSubService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Interfaces.IRedisPubSubService.yml\" sourcestartlinenumber=\"1\">Interface for Redis pub/sub operations with generic support</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Interfaces.IRedisStreamService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Interfaces.IRedisStreamService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Interfaces.IRedisStreamService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Interfaces.IRedisStreamService.yml\" sourcestartlinenumber=\"1\">Interface for Redis Streams operations with generic support</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Interfaces.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Interfaces.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Interfaces",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.BackoffStrategy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.BackoffStrategy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.BackoffStrategy",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.BackoffStrategy.yml\" sourcestartlinenumber=\"1\">Backoff strategy for retry logic</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.CircuitBreakerSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.CircuitBreakerSettings.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.CircuitBreakerSettings",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.CircuitBreakerSettings.yml\" sourcestartlinenumber=\"1\">Circuit breaker configuration</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.CircuitState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.CircuitState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.CircuitState",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.CircuitState.yml\" sourcestartlinenumber=\"1\">Connection state for circuit breaker</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.ConnectionHealthStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.ConnectionHealthStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.ConnectionHealthStatus",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.ConnectionHealthStatus.yml\" sourcestartlinenumber=\"1\">Connection health status</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.ConnectionTimeoutSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.ConnectionTimeoutSettings.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.ConnectionTimeoutSettings",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.ConnectionTimeoutSettings.yml\" sourcestartlinenumber=\"1\">Connection timeout configuration for Redis operations</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.DeadLetterMessage-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.DeadLetterMessage-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.DeadLetterMessage<T>",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.DeadLetterMessage-1.yml\" sourcestartlinenumber=\"1\">Represents a message that failed processing and was moved to dead letter queue</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.HealthMonitoringSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.HealthMonitoringSettings.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.HealthMonitoringSettings",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.HealthMonitoringSettings.yml\" sourcestartlinenumber=\"1\">Connection health monitoring settings</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.RedisOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.RedisOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.RedisOptions",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.RedisOptions.yml\" sourcestartlinenumber=\"1\">Configuration options for Redis connection and operations</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.RetryConfiguration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.RetryConfiguration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.RetryConfiguration",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.RetryConfiguration.yml\" sourcestartlinenumber=\"1\">Retry configuration with advanced backoff strategies</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.RetryResult-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.RetryResult-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.RetryResult<T>",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.RetryResult-1.yml\" sourcestartlinenumber=\"1\">Result of a retry operation</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.SerializerType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.SerializerType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.SerializerType",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.SerializerType.yml\" sourcestartlinenumber=\"1\">Available serializer types</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.StreamHealthInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.StreamHealthInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.StreamHealthInfo",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.StreamHealthInfo.yml\" sourcestartlinenumber=\"1\">Contains health information about a Redis Stream</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.StreamMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.StreamMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.StreamMetrics",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.StreamMetrics.yml\" sourcestartlinenumber=\"1\">Contains metrics about stream operations</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.SubscriptionStats.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.SubscriptionStats.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.SubscriptionStats",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.SubscriptionStats.yml\" sourcestartlinenumber=\"1\">Subscription statistics</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.SubscriptionToken.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.SubscriptionToken.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.SubscriptionToken",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.SubscriptionToken.yml\" sourcestartlinenumber=\"1\">Represents a subscription to a Redis channel or pattern</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.SubscriptionType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.SubscriptionType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models.SubscriptionType",
+      "Summary": "<p sourcefile=\"api/RedisKit.Models.SubscriptionType.yml\" sourcestartlinenumber=\"1\">Type of subscription</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Models.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Models.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Models",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Serialization.IRedisSerializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Serialization.IRedisSerializer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Serialization.IRedisSerializer",
+      "Summary": "<p sourcefile=\"api/RedisKit.Serialization.IRedisSerializer.yml\" sourcestartlinenumber=\"1\">Interface for Redis serialization operations supporting both sync and async methods</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Serialization.RedisSerializerFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Serialization.RedisSerializerFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Serialization.RedisSerializerFactory",
+      "Summary": "<p sourcefile=\"api/RedisKit.Serialization.RedisSerializerFactory.yml\" sourcestartlinenumber=\"1\">Factory for creating Redis serializers with support for custom serializers and thread-safe singleton instances</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Serialization.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Serialization.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Serialization",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Services.PubSubService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Services.PubSubService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Services.PubSubService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Services.PubSubService.yml\" sourcestartlinenumber=\"1\">High-performance implementation of IRedisPubSubService with advanced features</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Services.RedisCacheService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Services.RedisCacheService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Services.RedisCacheService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Services.RedisCacheService.yml\" sourcestartlinenumber=\"1\">Implementation of IRedisCacheService using StackExchange.Redis and configurable serialization</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Services.RedisStreamService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Services.RedisStreamService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Services.RedisStreamService",
+      "Summary": "<p sourcefile=\"api/RedisKit.Services.RedisStreamService.yml\" sourcestartlinenumber=\"1\">Implementation of IRedisStreamService using StackExchange.Redis and configurable serialization</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/RedisKit.Services.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RedisKit.Services.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "RedisKit.Services",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Extensions
+  commentId: N:RedisKit.Extensions
+  id: RedisKit.Extensions
+  children:
+  - RedisKit.Extensions.ServiceCollectionExtensions
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Extensions
+  nameWithType: RedisKit.Extensions
+  fullName: RedisKit.Extensions
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Extensions.ServiceCollectionExtensions
+  commentId: T:RedisKit.Extensions.ServiceCollectionExtensions
+  href: RedisKit.Extensions.ServiceCollectionExtensions.html
+  name: ServiceCollectionExtensions
+  nameWithType: ServiceCollectionExtensions
+  fullName: RedisKit.Extensions.ServiceCollectionExtensions

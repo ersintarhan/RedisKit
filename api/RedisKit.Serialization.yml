@@ -1,0 +1,53 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Serialization
+  commentId: N:RedisKit.Serialization
+  id: RedisKit.Serialization
+  children:
+  - RedisKit.Serialization.IRedisSerializer
+  - RedisKit.Serialization.RedisSerializerFactory
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Serialization
+  nameWithType: RedisKit.Serialization
+  fullName: RedisKit.Serialization
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Serialization.IRedisSerializer
+  commentId: T:RedisKit.Serialization.IRedisSerializer
+  parent: RedisKit.Serialization
+  href: RedisKit.Serialization.IRedisSerializer.html
+  name: IRedisSerializer
+  nameWithType: IRedisSerializer
+  fullName: RedisKit.Serialization.IRedisSerializer
+- uid: RedisKit.Serialization.RedisSerializerFactory
+  commentId: T:RedisKit.Serialization.RedisSerializerFactory
+  href: RedisKit.Serialization.RedisSerializerFactory.html
+  name: RedisSerializerFactory
+  nameWithType: RedisSerializerFactory
+  fullName: RedisKit.Serialization.RedisSerializerFactory
+- uid: RedisKit.Serialization
+  commentId: N:RedisKit.Serialization
+  href: RedisKit.html
+  name: RedisKit.Serialization
+  nameWithType: RedisKit.Serialization
+  fullName: RedisKit.Serialization
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Serialization
+    name: Serialization
+    href: RedisKit.Serialization.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Serialization
+    name: Serialization
+    href: RedisKit.Serialization.html

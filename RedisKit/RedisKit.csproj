@@ -19,6 +19,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>redis;cache;pubsub;streams;messagepack;performance;dotnet;csharp</PackageTags>
     <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

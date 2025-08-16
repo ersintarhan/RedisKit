@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Redis Cache &amp; Pub/Sub Library - AI Development Context | RedisKit </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Redis Cache &amp; Pub/Sub Library - AI Development Context | RedisKit ">
+      
+      
+      <link rel="icon" href="images/favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/ersintarhan/RedisKit/blob/main/QWEN.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="images/logo.png" alt="RedisKit">
+            RedisKit
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="redis-cache--pubsub-library---ai-development-context">Redis Cache &amp; Pub/Sub Library - AI Development Context</h1>
+
+<h2 id="-critical-always-use-latest-library-versions">🚨 CRITICAL: ALWAYS USE LATEST LIBRARY VERSIONS</h2>
+<h3 id="required-dependencies">Required Dependencies</h3>
+<pre><code class="lang-xml">&lt;PackageReference Include=&quot;StackExchange.Redis&quot; Version=&quot;2.8.16&quot; /&gt;
+&lt;PackageReference Include=&quot;MessagePack&quot; Version=&quot;2.5.187&quot; /&gt;
+&lt;PackageReference Include=&quot;Microsoft.Extensions.DependencyInjection&quot; Version=&quot;9.0.0&quot; /&gt;
+&lt;PackageReference Include=&quot;Microsoft.Extensions.Options&quot; Version=&quot;9.0.0&quot; /&gt;
+&lt;PackageReference Include=&quot;Microsoft.Extensions.Logging&quot; Version=&quot;9.0.0&quot; /&gt;
+</code></pre>
+<h3 id="context7-integration---mandatory">Context7 Integration - MANDATORY</h3>
+<p><strong>BEFORE implementing ANY feature, ALWAYS query Context7 for latest documentation:</strong></p>
+<pre><code># For Redis operations
+&quot;How to use StackExchange.Redis v2.8 [specific feature]? use context7&quot;
+
+# For MessagePack serialization
+&quot;MessagePack-CSharp v2.5 best practices for [scenario], use context7&quot;
+
+# For .NET 9 features
+&quot;.NET 9 [feature] implementation patterns, use context7&quot;
+</code></pre>
+<h2 id="-stackexchangeredis-v28-critical-api-changes">⚠️ StackExchange.Redis v2.8+ Critical API Changes</h2>
+<h3 id="-correct-modern-patterns-v28">✅ CORRECT Modern Patterns (v2.8+)</h3>
+<pre><code class="lang-csharp">// ASYNC OPERATIONS - Always use Async methods
+await database.StringSetAsync(key, value, expiry);
+await database.StringGetAsync(key);
+await database.HashSetAsync(key, hashFields);
+await database.ListRightPushAsync(key, values);
+await database.SetAddAsync(key, member);
+
+// CHANNELS - Use RedisChannel static methods
+var literalChannel = RedisChannel.Literal(&quot;notifications&quot;);
+var patternChannel = RedisChannel.Pattern(&quot;user:*&quot;);
+
+// PUB/SUB - Always async
+await subscriber.SubscribeAsync(channel, async (ch, msg) =&gt; {
+    await ProcessMessageAsync(msg);
+});
+await subscriber.PublishAsync(channel, message);
+
+// TRANSACTIONS
+var transaction = database.CreateTransaction();
+transaction.AddCondition(Condition.KeyNotExists(key));
+transaction.StringSetAsync(key, value);
+var committed = await transaction.ExecuteAsync();
+
+// LUA SCRIPTING
+var result = await database.ScriptEvaluateAsync(
+    script, 
+    keys: new RedisKey[] { key }, 
+    values: new RedisValue[] { value }
+);
+
+// BATCH OPERATIONS
+var batch = database.CreateBatch();
+var task1 = batch.StringGetAsync(key1);
+var task2 = batch.StringGetAsync(key2);
+batch.Execute();
+await Task.WhenAll(task1, task2);
+</code></pre>
+<h3 id="-never-use-these-old-patterns">❌ NEVER USE These Old Patterns</h3>
+<pre><code class="lang-csharp">// WRONG - Synchronous methods (removed in v2.8)
+database.StringSet(key, value);  // ❌ NO!
+database.StringGet(key);         // ❌ NO!
+
+// WRONG - Old channel constructors
+new RedisChannel(&quot;name&quot;, RedisChannel.PatternMode.Literal);  // ❌ NO!
+
+// WRONG - Synchronous pub/sub
+subscriber.Subscribe(channel, handler);  // ❌ NO!
+
+// WRONG - Old Execute method
+database.Execute(&quot;SET&quot;, key, value);  // ❌ NO! Use specific async methods
+</code></pre>
+<h2 id="-messagepack-csharp-integration">📦 MessagePack-CSharp Integration</h2>
+<h3 id="configuration">Configuration</h3>
+<pre><code class="lang-csharp">// Standard configuration with compression
+var options = MessagePackSerializerOptions.Standard
+    .WithResolver(ContractlessStandardResolverAllowPrivate.Instance)
+    .WithCompression(MessagePackCompression.Lz4BlockArray);
+
+// For DI registration
+services.AddSingleton(options);
+</code></pre>
+<h3 id="model-attributes">Model Attributes</h3>
+<pre><code class="lang-csharp">[MessagePackObject]
+public class CacheItem&lt;T&gt;
+{
+    [Key(0)]
+    public string Id { get; set; } = string.Empty;
+    
+    [Key(1)]
+    public T Data { get; set; } = default!;
+    
+    [Key(2)]
+    public DateTime CreatedUtc { get; set; }
+    
+    [Key(3)]
+    public TimeSpan? Ttl { get; set; }
+    
+    [IgnoreMember]
+    public bool IsExpired =&gt; CreatedUtc.Add(Ttl ?? TimeSpan.MaxValue) &lt; DateTime.UtcNow;
+}
+</code></pre>
+<h3 id="serialization-helpers">Serialization Helpers</h3>
+<pre><code class="lang-csharp">public static class MessagePackHelper
+{
+    private static readonly MessagePackSerializerOptions Options = 
+        MessagePackSerializerOptions.Standard
+            .WithResolver(ContractlessStandardResolverAllowPrivate.Instance)
+            .WithCompression(MessagePackCompression.Lz4BlockArray);
+    
+    public static byte[] Serialize&lt;T&gt;(T obj) =&gt; 
+        MessagePackSerializer.Serialize(obj, Options);
+    
+    public static T Deserialize&lt;T&gt;(byte[] bytes) =&gt; 
+        MessagePackSerializer.Deserialize&lt;T&gt;(bytes, Options);
+    
+    public static async Task&lt;T&gt; DeserializeAsync&lt;T&gt;(Stream stream, CancellationToken ct = default) =&gt;
+        await MessagePackSerializer.DeserializeAsync&lt;T&gt;(stream, Options, ct);
+}
+</code></pre>
+<h2 id="-architecture-patterns">🏗️ Architecture Patterns</h2>
+<h3 id="service-implementation-template">Service Implementation Template</h3>
+<pre><code class="lang-csharp">public class CacheService : ICacheService
+{
+    private readonly IDatabase _database;
+    private readonly ILogger&lt;CacheService&gt; _logger;
+    private readonly MessagePackSerializerOptions _serializerOptions;
+    private readonly RedisOptions _options;
+    
+    public CacheService(
+        IConnectionMultiplexer multiplexer,
+        ILogger&lt;CacheService&gt; logger,
+        IOptions&lt;RedisOptions&gt; options,
+        MessagePackSerializerOptions serializerOptions)
+    {
+        _database = multiplexer.GetDatabase();
+        _logger = logger;
+        _options = options.Value;
+        _serializerOptions = serializerOptions;
+    }
+    
+    public async Task&lt;T?&gt; GetAsync&lt;T&gt;(string key, CancellationToken ct = default)
+    {
+        var fullKey = GetFullKey(key);
+        
+        try
+        {
+            var bytes = await _database.StringGetAsync(fullKey);
+            if (bytes.IsNull) return default;
+            
+            return MessagePackSerializer.Deserialize&lt;T&gt;(bytes!, _serializerOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, &quot;Failed to get cache key: {Key}&quot;, fullKey);
+            throw;
+        }
+    }
+    
+    private string GetFullKey(string key) =&gt; 
+        string.IsNullOrEmpty(_options.CacheKeyPrefix) 
+            ? key 
+            : $&quot;{_options.CacheKeyPrefix}{key}&quot;;
+}
+</code></pre>
+<h3 id="connection-management">Connection Management</h3>
+<pre><code class="lang-csharp">public class RedisConnectionFactory
+{
+    private readonly ILogger&lt;RedisConnectionFactory&gt; _logger;
+    private readonly SemaphoreSlim _connectionLock = new(1, 1);
+    private IConnectionMultiplexer? _connection;
+    
+    public async Task&lt;IConnectionMultiplexer&gt; GetConnectionAsync(RedisOptions options)
+    {
+        if (_connection?.IsConnected == true)
+            return _connection;
+        
+        await _connectionLock.WaitAsync();
+        try
+        {
+            if (_connection?.IsConnected == true)
+                return _connection;
+            
+            var config = ConfigurationOptions.Parse(options.ConnectionString);
+            config.AsyncTimeout = options.AsyncTimeout;
+            config.SyncTimeout = options.SyncTimeout;
+            config.ConnectRetry = options.RetryAttempts;
+            config.AbortOnConnectFail = false;
+            config.ReconnectRetryPolicy = new ExponentialRetry(5000);
+            
+            _connection = await ConnectionMultiplexer.ConnectAsync(config);
+            
+            // Register connection events
+            _connection.ConnectionFailed += OnConnectionFailed;
+            _connection.ConnectionRestored += OnConnectionRestored;
+            
+            return _connection;
+        }
+        finally
+        {
+            _connectionLock.Release();
+        }
+    }
+}
+</code></pre>
+<h2 id="-testing-patterns">🧪 Testing Patterns</h2>
+<h3 id="unit-test-with-mocking">Unit Test with Mocking</h3>
+<pre><code class="lang-csharp">[Fact]
+public async Task GetAsync_ReturnsDeserializedValue_WhenKeyExists()
+{
+    // Arrange
+    var mockDatabase = new Mock&lt;IDatabase&gt;();
+    var testData = new TestModel { Id = 1, Name = &quot;Test&quot; };
+    var serialized = MessagePackSerializer.Serialize(testData);
+    
+    mockDatabase
+        .Setup(x =&gt; x.StringGetAsync(It.IsAny&lt;RedisKey&gt;(), It.IsAny&lt;CommandFlags&gt;()))
+        .ReturnsAsync(serialized);
+    
+    // Act
+    var result = await service.GetAsync&lt;TestModel&gt;(&quot;test-key&quot;);
+    
+    // Assert
+    Assert.NotNull(result);
+    Assert.Equal(testData.Id, result.Id);
+}
+</code></pre>
+<h3 id="integration-test-with-testcontainers">Integration Test with Testcontainers</h3>
+<pre><code class="lang-csharp">public class RedisIntegrationTests : IAsyncLifetime
+{
+    private readonly RedisContainer _container = new RedisBuilder()
+        .WithImage(&quot;redis:7-alpine&quot;)
+        .WithPortBinding(6379, true)
+        .Build();
+    
+    public async Task InitializeAsync()
+    {
+        await _container.StartAsync();
+    }
+    
+    [Fact]
+    public async Task CacheService_SetAndGet_WorksCorrectly()
+    {
+        // Arrange
+        var connectionString = _container.GetConnectionString();
+        var services = new ServiceCollection();
+        services.AddRedisServices(opt =&gt; opt.ConnectionString = connectionString);
+        
+        var provider = services.BuildServiceProvider();
+        var cache = provider.GetRequiredService&lt;ICacheService&gt;();
+        
+        // Act
+        await cache.SetAsync(&quot;key&quot;, &quot;value&quot;, TimeSpan.FromSeconds(10));
+        var result = await cache.GetAsync&lt;string&gt;(&quot;key&quot;);
+        
+        // Assert
+        Assert.Equal(&quot;value&quot;, result);
+    }
+}
+</code></pre>
+<h2 id="-performance-optimizations">🔧 Performance Optimizations</h2>
+<h3 id="1-connection-pooling">1. Connection Pooling</h3>
+<pre><code class="lang-csharp">// Singleton registration - CRITICAL for performance
+services.AddSingleton&lt;IConnectionMultiplexer&gt;(sp =&gt;
+{
+    var options = sp.GetRequiredService&lt;IOptions&lt;RedisOptions&gt;&gt;();
+    return ConnectionMultiplexer.Connect(options.Value.ConnectionString);
+});
+</code></pre>
+<h3 id="2-pipelining--batching">2. Pipelining &amp; Batching</h3>
+<pre><code class="lang-csharp">public async Task&lt;Dictionary&lt;string, T&gt;&gt; GetManyAsync&lt;T&gt;(IEnumerable&lt;string&gt; keys)
+{
+    var batch = _database.CreateBatch();
+    var tasks = keys.ToDictionary(
+        key =&gt; key,
+        key =&gt; batch.StringGetAsync(GetFullKey(key))
+    );
+    
+    batch.Execute();
+    await Task.WhenAll(tasks.Values);
+    
+    return tasks
+        .Where(kvp =&gt; !kvp.Value.Result.IsNull)
+        .ToDictionary(
+            kvp =&gt; kvp.Key,
+            kvp =&gt; MessagePackSerializer.Deserialize&lt;T&gt;(kvp.Value.Result!, _serializerOptions)
+        );
+}
+</code></pre>
+<h3 id="3-memory-optimization">3. Memory Optimization</h3>
+<pre><code class="lang-csharp">// Use ArrayPool for large operations
+public async Task ProcessLargeDataAsync(byte[] data)
+{
+    var buffer = ArrayPool&lt;byte&gt;.Shared.Rent(data.Length);
+    try
+    {
+        // Process data
+        await _database.StringSetAsync(key, buffer.AsMemory(0, data.Length));
+    }
+    finally
+    {
+        ArrayPool&lt;byte&gt;.Shared.Return(buffer, clearArray: true);
+    }
+}
+</code></pre>
+<h2 id="-monitoring--health-checks">📊 Monitoring &amp; Health Checks</h2>
+<h3 id="health-check-implementation">Health Check Implementation</h3>
+<pre><code class="lang-csharp">public class RedisHealthCheck : IHealthCheck
+{
+    private readonly IConnectionMultiplexer _multiplexer;
+    
+    public async Task&lt;HealthCheckResult&gt; CheckHealthAsync(
+        HealthCheckContext context, 
+        CancellationToken ct = default)
+    {
+        try
+        {
+            var database = _multiplexer.GetDatabase();
+            var latency = await database.PingAsync();
+            
+            if (latency &gt; TimeSpan.FromSeconds(5))
+            {
+                return HealthCheckResult.Degraded(
+                    $&quot;Redis latency is high: {latency.TotalMilliseconds}ms&quot;);
+            }
+            
+            return HealthCheckResult.Healthy(
+                $&quot;Redis is healthy. Latency: {latency.TotalMilliseconds}ms&quot;);
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy(&quot;Redis connection failed&quot;, ex);
+        }
+    }
+}
+
+// Registration
+services.AddHealthChecks()
+    .AddTypeActivatedCheck&lt;RedisHealthCheck&gt;(&quot;redis&quot;);
+</code></pre>
+<h2 id="-common-issues--solutions">🐛 Common Issues &amp; Solutions</h2>
+<h3 id="issue-1-execute-method-not-found">Issue 1: &quot;Execute&quot; method not found</h3>
+<pre><code class="lang-csharp">// ❌ WRONG
+await database.Execute(&quot;SET&quot;, key, value);
+
+// ✅ CORRECT - Use specific async methods
+await database.StringSetAsync(key, value);
+</code></pre>
+<h3 id="issue-2-channel-creation-errors">Issue 2: Channel creation errors</h3>
+<pre><code class="lang-csharp">// ❌ WRONG
+new RedisChannel(&quot;channel&quot;, RedisChannel.PatternMode.Literal);
+
+// ✅ CORRECT
+var channel = RedisChannel.Literal(&quot;channel&quot;);
+</code></pre>
+<h3 id="issue-3-synchronous-operations-timeout">Issue 3: Synchronous operations timeout</h3>
+<pre><code class="lang-csharp">// ❌ WRONG - Synchronous operations removed
+database.StringGet(key);
+
+// ✅ CORRECT - Always use async
+await database.StringGetAsync(key);
+</code></pre>
+<h2 id="-development-checklist">📝 Development Checklist</h2>
+<ul>
+<li>[ ] <strong>ALWAYS</strong> use Context7 for latest API documentation</li>
+<li>[ ] <strong>ALWAYS</strong> use async/await patterns</li>
+<li>[ ] <strong>NEVER</strong> use synchronous Redis operations</li>
+<li>[ ] <strong>ALWAYS</strong> handle connection failures gracefully</li>
+<li>[ ] <strong>ALWAYS</strong> use MessagePack for serialization</li>
+<li>[ ] <strong>NEVER</strong> concatenate strings for Redis keys</li>
+<li>[ ] <strong>ALWAYS</strong> set appropriate TTL for cache entries</li>
+<li>[ ] <strong>ALWAYS</strong> dispose connections properly</li>
+<li>[ ] <strong>ALWAYS</strong> use connection pooling (singleton)</li>
+<li>[ ] <strong>ALWAYS</strong> implement health checks</li>
+</ul>
+<h2 id="-quick-debug-commands">🔍 Quick Debug Commands</h2>
+<pre><code class="lang-bash"># Monitor Redis commands in real-time
+redis-cli MONITOR
+
+# Check memory usage
+redis-cli INFO memory
+
+# List keys matching pattern
+redis-cli --scan --pattern &quot;myapp:*&quot;
+
+# Check pub/sub channels
+redis-cli PUBSUB CHANNELS
+
+# Get slow queries
+redis-cli SLOWLOG GET 10
+
+# Check connected clients
+redis-cli CLIENT LIST
+</code></pre>
+<h2 id="-context7-query-templates">🚀 Context7 Query Templates</h2>
+<pre><code># Get latest Redis features
+&quot;StackExchange.Redis v2.8 new features and migration guide, use context7&quot;
+
+# MessagePack performance
+&quot;MessagePack-CSharp v2.5 performance optimization techniques, use context7&quot;
+
+# Error handling patterns
+&quot;StackExchange.Redis v2.8 connection resilience patterns, use context7&quot;
+
+# Pub/Sub patterns
+&quot;StackExchange.Redis v2.8 pub/sub best practices, use context7&quot;
+
+# Distributed locking
+&quot;Redis distributed lock implementation with StackExchange.Redis v2.8, use context7&quot;
+</code></pre>
+<hr>
+<h2 id="-final-warning">⚠️ FINAL WARNING</h2>
+<p><strong>NEVER trust outdated information or memory!</strong></p>
+<p>When implementing ANY feature:</p>
+<ol>
+<li>First check with Context7 for latest documentation</li>
+<li>Verify API signatures match v2.8+ patterns</li>
+<li>Always use async/await</li>
+<li>Test with actual Redis instance</li>
+<li>Monitor performance and errors</li>
+</ol>
+<p><strong>Remember</strong>: StackExchange.Redis v2.8 has BREAKING CHANGES. Old patterns WILL NOT WORK!</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/ersintarhan/RedisKit/blob/main/QWEN.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          RedisKit - High-performance Redis toolkit for .NET
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

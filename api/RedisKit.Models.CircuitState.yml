@@ -1,0 +1,147 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.CircuitState
+  commentId: T:RedisKit.Models.CircuitState
+  id: CircuitState
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.CircuitState.Closed
+  - RedisKit.Models.CircuitState.HalfOpen
+  - RedisKit.Models.CircuitState.Open
+  langs:
+  - csharp
+  - vb
+  name: CircuitState
+  nameWithType: CircuitState
+  fullName: RedisKit.Models.CircuitState
+  type: Enum
+  source:
+    remote:
+      path: RedisKit/Models/CircuitState.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: CircuitState
+    path: RedisKit/Models/CircuitState.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Connection state for circuit breaker
+  example: []
+  syntax:
+    content: public enum CircuitState
+    content.vb: Public Enum CircuitState
+- uid: RedisKit.Models.CircuitState.Closed
+  commentId: F:RedisKit.Models.CircuitState.Closed
+  id: Closed
+  parent: RedisKit.Models.CircuitState
+  langs:
+  - csharp
+  - vb
+  name: Closed
+  nameWithType: CircuitState.Closed
+  fullName: RedisKit.Models.CircuitState.Closed
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/CircuitState.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Closed
+    path: RedisKit/Models/CircuitState.cs
+    startLine: 10
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Circuit is closed, normal operation
+  example: []
+  syntax:
+    content: Closed = 0
+    return:
+      type: RedisKit.Models.CircuitState
+- uid: RedisKit.Models.CircuitState.Open
+  commentId: F:RedisKit.Models.CircuitState.Open
+  id: Open
+  parent: RedisKit.Models.CircuitState
+  langs:
+  - csharp
+  - vb
+  name: Open
+  nameWithType: CircuitState.Open
+  fullName: RedisKit.Models.CircuitState.Open
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/CircuitState.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Open
+    path: RedisKit/Models/CircuitState.cs
+    startLine: 15
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Circuit is open, rejecting requests
+  example: []
+  syntax:
+    content: Open = 1
+    return:
+      type: RedisKit.Models.CircuitState
+- uid: RedisKit.Models.CircuitState.HalfOpen
+  commentId: F:RedisKit.Models.CircuitState.HalfOpen
+  id: HalfOpen
+  parent: RedisKit.Models.CircuitState
+  langs:
+  - csharp
+  - vb
+  name: HalfOpen
+  nameWithType: CircuitState.HalfOpen
+  fullName: RedisKit.Models.CircuitState.HalfOpen
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/CircuitState.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: HalfOpen
+    path: RedisKit/Models/CircuitState.cs
+    startLine: 20
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Circuit is half-open, testing if service recovered
+  example: []
+  syntax:
+    content: HalfOpen = 2
+    return:
+      type: RedisKit.Models.CircuitState
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Models.CircuitState
+  commentId: T:RedisKit.Models.CircuitState
+  parent: RedisKit.Models
+  href: RedisKit.Models.CircuitState.html
+  name: CircuitState
+  nameWithType: CircuitState
+  fullName: RedisKit.Models.CircuitState

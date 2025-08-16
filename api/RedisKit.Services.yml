@@ -1,0 +1,37 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Services
+  commentId: N:RedisKit.Services
+  id: RedisKit.Services
+  children:
+  - RedisKit.Services.PubSubService
+  - RedisKit.Services.RedisCacheService
+  - RedisKit.Services.RedisStreamService
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Services
+  nameWithType: RedisKit.Services
+  fullName: RedisKit.Services
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Services.PubSubService
+  commentId: T:RedisKit.Services.PubSubService
+  href: RedisKit.Services.PubSubService.html
+  name: PubSubService
+  nameWithType: PubSubService
+  fullName: RedisKit.Services.PubSubService
+- uid: RedisKit.Services.RedisCacheService
+  commentId: T:RedisKit.Services.RedisCacheService
+  href: RedisKit.Services.RedisCacheService.html
+  name: RedisCacheService
+  nameWithType: RedisCacheService
+  fullName: RedisKit.Services.RedisCacheService
+- uid: RedisKit.Services.RedisStreamService
+  commentId: T:RedisKit.Services.RedisStreamService
+  href: RedisKit.Services.RedisStreamService.html
+  name: RedisStreamService
+  nameWithType: RedisStreamService
+  fullName: RedisKit.Services.RedisStreamService

@@ -1,0 +1,1102 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Interfaces.IRedisPubSubService
+  commentId: T:RedisKit.Interfaces.IRedisPubSubService
+  id: IRedisPubSubService
+  parent: RedisKit.Interfaces
+  children:
+  - RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync(System.String,System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync(System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync(System.String,System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.PublishAsync``1(System.String,``0,System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(RedisKit.Models.SubscriptionToken,System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+  - RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync(System.String,System.Threading.CancellationToken)
+  langs:
+  - csharp
+  - vb
+  name: IRedisPubSubService
+  nameWithType: IRedisPubSubService
+  fullName: RedisKit.Interfaces.IRedisPubSubService
+  type: Interface
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: IRedisPubSubService
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 7
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Interface for Redis pub/sub operations with generic support
+  example: []
+  syntax:
+    content: public interface IRedisPubSubService
+    content.vb: Public Interface IRedisPubSubService
+- uid: RedisKit.Interfaces.IRedisPubSubService.PublishAsync``1(System.String,``0,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.PublishAsync``1(System.String,``0,System.Threading.CancellationToken)
+  id: PublishAsync``1(System.String,``0,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: PublishAsync<T>(string, T, CancellationToken)
+  nameWithType: IRedisPubSubService.PublishAsync<T>(string, T, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.PublishAsync<T>(string, T, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: PublishAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 12
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Publishes a message to a channel
+  example: []
+  syntax:
+    content: 'Task<long> PublishAsync<T>(string channel, T message, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: channel
+      type: System.String
+    - id: message
+      type: '{T}'
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{System.Int64}
+    content.vb: Function PublishAsync(Of T As Class)(channel As String, message As T, cancellationToken As CancellationToken = Nothing) As Task(Of Long)
+  overload: RedisKit.Interfaces.IRedisPubSubService.PublishAsync*
+  nameWithType.vb: IRedisPubSubService.PublishAsync(Of T)(String, T, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.PublishAsync(Of T)(String, T, System.Threading.CancellationToken)
+  name.vb: PublishAsync(Of T)(String, T, CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  id: SubscribeAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: SubscribeAsync<T>(string, Func<T, CancellationToken, Task>, CancellationToken)
+  nameWithType: IRedisPubSubService.SubscribeAsync<T>(string, Func<T, CancellationToken, Task>, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync<T>(string, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task>, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscribeAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 18
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Subscribes to a channel and registers a handler for messages
+  example: []
+  syntax:
+    content: 'Task<SubscriptionToken> SubscribeAsync<T>(string channel, Func<T, CancellationToken, Task> handler, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: channel
+      type: System.String
+    - id: handler
+      type: System.Func{{T},System.Threading.CancellationToken,System.Threading.Tasks.Task}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+      description: Subscription token that can be used to unsubscribe
+    content.vb: Function SubscribeAsync(Of T As Class)(channel As String, handler As Func(Of T, CancellationToken, Task), cancellationToken As CancellationToken = Nothing) As Task(Of SubscriptionToken)
+  overload: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync*
+  nameWithType.vb: IRedisPubSubService.SubscribeAsync(Of T)(String, Func(Of T, CancellationToken, Task), CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync(Of T)(String, System.Func(Of T, System.Threading.CancellationToken, System.Threading.Tasks.Task), System.Threading.CancellationToken)
+  name.vb: SubscribeAsync(Of T)(String, Func(Of T, CancellationToken, Task), CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  id: SubscribeWithMetadataAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: SubscribeWithMetadataAsync<T>(string, Func<T, string, CancellationToken, Task>, CancellationToken)
+  nameWithType: IRedisPubSubService.SubscribeWithMetadataAsync<T>(string, Func<T, string, CancellationToken, Task>, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync<T>(string, System.Func<T, string, System.Threading.CancellationToken, System.Threading.Tasks.Task>, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscribeWithMetadataAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 24
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Subscribes to a channel with message metadata (channel name, publish time, etc.)
+  example: []
+  syntax:
+    content: 'Task<SubscriptionToken> SubscribeWithMetadataAsync<T>(string channel, Func<T, string, CancellationToken, Task> handler, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: channel
+      type: System.String
+    - id: handler
+      type: System.Func{{T},System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+      description: Subscription token that can be used to unsubscribe
+    content.vb: Function SubscribeWithMetadataAsync(Of T As Class)(channel As String, handler As Func(Of T, String, CancellationToken, Task), cancellationToken As CancellationToken = Nothing) As Task(Of SubscriptionToken)
+  overload: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync*
+  nameWithType.vb: IRedisPubSubService.SubscribeWithMetadataAsync(Of T)(String, Func(Of T, String, CancellationToken, Task), CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync(Of T)(String, System.Func(Of T, String, System.Threading.CancellationToken, System.Threading.Tasks.Task), System.Threading.CancellationToken)
+  name.vb: SubscribeWithMetadataAsync(Of T)(String, Func(Of T, String, CancellationToken, Task), CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+  id: UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: UnsubscribeAsync(string, CancellationToken)
+  nameWithType: IRedisPubSubService.UnsubscribeAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: UnsubscribeAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 29
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Unsubscribes from a channel
+  example: []
+  syntax:
+    content: Task UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)
+    parameters:
+    - id: channel
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Function UnsubscribeAsync(channel As String, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync*
+  nameWithType.vb: IRedisPubSubService.UnsubscribeAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(String, System.Threading.CancellationToken)
+  name.vb: UnsubscribeAsync(String, CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(RedisKit.Models.SubscriptionToken,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(RedisKit.Models.SubscriptionToken,System.Threading.CancellationToken)
+  id: UnsubscribeAsync(RedisKit.Models.SubscriptionToken,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: UnsubscribeAsync(SubscriptionToken, CancellationToken)
+  nameWithType: IRedisPubSubService.UnsubscribeAsync(SubscriptionToken, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync(RedisKit.Models.SubscriptionToken, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: UnsubscribeAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 34
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Unsubscribes a specific handler from a channel
+  example: []
+  syntax:
+    content: Task UnsubscribeAsync(SubscriptionToken token, CancellationToken cancellationToken = default)
+    parameters:
+    - id: token
+      type: RedisKit.Models.SubscriptionToken
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Function UnsubscribeAsync(token As SubscriptionToken, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync*
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  id: SubscribePatternAsync``1(System.String,System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: SubscribePatternAsync<T>(string, Func<T, CancellationToken, Task>, CancellationToken)
+  nameWithType: IRedisPubSubService.SubscribePatternAsync<T>(string, Func<T, CancellationToken, Task>, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync<T>(string, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task>, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscribePatternAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 40
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Subscribes to channels matching a pattern and registers a handler for messages
+  example: []
+  syntax:
+    content: 'Task<SubscriptionToken> SubscribePatternAsync<T>(string pattern, Func<T, CancellationToken, Task> handler, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: pattern
+      type: System.String
+    - id: handler
+      type: System.Func{{T},System.Threading.CancellationToken,System.Threading.Tasks.Task}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+      description: Subscription token that can be used to unsubscribe
+    content.vb: Function SubscribePatternAsync(Of T As Class)(pattern As String, handler As Func(Of T, CancellationToken, Task), cancellationToken As CancellationToken = Nothing) As Task(Of SubscriptionToken)
+  overload: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync*
+  nameWithType.vb: IRedisPubSubService.SubscribePatternAsync(Of T)(String, Func(Of T, CancellationToken, Task), CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync(Of T)(String, System.Func(Of T, System.Threading.CancellationToken, System.Threading.Tasks.Task), System.Threading.CancellationToken)
+  name.vb: SubscribePatternAsync(Of T)(String, Func(Of T, CancellationToken, Task), CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  id: SubscribePatternWithChannelAsync``1(System.String,System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: SubscribePatternWithChannelAsync<T>(string, Func<T, string, CancellationToken, Task>, CancellationToken)
+  nameWithType: IRedisPubSubService.SubscribePatternWithChannelAsync<T>(string, Func<T, string, CancellationToken, Task>, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync<T>(string, System.Func<T, string, System.Threading.CancellationToken, System.Threading.Tasks.Task>, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SubscribePatternWithChannelAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 46
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Subscribes to channels matching a pattern with channel name included
+  example: []
+  syntax:
+    content: 'Task<SubscriptionToken> SubscribePatternWithChannelAsync<T>(string pattern, Func<T, string, CancellationToken, Task> handler, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: pattern
+      type: System.String
+    - id: handler
+      type: System.Func{{T},System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+      description: Subscription token that can be used to unsubscribe
+    content.vb: Function SubscribePatternWithChannelAsync(Of T As Class)(pattern As String, handler As Func(Of T, String, CancellationToken, Task), cancellationToken As CancellationToken = Nothing) As Task(Of SubscriptionToken)
+  overload: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync*
+  nameWithType.vb: IRedisPubSubService.SubscribePatternWithChannelAsync(Of T)(String, Func(Of T, String, CancellationToken, Task), CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync(Of T)(String, System.Func(Of T, String, System.Threading.CancellationToken, System.Threading.Tasks.Task), System.Threading.CancellationToken)
+  name.vb: SubscribePatternWithChannelAsync(Of T)(String, Func(Of T, String, CancellationToken, Task), CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync(System.String,System.Threading.CancellationToken)
+  id: UnsubscribePatternAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: UnsubscribePatternAsync(string, CancellationToken)
+  nameWithType: IRedisPubSubService.UnsubscribePatternAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: UnsubscribePatternAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 51
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Unsubscribes from a channel pattern
+  example: []
+  syntax:
+    content: Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)
+    parameters:
+    - id: pattern
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Function UnsubscribePatternAsync(pattern As String, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync*
+  nameWithType.vb: IRedisPubSubService.UnsubscribePatternAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync(String, System.Threading.CancellationToken)
+  name.vb: UnsubscribePatternAsync(String, CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync(System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync(System.Threading.CancellationToken)
+  id: GetSubscriptionStatsAsync(System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: GetSubscriptionStatsAsync(CancellationToken)
+  nameWithType: IRedisPubSubService.GetSubscriptionStatsAsync(CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync(System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: GetSubscriptionStatsAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 56
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Gets statistics about current subscriptions
+  example: []
+  syntax:
+    content: Task<SubscriptionStats[]> GetSubscriptionStatsAsync(CancellationToken cancellationToken = default)
+    parameters:
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionStats[]}
+    content.vb: Function GetSubscriptionStatsAsync(cancellationToken As CancellationToken = Nothing) As Task(Of SubscriptionStats())
+  overload: RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync*
+- uid: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync(System.String,System.Threading.CancellationToken)
+  id: HasSubscribersAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: HasSubscribersAsync(string, CancellationToken)
+  nameWithType: IRedisPubSubService.HasSubscribersAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: HasSubscribersAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 61
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Checks if a channel has any active subscriptions
+  example: []
+  syntax:
+    content: Task<bool> HasSubscribersAsync(string channel, CancellationToken cancellationToken = default)
+    parameters:
+    - id: channel
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task{System.Boolean}
+    content.vb: Function HasSubscribersAsync(channel As String, cancellationToken As CancellationToken = Nothing) As Task(Of Boolean)
+  overload: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync*
+  nameWithType.vb: IRedisPubSubService.HasSubscribersAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync(String, System.Threading.CancellationToken)
+  name.vb: HasSubscribersAsync(String, CancellationToken)
+- uid: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync(System.String,System.Threading.CancellationToken)
+  id: GetSubscriberCountAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisPubSubService
+  langs:
+  - csharp
+  - vb
+  name: GetSubscriberCountAsync(string, CancellationToken)
+  nameWithType: IRedisPubSubService.GetSubscriberCountAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Interfaces/IRedisPubSubService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: GetSubscriberCountAsync
+    path: RedisKit/Interfaces/IRedisPubSubService.cs
+    startLine: 66
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Interfaces
+  summary: Gets the number of subscribers for a channel
+  example: []
+  syntax:
+    content: Task<int> GetSubscriberCountAsync(string channel, CancellationToken cancellationToken = default)
+    parameters:
+    - id: channel
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task{System.Int32}
+    content.vb: Function GetSubscriberCountAsync(channel As String, cancellationToken As CancellationToken = Nothing) As Task(Of Integer)
+  overload: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync*
+  nameWithType.vb: IRedisPubSubService.GetSubscriberCountAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync(String, System.Threading.CancellationToken)
+  name.vb: GetSubscriberCountAsync(String, CancellationToken)
+references:
+- uid: RedisKit.Interfaces
+  commentId: N:RedisKit.Interfaces
+  href: RedisKit.html
+  name: RedisKit.Interfaces
+  nameWithType: RedisKit.Interfaces
+  fullName: RedisKit.Interfaces
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html
+- uid: RedisKit.Interfaces.IRedisPubSubService.PublishAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.PublishAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_PublishAsync__1_System_String___0_System_Threading_CancellationToken_
+  name: PublishAsync
+  nameWithType: IRedisPubSubService.PublishAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.PublishAsync
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Threading.CancellationToken
+  commentId: T:System.Threading.CancellationToken
+  parent: System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  name: CancellationToken
+  nameWithType: CancellationToken
+  fullName: System.Threading.CancellationToken
+- uid: System.Threading.Tasks.Task{System.Int64}
+  commentId: T:System.Threading.Tasks.Task{System.Int64}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<long>
+  nameWithType: Task<long>
+  fullName: System.Threading.Tasks.Task<long>
+  nameWithType.vb: Task(Of Long)
+  fullName.vb: System.Threading.Tasks.Task(Of Long)
+  name.vb: Task(Of Long)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Int64
+    name: long
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int64
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int64
+    name: Long
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int64
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Threading
+  commentId: N:System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading
+  nameWithType: System.Threading
+  fullName: System.Threading
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+- uid: System.Threading.Tasks.Task`1
+  commentId: T:System.Threading.Tasks.Task`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<TResult>
+  nameWithType: Task<TResult>
+  fullName: System.Threading.Tasks.Task<TResult>
+  nameWithType.vb: Task(Of TResult)
+  fullName.vb: System.Threading.Tasks.Task(Of TResult)
+  name.vb: Task(Of TResult)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Threading.Tasks
+  commentId: N:System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading.Tasks
+  nameWithType: System.Threading.Tasks
+  fullName: System.Threading.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_SubscribeAsync__1_System_String_System_Func___0_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_
+  name: SubscribeAsync
+  nameWithType: IRedisPubSubService.SubscribeAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribeAsync
+- uid: System.Func{{T},System.Threading.CancellationToken,System.Threading.Tasks.Task}
+  commentId: T:System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task}
+  parent: System
+  definition: System.Func`3
+  href: https://learn.microsoft.com/dotnet/api/system.func-3
+  name: Func<T, CancellationToken, Task>
+  nameWithType: Func<T, CancellationToken, Task>
+  fullName: System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task>
+  nameWithType.vb: Func(Of T, CancellationToken, Task)
+  fullName.vb: System.Func(Of T, System.Threading.CancellationToken, System.Threading.Tasks.Task)
+  name.vb: Func(Of T, CancellationToken, Task)
+  spec.csharp:
+  - uid: System.Func`3
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-3
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: ','
+  - name: " "
+  - uid: System.Threading.Tasks.Task
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`3
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-3
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: ','
+  - name: " "
+  - uid: System.Threading.Tasks.Task
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  - name: )
+- uid: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+  commentId: T:System.Threading.Tasks.Task{RedisKit.Models.SubscriptionToken}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<SubscriptionToken>
+  nameWithType: Task<SubscriptionToken>
+  fullName: System.Threading.Tasks.Task<RedisKit.Models.SubscriptionToken>
+  nameWithType.vb: Task(Of SubscriptionToken)
+  fullName.vb: System.Threading.Tasks.Task(Of RedisKit.Models.SubscriptionToken)
+  name.vb: Task(Of SubscriptionToken)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: RedisKit.Models.SubscriptionToken
+    name: SubscriptionToken
+    href: RedisKit.Models.SubscriptionToken.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: RedisKit.Models.SubscriptionToken
+    name: SubscriptionToken
+    href: RedisKit.Models.SubscriptionToken.html
+  - name: )
+- uid: System.Func`3
+  commentId: T:System.Func`3
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.func-3
+  name: Func<T1, T2, TResult>
+  nameWithType: Func<T1, T2, TResult>
+  fullName: System.Func<T1, T2, TResult>
+  nameWithType.vb: Func(Of T1, T2, TResult)
+  fullName.vb: System.Func(Of T1, T2, TResult)
+  name.vb: Func(Of T1, T2, TResult)
+  spec.csharp:
+  - uid: System.Func`3
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-3
+  - name: <
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`3
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-3
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_SubscribeWithMetadataAsync__1_System_String_System_Func___0_System_String_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_
+  name: SubscribeWithMetadataAsync
+  nameWithType: IRedisPubSubService.SubscribeWithMetadataAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribeWithMetadataAsync
+- uid: System.Func{{T},System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task}
+  commentId: T:System.Func{``0,System.String,System.Threading.CancellationToken,System.Threading.Tasks.Task}
+  parent: System
+  definition: System.Func`4
+  href: https://learn.microsoft.com/dotnet/api/system.func-4
+  name: Func<T, string, CancellationToken, Task>
+  nameWithType: Func<T, string, CancellationToken, Task>
+  fullName: System.Func<T, string, System.Threading.CancellationToken, System.Threading.Tasks.Task>
+  nameWithType.vb: Func(Of T, String, CancellationToken, Task)
+  fullName.vb: System.Func(Of T, String, System.Threading.CancellationToken, System.Threading.Tasks.Task)
+  name.vb: Func(Of T, String, CancellationToken, Task)
+  spec.csharp:
+  - uid: System.Func`4
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-4
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: ','
+  - name: " "
+  - uid: System.Threading.Tasks.Task
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`4
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-4
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: ','
+  - name: " "
+  - uid: System.Threading.Tasks.Task
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  - name: )
+- uid: System.Func`4
+  commentId: T:System.Func`4
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.func-4
+  name: Func<T1, T2, T3, TResult>
+  nameWithType: Func<T1, T2, T3, TResult>
+  fullName: System.Func<T1, T2, T3, TResult>
+  nameWithType.vb: Func(Of T1, T2, T3, TResult)
+  fullName.vb: System.Func(Of T1, T2, T3, TResult)
+  name.vb: Func(Of T1, T2, T3, TResult)
+  spec.csharp:
+  - uid: System.Func`4
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-4
+  - name: <
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: T3
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`4
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-4
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: T3
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_UnsubscribeAsync_System_String_System_Threading_CancellationToken_
+  name: UnsubscribeAsync
+  nameWithType: IRedisPubSubService.UnsubscribeAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.UnsubscribeAsync
+- uid: System.Threading.Tasks.Task
+  commentId: T:System.Threading.Tasks.Task
+  parent: System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  name: Task
+  nameWithType: Task
+  fullName: System.Threading.Tasks.Task
+- uid: RedisKit.Models.SubscriptionToken
+  commentId: T:RedisKit.Models.SubscriptionToken
+  parent: RedisKit.Models
+  href: RedisKit.Models.SubscriptionToken.html
+  name: SubscriptionToken
+  nameWithType: SubscriptionToken
+  fullName: RedisKit.Models.SubscriptionToken
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_SubscribePatternAsync__1_System_String_System_Func___0_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_
+  name: SubscribePatternAsync
+  nameWithType: IRedisPubSubService.SubscribePatternAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternAsync
+- uid: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_SubscribePatternWithChannelAsync__1_System_String_System_Func___0_System_String_System_Threading_CancellationToken_System_Threading_Tasks_Task__System_Threading_CancellationToken_
+  name: SubscribePatternWithChannelAsync
+  nameWithType: IRedisPubSubService.SubscribePatternWithChannelAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.SubscribePatternWithChannelAsync
+- uid: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_UnsubscribePatternAsync_System_String_System_Threading_CancellationToken_
+  name: UnsubscribePatternAsync
+  nameWithType: IRedisPubSubService.UnsubscribePatternAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.UnsubscribePatternAsync
+- uid: RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_GetSubscriptionStatsAsync_System_Threading_CancellationToken_
+  name: GetSubscriptionStatsAsync
+  nameWithType: IRedisPubSubService.GetSubscriptionStatsAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.GetSubscriptionStatsAsync
+- uid: System.Threading.Tasks.Task{RedisKit.Models.SubscriptionStats[]}
+  commentId: T:System.Threading.Tasks.Task{RedisKit.Models.SubscriptionStats[]}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<SubscriptionStats[]>
+  nameWithType: Task<SubscriptionStats[]>
+  fullName: System.Threading.Tasks.Task<RedisKit.Models.SubscriptionStats[]>
+  nameWithType.vb: Task(Of SubscriptionStats())
+  fullName.vb: System.Threading.Tasks.Task(Of RedisKit.Models.SubscriptionStats())
+  name.vb: Task(Of SubscriptionStats())
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: RedisKit.Models.SubscriptionStats
+    name: SubscriptionStats
+    href: RedisKit.Models.SubscriptionStats.html
+  - name: '['
+  - name: ']'
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: RedisKit.Models.SubscriptionStats
+    name: SubscriptionStats
+    href: RedisKit.Models.SubscriptionStats.html
+  - name: (
+  - name: )
+  - name: )
+- uid: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_HasSubscribersAsync_System_String_System_Threading_CancellationToken_
+  name: HasSubscribersAsync
+  nameWithType: IRedisPubSubService.HasSubscribersAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.HasSubscribersAsync
+- uid: System.Threading.Tasks.Task{System.Boolean}
+  commentId: T:System.Threading.Tasks.Task{System.Boolean}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<bool>
+  nameWithType: Task<bool>
+  fullName: System.Threading.Tasks.Task<bool>
+  nameWithType.vb: Task(Of Boolean)
+  fullName.vb: System.Threading.Tasks.Task(Of Boolean)
+  name.vb: Task(Of Boolean)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+- uid: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync*
+  commentId: Overload:RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync
+  href: RedisKit.Interfaces.IRedisPubSubService.html#RedisKit_Interfaces_IRedisPubSubService_GetSubscriberCountAsync_System_String_System_Threading_CancellationToken_
+  name: GetSubscriberCountAsync
+  nameWithType: IRedisPubSubService.GetSubscriberCountAsync
+  fullName: RedisKit.Interfaces.IRedisPubSubService.GetSubscriberCountAsync
+- uid: System.Threading.Tasks.Task{System.Int32}
+  commentId: T:System.Threading.Tasks.Task{System.Int32}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<int>
+  nameWithType: Task<int>
+  fullName: System.Threading.Tasks.Task<int>
+  nameWithType.vb: Task(Of Integer)
+  fullName.vb: System.Threading.Tasks.Task(Of Integer)
+  name.vb: Task(Of Integer)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )

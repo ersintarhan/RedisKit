@@ -1,0 +1,141 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Models.SerializerType
+  commentId: T:RedisKit.Models.SerializerType
+  id: SerializerType
+  parent: RedisKit.Models
+  children:
+  - RedisKit.Models.SerializerType.Custom
+  - RedisKit.Models.SerializerType.MessagePack
+  - RedisKit.Models.SerializerType.SystemTextJson
+  langs:
+  - csharp
+  - vb
+  name: SerializerType
+  nameWithType: SerializerType
+  fullName: RedisKit.Models.SerializerType
+  type: Enum
+  source:
+    remote:
+      path: RedisKit/Models/SerializerType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SerializerType
+    path: RedisKit/Models/SerializerType.cs
+    startLine: 5
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  summary: Available serializer types
+  example: []
+  syntax:
+    content: public enum SerializerType
+    content.vb: Public Enum SerializerType
+- uid: RedisKit.Models.SerializerType.MessagePack
+  commentId: F:RedisKit.Models.SerializerType.MessagePack
+  id: MessagePack
+  parent: RedisKit.Models.SerializerType
+  langs:
+  - csharp
+  - vb
+  name: MessagePack
+  nameWithType: SerializerType.MessagePack
+  fullName: RedisKit.Models.SerializerType.MessagePack
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/SerializerType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: MessagePack
+    path: RedisKit/Models/SerializerType.cs
+    startLine: 7
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: MessagePack = 0
+    return:
+      type: RedisKit.Models.SerializerType
+- uid: RedisKit.Models.SerializerType.SystemTextJson
+  commentId: F:RedisKit.Models.SerializerType.SystemTextJson
+  id: SystemTextJson
+  parent: RedisKit.Models.SerializerType
+  langs:
+  - csharp
+  - vb
+  name: SystemTextJson
+  nameWithType: SerializerType.SystemTextJson
+  fullName: RedisKit.Models.SerializerType.SystemTextJson
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/SerializerType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SystemTextJson
+    path: RedisKit/Models/SerializerType.cs
+    startLine: 8
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: SystemTextJson = 1
+    return:
+      type: RedisKit.Models.SerializerType
+- uid: RedisKit.Models.SerializerType.Custom
+  commentId: F:RedisKit.Models.SerializerType.Custom
+  id: Custom
+  parent: RedisKit.Models.SerializerType
+  langs:
+  - csharp
+  - vb
+  name: Custom
+  nameWithType: SerializerType.Custom
+  fullName: RedisKit.Models.SerializerType.Custom
+  type: Field
+  source:
+    remote:
+      path: RedisKit/Models/SerializerType.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: Custom
+    path: RedisKit/Models/SerializerType.cs
+    startLine: 9
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Models
+  syntax:
+    content: Custom = 2
+    return:
+      type: RedisKit.Models.SerializerType
+references:
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Models.SerializerType
+  commentId: T:RedisKit.Models.SerializerType
+  parent: RedisKit.Models
+  href: RedisKit.Models.SerializerType.html
+  name: SerializerType
+  nameWithType: SerializerType
+  fullName: RedisKit.Models.SerializerType

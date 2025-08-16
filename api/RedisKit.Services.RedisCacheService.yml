@@ -1,0 +1,1886 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Services.RedisCacheService
+  commentId: T:RedisKit.Services.RedisCacheService
+  id: RedisCacheService
+  parent: RedisKit.Services
+  children:
+  - RedisKit.Services.RedisCacheService.#ctor(StackExchange.Redis.IDatabaseAsync,Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService},RedisKit.Models.RedisOptions)
+  - RedisKit.Services.RedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  - RedisKit.Services.RedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  - RedisKit.Services.RedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  - RedisKit.Services.RedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  - RedisKit.Services.RedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  - RedisKit.Services.RedisCacheService.SetKeyPrefix(System.String)
+  - RedisKit.Services.RedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  langs:
+  - csharp
+  - vb
+  name: RedisCacheService
+  nameWithType: RedisCacheService
+  fullName: RedisKit.Services.RedisCacheService
+  type: Class
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: RedisCacheService
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 11
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Implementation of IRedisCacheService using StackExchange.Redis and configurable serialization
+  example: []
+  syntax:
+    content: 'public class RedisCacheService : IRedisCacheService'
+    content.vb: Public Class RedisCacheService Implements IRedisCacheService
+  inheritance:
+  - System.Object
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: RedisKit.Services.RedisCacheService.#ctor(StackExchange.Redis.IDatabaseAsync,Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService},RedisKit.Models.RedisOptions)
+  commentId: M:RedisKit.Services.RedisCacheService.#ctor(StackExchange.Redis.IDatabaseAsync,Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService},RedisKit.Models.RedisOptions)
+  id: '#ctor(StackExchange.Redis.IDatabaseAsync,Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService},RedisKit.Models.RedisOptions)'
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: RedisCacheService(IDatabaseAsync, ILogger<RedisCacheService>, RedisOptions)
+  nameWithType: RedisCacheService.RedisCacheService(IDatabaseAsync, ILogger<RedisCacheService>, RedisOptions)
+  fullName: RedisKit.Services.RedisCacheService.RedisCacheService(StackExchange.Redis.IDatabaseAsync, Microsoft.Extensions.Logging.ILogger<RedisKit.Services.RedisCacheService>, RedisKit.Models.RedisOptions)
+  type: Constructor
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: .ctor
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 19
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  syntax:
+    content: public RedisCacheService(IDatabaseAsync database, ILogger<RedisCacheService> logger, RedisOptions options)
+    parameters:
+    - id: database
+      type: StackExchange.Redis.IDatabaseAsync
+    - id: logger
+      type: Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService}
+    - id: options
+      type: RedisKit.Models.RedisOptions
+    content.vb: Public Sub New(database As IDatabaseAsync, logger As ILogger(Of RedisCacheService), options As RedisOptions)
+  overload: RedisKit.Services.RedisCacheService.#ctor*
+  nameWithType.vb: RedisCacheService.New(IDatabaseAsync, ILogger(Of RedisCacheService), RedisOptions)
+  fullName.vb: RedisKit.Services.RedisCacheService.New(StackExchange.Redis.IDatabaseAsync, Microsoft.Extensions.Logging.ILogger(Of RedisKit.Services.RedisCacheService), RedisKit.Models.RedisOptions)
+  name.vb: New(IDatabaseAsync, ILogger(Of RedisCacheService), RedisOptions)
+- uid: RedisKit.Services.RedisCacheService.SetKeyPrefix(System.String)
+  commentId: M:RedisKit.Services.RedisCacheService.SetKeyPrefix(System.String)
+  id: SetKeyPrefix(System.String)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: SetKeyPrefix(string)
+  nameWithType: RedisCacheService.SetKeyPrefix(string)
+  fullName: RedisKit.Services.RedisCacheService.SetKeyPrefix(string)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SetKeyPrefix
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 32
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Sets a prefix for all cache keys
+  example: []
+  syntax:
+    content: public void SetKeyPrefix(string prefix)
+    parameters:
+    - id: prefix
+      type: System.String
+    content.vb: Public Sub SetKeyPrefix(prefix As String)
+  overload: RedisKit.Services.RedisCacheService.SetKeyPrefix*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(System.String)
+  nameWithType.vb: RedisCacheService.SetKeyPrefix(String)
+  fullName.vb: RedisKit.Services.RedisCacheService.SetKeyPrefix(String)
+  name.vb: SetKeyPrefix(String)
+- uid: RedisKit.Services.RedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  id: GetAsync``1(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: GetAsync<T>(string, CancellationToken)
+  nameWithType: RedisCacheService.GetAsync<T>(string, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.GetAsync<T>(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: GetAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 37
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Gets an item from the cache by key
+  example: []
+  syntax:
+    content: 'public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: key
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{{T}}
+    content.vb: Public Function GetAsync(Of T As Class)(key As String, cancellationToken As CancellationToken = Nothing) As Task(Of T)
+  overload: RedisKit.Services.RedisCacheService.GetAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.GetAsync(Of T)(String, CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.GetAsync(Of T)(String, System.Threading.CancellationToken)
+  name.vb: GetAsync(Of T)(String, CancellationToken)
+- uid: RedisKit.Services.RedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  id: SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  nameWithType: RedisCacheService.SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.SetAsync<T>(string, T, System.TimeSpan?, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SetAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 63
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Sets an item in the cache with optional TTL
+  example: []
+  syntax:
+    content: 'public Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: key
+      type: System.String
+    - id: value
+      type: '{T}'
+    - id: ttl
+      type: System.Nullable{System.TimeSpan}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Public Function SetAsync(Of T As Class)(key As String, value As T, ttl As TimeSpan? = Nothing, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Services.RedisCacheService.SetAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,{T},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.SetAsync(Of T)(String, T, System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+- uid: RedisKit.Services.RedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  id: DeleteAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: DeleteAsync(string, CancellationToken)
+  nameWithType: RedisCacheService.DeleteAsync(string, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.DeleteAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: DeleteAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 91
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Deletes an item from the cache by key
+  example: []
+  syntax:
+    content: public Task DeleteAsync(string key, CancellationToken cancellationToken = default)
+    parameters:
+    - id: key
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Public Function DeleteAsync(key As String, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Services.RedisCacheService.DeleteAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.DeleteAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.DeleteAsync(String, System.Threading.CancellationToken)
+  name.vb: DeleteAsync(String, CancellationToken)
+- uid: RedisKit.Services.RedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  id: GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: GetManyAsync<T>(IEnumerable<string>, CancellationToken)
+  nameWithType: RedisCacheService.GetManyAsync<T>(IEnumerable<string>, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.GetManyAsync<T>(System.Collections.Generic.IEnumerable<string>, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: GetManyAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 113
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Gets multiple items from the cache
+  example: []
+  syntax:
+    content: 'public Task<Dictionary<string, T?>> GetManyAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: keys
+      type: System.Collections.Generic.IEnumerable{System.String}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{System.String,{T}}}
+    content.vb: Public Function GetManyAsync(Of T As Class)(keys As IEnumerable(Of String), cancellationToken As CancellationToken = Nothing) As Task(Of Dictionary(Of String, T))
+  overload: RedisKit.Services.RedisCacheService.GetManyAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.GetManyAsync(Of T)(IEnumerable(Of String), CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.GetManyAsync(Of T)(System.Collections.Generic.IEnumerable(Of String), System.Threading.CancellationToken)
+  name.vb: GetManyAsync(Of T)(IEnumerable(Of String), CancellationToken)
+- uid: RedisKit.Services.RedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  id: SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  nameWithType: RedisCacheService.SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.SetManyAsync<T>(System.Collections.Generic.IDictionary<string, T>, System.TimeSpan?, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: SetManyAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 150
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Sets multiple items in the cache with optional TTL
+  example: []
+  syntax:
+    content: 'public Task SetManyAsync<T>(IDictionary<string, T> values, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class'
+    parameters:
+    - id: values
+      type: System.Collections.Generic.IDictionary{System.String,{T}}
+    - id: ttl
+      type: System.Nullable{System.TimeSpan}
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    typeParameters:
+    - id: T
+    return:
+      type: System.Threading.Tasks.Task
+    content.vb: Public Function SetManyAsync(Of T As Class)(values As IDictionary(Of String, T), ttl As TimeSpan? = Nothing, cancellationToken As CancellationToken = Nothing) As Task
+  overload: RedisKit.Services.RedisCacheService.SetManyAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,{T}},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.SetManyAsync(Of T)(System.Collections.Generic.IDictionary(Of String, T), System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+- uid: RedisKit.Services.RedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Services.RedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  id: ExistsAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Services.RedisCacheService
+  langs:
+  - csharp
+  - vb
+  name: ExistsAsync(string, CancellationToken)
+  nameWithType: RedisCacheService.ExistsAsync(string, CancellationToken)
+  fullName: RedisKit.Services.RedisCacheService.ExistsAsync(string, System.Threading.CancellationToken)
+  type: Method
+  source:
+    remote:
+      path: RedisKit/Services/RedisCacheService.cs
+      branch: master
+      repo: https://github.com/ersintarhan/RedisKit.git
+    id: ExistsAsync
+    path: RedisKit/Services/RedisCacheService.cs
+    startLine: 191
+  assemblies:
+  - RedisKit
+  namespace: RedisKit.Services
+  summary: Checks if a key exists in the cache
+  example: []
+  syntax:
+    content: public Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
+    parameters:
+    - id: key
+      type: System.String
+    - id: cancellationToken
+      type: System.Threading.CancellationToken
+    return:
+      type: System.Threading.Tasks.Task{System.Boolean}
+    content.vb: Public Function ExistsAsync(key As String, cancellationToken As CancellationToken = Nothing) As Task(Of Boolean)
+  overload: RedisKit.Services.RedisCacheService.ExistsAsync*
+  implements:
+  - RedisKit.Interfaces.IRedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  nameWithType.vb: RedisCacheService.ExistsAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Services.RedisCacheService.ExistsAsync(String, System.Threading.CancellationToken)
+  name.vb: ExistsAsync(String, CancellationToken)
+references:
+- uid: RedisKit.Services
+  commentId: N:RedisKit.Services
+  href: RedisKit.html
+  name: RedisKit.Services
+  nameWithType: RedisKit.Services
+  fullName: RedisKit.Services
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Services
+    name: Services
+    href: RedisKit.Services.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Services
+    name: Services
+    href: RedisKit.Services.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: RedisKit.Interfaces.IRedisCacheService
+  commentId: T:RedisKit.Interfaces.IRedisCacheService
+  parent: RedisKit.Interfaces
+  href: RedisKit.Interfaces.IRedisCacheService.html
+  name: IRedisCacheService
+  nameWithType: IRedisCacheService
+  fullName: RedisKit.Interfaces.IRedisCacheService
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: RedisKit.Interfaces
+  commentId: N:RedisKit.Interfaces
+  href: RedisKit.html
+  name: RedisKit.Interfaces
+  nameWithType: RedisKit.Interfaces
+  fullName: RedisKit.Interfaces
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Interfaces
+    name: Interfaces
+    href: RedisKit.Interfaces.html
+- uid: RedisKit.Services.RedisCacheService.#ctor*
+  commentId: Overload:RedisKit.Services.RedisCacheService.#ctor
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService__ctor_StackExchange_Redis_IDatabaseAsync_Microsoft_Extensions_Logging_ILogger_RedisKit_Services_RedisCacheService__RedisKit_Models_RedisOptions_
+  name: RedisCacheService
+  nameWithType: RedisCacheService.RedisCacheService
+  fullName: RedisKit.Services.RedisCacheService.RedisCacheService
+  nameWithType.vb: RedisCacheService.New
+  fullName.vb: RedisKit.Services.RedisCacheService.New
+  name.vb: New
+- uid: StackExchange.Redis.IDatabaseAsync
+  commentId: T:StackExchange.Redis.IDatabaseAsync
+  parent: StackExchange.Redis
+  isExternal: true
+  name: IDatabaseAsync
+  nameWithType: IDatabaseAsync
+  fullName: StackExchange.Redis.IDatabaseAsync
+- uid: Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService}
+  commentId: T:Microsoft.Extensions.Logging.ILogger{RedisKit.Services.RedisCacheService}
+  parent: Microsoft.Extensions.Logging
+  definition: Microsoft.Extensions.Logging.ILogger`1
+  href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  name: ILogger<RedisCacheService>
+  nameWithType: ILogger<RedisCacheService>
+  fullName: Microsoft.Extensions.Logging.ILogger<RedisKit.Services.RedisCacheService>
+  nameWithType.vb: ILogger(Of RedisCacheService)
+  fullName.vb: Microsoft.Extensions.Logging.ILogger(Of RedisKit.Services.RedisCacheService)
+  name.vb: ILogger(Of RedisCacheService)
+  spec.csharp:
+  - uid: Microsoft.Extensions.Logging.ILogger`1
+    name: ILogger
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  - name: <
+  - uid: RedisKit.Services.RedisCacheService
+    name: RedisCacheService
+    href: RedisKit.Services.RedisCacheService.html
+  - name: '>'
+  spec.vb:
+  - uid: Microsoft.Extensions.Logging.ILogger`1
+    name: ILogger
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: RedisKit.Services.RedisCacheService
+    name: RedisCacheService
+    href: RedisKit.Services.RedisCacheService.html
+  - name: )
+- uid: RedisKit.Models.RedisOptions
+  commentId: T:RedisKit.Models.RedisOptions
+  parent: RedisKit.Models
+  href: RedisKit.Models.RedisOptions.html
+  name: RedisOptions
+  nameWithType: RedisOptions
+  fullName: RedisKit.Models.RedisOptions
+- uid: StackExchange.Redis
+  commentId: N:StackExchange.Redis
+  isExternal: true
+  name: StackExchange.Redis
+  nameWithType: StackExchange.Redis
+  fullName: StackExchange.Redis
+  spec.csharp:
+  - uid: StackExchange
+    name: StackExchange
+    isExternal: true
+  - name: .
+  - uid: StackExchange.Redis
+    name: Redis
+    isExternal: true
+  spec.vb:
+  - uid: StackExchange
+    name: StackExchange
+    isExternal: true
+  - name: .
+  - uid: StackExchange.Redis
+    name: Redis
+    isExternal: true
+- uid: Microsoft.Extensions.Logging.ILogger`1
+  commentId: T:Microsoft.Extensions.Logging.ILogger`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  name: ILogger<TCategoryName>
+  nameWithType: ILogger<TCategoryName>
+  fullName: Microsoft.Extensions.Logging.ILogger<TCategoryName>
+  nameWithType.vb: ILogger(Of TCategoryName)
+  fullName.vb: Microsoft.Extensions.Logging.ILogger(Of TCategoryName)
+  name.vb: ILogger(Of TCategoryName)
+  spec.csharp:
+  - uid: Microsoft.Extensions.Logging.ILogger`1
+    name: ILogger
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  - name: <
+  - name: TCategoryName
+  - name: '>'
+  spec.vb:
+  - uid: Microsoft.Extensions.Logging.ILogger`1
+    name: ILogger
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TCategoryName
+  - name: )
+- uid: Microsoft.Extensions.Logging
+  commentId: N:Microsoft.Extensions.Logging
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/microsoft
+  name: Microsoft.Extensions.Logging
+  nameWithType: Microsoft.Extensions.Logging
+  fullName: Microsoft.Extensions.Logging
+  spec.csharp:
+  - uid: Microsoft
+    name: Microsoft
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft
+  - name: .
+  - uid: Microsoft.Extensions
+    name: Extensions
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions
+  - name: .
+  - uid: Microsoft.Extensions.Logging
+    name: Logging
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging
+  spec.vb:
+  - uid: Microsoft
+    name: Microsoft
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft
+  - name: .
+  - uid: Microsoft.Extensions
+    name: Extensions
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions
+  - name: .
+  - uid: Microsoft.Extensions.Logging
+    name: Logging
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging
+- uid: RedisKit.Models
+  commentId: N:RedisKit.Models
+  href: RedisKit.html
+  name: RedisKit.Models
+  nameWithType: RedisKit.Models
+  fullName: RedisKit.Models
+  spec.csharp:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+  spec.vb:
+  - uid: RedisKit
+    name: RedisKit
+    href: RedisKit.html
+  - name: .
+  - uid: RedisKit.Models
+    name: Models
+    href: RedisKit.Models.html
+- uid: RedisKit.Services.RedisCacheService.SetKeyPrefix*
+  commentId: Overload:RedisKit.Services.RedisCacheService.SetKeyPrefix
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_SetKeyPrefix_System_String_
+  name: SetKeyPrefix
+  nameWithType: RedisCacheService.SetKeyPrefix
+  fullName: RedisKit.Services.RedisCacheService.SetKeyPrefix
+- uid: RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(System.String)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(System.String)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetKeyPrefix_System_String_
+  name: SetKeyPrefix(string)
+  nameWithType: IRedisCacheService.SetKeyPrefix(string)
+  fullName: RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(string)
+  nameWithType.vb: IRedisCacheService.SetKeyPrefix(String)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(String)
+  name.vb: SetKeyPrefix(String)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(System.String)
+    name: SetKeyPrefix
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetKeyPrefix_System_String_
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetKeyPrefix(System.String)
+    name: SetKeyPrefix
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetKeyPrefix_System_String_
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: RedisKit.Services.RedisCacheService.GetAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.GetAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_GetAsync__1_System_String_System_Threading_CancellationToken_
+  name: GetAsync
+  nameWithType: RedisCacheService.GetAsync
+  fullName: RedisKit.Services.RedisCacheService.GetAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetAsync__1_System_String_System_Threading_CancellationToken_
+  name: GetAsync<T>(string, CancellationToken)
+  nameWithType: IRedisCacheService.GetAsync<T>(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.GetAsync<T>(string, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.GetAsync(Of T)(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.GetAsync(Of T)(String, System.Threading.CancellationToken)
+  name.vb: GetAsync(Of T)(String, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+    name: GetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetAsync__1_System_String_System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.GetAsync``1(System.String,System.Threading.CancellationToken)
+    name: GetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetAsync__1_System_String_System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: System.Threading.CancellationToken
+  commentId: T:System.Threading.CancellationToken
+  parent: System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  name: CancellationToken
+  nameWithType: CancellationToken
+  fullName: System.Threading.CancellationToken
+- uid: System.Threading.Tasks.Task{{T}}
+  commentId: T:System.Threading.Tasks.Task{``0}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<T>
+  nameWithType: Task<T>
+  fullName: System.Threading.Tasks.Task<T>
+  nameWithType.vb: Task(Of T)
+  fullName.vb: System.Threading.Tasks.Task(Of T)
+  name.vb: Task(Of T)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Threading
+  commentId: N:System.Threading
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading
+  nameWithType: System.Threading
+  fullName: System.Threading
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+- uid: System.Threading.Tasks.Task`1
+  commentId: T:System.Threading.Tasks.Task`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<TResult>
+  nameWithType: Task<TResult>
+  fullName: System.Threading.Tasks.Task<TResult>
+  nameWithType.vb: Task(Of TResult)
+  fullName.vb: System.Threading.Tasks.Task(Of TResult)
+  name.vb: Task(Of TResult)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Threading.Tasks
+  commentId: N:System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading.Tasks
+  nameWithType: System.Threading.Tasks
+  fullName: System.Threading.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+- uid: RedisKit.Services.RedisCacheService.SetAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.SetAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetAsync
+  nameWithType: RedisCacheService.SetAsync
+  fullName: RedisKit.Services.RedisCacheService.SetAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,{T},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  definition: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  nameWithType: IRedisCacheService.SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.SetAsync<T>(string, T, System.TimeSpan?, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.SetAsync(Of T)(String, T, System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Nullable{System.TimeSpan}
+  commentId: T:System.Nullable{System.TimeSpan}
+  parent: System
+  definition: System.Nullable`1
+  href: https://learn.microsoft.com/dotnet/api/system.timespan
+  name: TimeSpan?
+  nameWithType: TimeSpan?
+  fullName: System.TimeSpan?
+  spec.csharp:
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  spec.vb:
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+- uid: System.Threading.Tasks.Task
+  commentId: T:System.Threading.Tasks.Task
+  parent: System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task
+  name: Task
+  nameWithType: Task
+  fullName: System.Threading.Tasks.Task
+- uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  nameWithType: IRedisCacheService.SetAsync<T>(string, T, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.SetAsync<T>(string, T, System.TimeSpan?, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.SetAsync(Of T)(String, T, System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetAsync(Of T)(String, T, TimeSpan?, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetAsync``1(System.String,``0,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetAsync__1_System_String___0_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Nullable`1
+  commentId: T:System.Nullable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  name: Nullable<T>
+  nameWithType: Nullable<T>
+  fullName: System.Nullable<T>
+  nameWithType.vb: Nullable(Of T)
+  fullName.vb: System.Nullable(Of T)
+  name.vb: Nullable(Of T)
+  spec.csharp:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: RedisKit.Services.RedisCacheService.DeleteAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.DeleteAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_DeleteAsync_System_String_System_Threading_CancellationToken_
+  name: DeleteAsync
+  nameWithType: RedisCacheService.DeleteAsync
+  fullName: RedisKit.Services.RedisCacheService.DeleteAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_DeleteAsync_System_String_System_Threading_CancellationToken_
+  name: DeleteAsync(string, CancellationToken)
+  nameWithType: IRedisCacheService.DeleteAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.DeleteAsync(string, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.DeleteAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.DeleteAsync(String, System.Threading.CancellationToken)
+  name.vb: DeleteAsync(String, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+    name: DeleteAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_DeleteAsync_System_String_System_Threading_CancellationToken_
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.DeleteAsync(System.String,System.Threading.CancellationToken)
+    name: DeleteAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_DeleteAsync_System_String_System_Threading_CancellationToken_
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: RedisKit.Services.RedisCacheService.GetManyAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.GetManyAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_GetManyAsync__1_System_Collections_Generic_IEnumerable_System_String__System_Threading_CancellationToken_
+  name: GetManyAsync
+  nameWithType: RedisCacheService.GetManyAsync
+  fullName: RedisKit.Services.RedisCacheService.GetManyAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetManyAsync__1_System_Collections_Generic_IEnumerable_System_String__System_Threading_CancellationToken_
+  name: GetManyAsync<T>(IEnumerable<string>, CancellationToken)
+  nameWithType: IRedisCacheService.GetManyAsync<T>(IEnumerable<string>, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.GetManyAsync<T>(System.Collections.Generic.IEnumerable<string>, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.GetManyAsync(Of T)(IEnumerable(Of String), CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.GetManyAsync(Of T)(System.Collections.Generic.IEnumerable(Of String), System.Threading.CancellationToken)
+  name.vb: GetManyAsync(Of T)(IEnumerable(Of String), CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    name: GetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetManyAsync__1_System_Collections_Generic_IEnumerable_System_String__System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.GetManyAsync``1(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    name: GetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_GetManyAsync__1_System_Collections_Generic_IEnumerable_System_String__System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: System.Collections.Generic.IEnumerable{System.String}
+  commentId: T:System.Collections.Generic.IEnumerable{System.String}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<string>
+  nameWithType: IEnumerable<string>
+  fullName: System.Collections.Generic.IEnumerable<string>
+  nameWithType.vb: IEnumerable(Of String)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of String)
+  name.vb: IEnumerable(Of String)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{System.String,{T}}}
+  commentId: T:System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{System.String,``0}}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<Dictionary<string, T>>
+  nameWithType: Task<Dictionary<string, T>>
+  fullName: System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, T>>
+  nameWithType.vb: Task(Of Dictionary(Of String, T))
+  fullName.vb: System.Threading.Tasks.Task(Of System.Collections.Generic.Dictionary(Of String, T))
+  name.vb: Task(Of Dictionary(Of String, T))
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: RedisKit.Services.RedisCacheService.SetManyAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.SetManyAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetManyAsync
+  nameWithType: RedisCacheService.SetManyAsync
+  fullName: RedisKit.Services.RedisCacheService.SetManyAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,{T}},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  definition: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  nameWithType: IRedisCacheService.SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.SetManyAsync<T>(System.Collections.Generic.IDictionary<string, T>, System.TimeSpan?, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.SetManyAsync(Of T)(System.Collections.Generic.IDictionary(Of String, T), System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: System.Collections.Generic.IDictionary{System.String,{T}}
+  commentId: T:System.Collections.Generic.IDictionary{System.String,``0}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IDictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<string, T>
+  nameWithType: IDictionary<string, T>
+  fullName: System.Collections.Generic.IDictionary<string, T>
+  nameWithType.vb: IDictionary(Of String, T)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, T)
+  name.vb: IDictionary(Of String, T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: )
+- uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  name: SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  nameWithType: IRedisCacheService.SetManyAsync<T>(IDictionary<string, T>, TimeSpan?, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.SetManyAsync<T>(System.Collections.Generic.IDictionary<string, T>, System.TimeSpan?, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.SetManyAsync(Of T)(System.Collections.Generic.IDictionary(Of String, T), System.TimeSpan?, System.Threading.CancellationToken)
+  name.vb: SetManyAsync(Of T)(IDictionary(Of String, T), TimeSpan?, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: <
+  - name: T
+  - name: '>'
+  - name: (
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.SetManyAsync``1(System.Collections.Generic.IDictionary{System.String,``0},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)
+    name: SetManyAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_SetManyAsync__1_System_Collections_Generic_IDictionary_System_String___0__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: (
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: T
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.TimeSpan
+    name: TimeSpan
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.timespan
+  - name: '?'
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2
+  commentId: T:System.Collections.Generic.IDictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<TKey, TValue>
+  nameWithType: IDictionary<TKey, TValue>
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>
+  nameWithType.vb: IDictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue)
+  name.vb: IDictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: RedisKit.Services.RedisCacheService.ExistsAsync*
+  commentId: Overload:RedisKit.Services.RedisCacheService.ExistsAsync
+  href: RedisKit.Services.RedisCacheService.html#RedisKit_Services_RedisCacheService_ExistsAsync_System_String_System_Threading_CancellationToken_
+  name: ExistsAsync
+  nameWithType: RedisCacheService.ExistsAsync
+  fullName: RedisKit.Services.RedisCacheService.ExistsAsync
+- uid: RedisKit.Interfaces.IRedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  commentId: M:RedisKit.Interfaces.IRedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+  parent: RedisKit.Interfaces.IRedisCacheService
+  isExternal: true
+  href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_ExistsAsync_System_String_System_Threading_CancellationToken_
+  name: ExistsAsync(string, CancellationToken)
+  nameWithType: IRedisCacheService.ExistsAsync(string, CancellationToken)
+  fullName: RedisKit.Interfaces.IRedisCacheService.ExistsAsync(string, System.Threading.CancellationToken)
+  nameWithType.vb: IRedisCacheService.ExistsAsync(String, CancellationToken)
+  fullName.vb: RedisKit.Interfaces.IRedisCacheService.ExistsAsync(String, System.Threading.CancellationToken)
+  name.vb: ExistsAsync(String, CancellationToken)
+  spec.csharp:
+  - uid: RedisKit.Interfaces.IRedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+    name: ExistsAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_ExistsAsync_System_String_System_Threading_CancellationToken_
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+  spec.vb:
+  - uid: RedisKit.Interfaces.IRedisCacheService.ExistsAsync(System.String,System.Threading.CancellationToken)
+    name: ExistsAsync
+    href: RedisKit.Interfaces.IRedisCacheService.html#RedisKit_Interfaces_IRedisCacheService_ExistsAsync_System_String_System_Threading_CancellationToken_
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Threading.CancellationToken
+    name: CancellationToken
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+  - name: )
+- uid: System.Threading.Tasks.Task{System.Boolean}
+  commentId: T:System.Threading.Tasks.Task{System.Boolean}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<bool>
+  nameWithType: Task<bool>
+  fullName: System.Threading.Tasks.Task<bool>
+  nameWithType.vb: Task(Of Boolean)
+  fullName.vb: System.Threading.Tasks.Task(Of Boolean)
+  name.vb: Task(Of Boolean)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )

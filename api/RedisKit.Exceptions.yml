@@ -1,0 +1,23 @@
+### YamlMime:ManagedReference
+items:
+- uid: RedisKit.Exceptions
+  commentId: N:RedisKit.Exceptions
+  id: RedisKit.Exceptions
+  children:
+  - RedisKit.Exceptions.RedisCircuitOpenException
+  langs:
+  - csharp
+  - vb
+  name: RedisKit.Exceptions
+  nameWithType: RedisKit.Exceptions
+  fullName: RedisKit.Exceptions
+  type: Namespace
+  assemblies:
+  - RedisKit
+references:
+- uid: RedisKit.Exceptions.RedisCircuitOpenException
+  commentId: T:RedisKit.Exceptions.RedisCircuitOpenException
+  href: RedisKit.Exceptions.RedisCircuitOpenException.html
+  name: RedisCircuitOpenException
+  nameWithType: RedisCircuitOpenException
+  fullName: RedisKit.Exceptions.RedisCircuitOpenException

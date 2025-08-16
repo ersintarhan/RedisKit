@@ -1,0 +1,10 @@
+apiRules:
+- exclude:
+    uidRegex: ^RedisKit\.Tests
+    type: Namespace
+- exclude:
+    uidRegex: ^RedisKit\.Example
+    type: Namespace
+- exclude:
+    uidRegex: ^RedisKit\.Benchmarks
+    type: Namespace
