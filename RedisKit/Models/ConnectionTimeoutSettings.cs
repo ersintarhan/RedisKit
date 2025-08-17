@@ -25,17 +25,7 @@ namespace RedisKit.Models
         /// </summary>
         public TimeSpan KeepAlive { get; set; } = TimeSpan.FromSeconds(60);
 
-        /// <summary>
-        /// Response timeout for operations (DEPRECATED)
-        /// </summary>
-        /// <remarks>
-        /// This property is deprecated in StackExchange.Redis 2.7+ and has no effect.
-        /// It will be removed in a future version to align with StackExchange.Redis 3.0.
-        /// Use SyncTimeout and AsyncTimeout instead for controlling operation timeouts.
-        /// </remarks>
-        [Obsolete("ResponseTimeout is obsolete in StackExchange.Redis 2.7+ and has no effect. Use SyncTimeout and AsyncTimeout instead.")]
-        public TimeSpan ResponseTimeout { get; set; } = TimeSpan.FromSeconds(5);
-
+        
         /// <summary>
         /// Timeout for configuration retrieval
         /// </summary>

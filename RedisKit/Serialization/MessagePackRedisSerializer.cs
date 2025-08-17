@@ -158,9 +158,7 @@ namespace RedisKit.Serialization
         /// </remarks>
         public byte[] Serialize<T>(T obj)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-
+            
             try
             {
                 _logger?.LogMessagePackSerialize(typeof(T).Name, 0);
@@ -239,8 +237,6 @@ namespace RedisKit.Serialization
         /// </remarks>
         public Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
 
             try
             {

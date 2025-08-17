@@ -31,9 +31,18 @@ namespace RedisKit.Models
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!_disposed)
             {
-                _disposeAction?.Invoke().GetAwaiter().GetResult();
+                if (disposing)
+                {
+                    _disposeAction?.Invoke().GetAwaiter().GetResult();
+                }
                 _disposed = true;
             }
         }

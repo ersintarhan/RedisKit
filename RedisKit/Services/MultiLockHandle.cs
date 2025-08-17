@@ -2,7 +2,7 @@ using RedisKit.Interfaces;
 
 namespace RedisKit.Services;
 
-internal class MultiLockHandle : IMultiLockHandle
+internal sealed class MultiLockHandle : IMultiLockHandle
 {
     private readonly List<ILockHandle> _locks;
     private bool _disposed;
@@ -25,19 +25,39 @@ internal class MultiLockHandle : IMultiLockHandle
 
     public async ValueTask DisposeAsync()
     {
-        if (_disposed)
-            return;
-
-        _disposed = true;
-        await ReleaseAllAsync().ConfigureAwait(false);
+        await DisposeAsyncCore();
+        Dispose(disposing: false);
+        GC.SuppressFinalize(this);
     }
 
     public void Dispose()
     {
-        if (_disposed)
-            return;
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
-        _disposed = true;
-        Task.Run(async () => await ReleaseAllAsync()).Wait(TimeSpan.FromSeconds(5));
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Synchronous dispose of managed resources
+                // Since we only have async operations, we need to block here
+                // This is not ideal but required for IDisposable pattern
+                Task.Run(async () => await ReleaseAllAsync()).Wait(TimeSpan.FromSeconds(5));
+            }
+
+            _disposed = true;
+        }
+    }
+
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (!_disposed)
+        {
+            await ReleaseAllAsync().ConfigureAwait(false);
+            _disposed = true;
+        }
     }
 }

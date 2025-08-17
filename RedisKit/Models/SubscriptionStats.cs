@@ -15,20 +15,20 @@ public class SubscriptionStats
 
     public long MessagesReceived
     {
-        get => _messagesReceived;
-        set => _messagesReceived = value;
+        get => Interlocked.Read(ref _messagesReceived);
+        set => Interlocked.Exchange(ref _messagesReceived, value);
     }
 
     public long MessagesProcessed
     {
-        get => _messagesProcessed;
-        set => _messagesProcessed = value;
+        get => Interlocked.Read(ref _messagesProcessed);
+        set => Interlocked.Exchange(ref _messagesProcessed, value);
     }
 
     public long MessagesFailed
     {
-        get => _messagesFailed;
-        set => _messagesFailed = value;
+        get => Interlocked.Read(ref _messagesFailed);
+        set => Interlocked.Exchange(ref _messagesFailed, value);
     }
 
     public DateTime? LastMessageAt { get; set; }

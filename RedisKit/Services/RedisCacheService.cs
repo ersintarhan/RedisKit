@@ -12,6 +12,7 @@ namespace RedisKit.Services
     /// </summary>
     public class RedisCacheService : IRedisCacheService
     {
+        const string VALUE_CANNOT_BE_NULL_OR_EMPTY = "Value cannot be null or empty";
         private readonly IDatabaseAsync _database;
         private readonly ILogger<RedisCacheService> _logger;
         private readonly RedisOptions _options;
@@ -55,7 +56,7 @@ namespace RedisKit.Services
         public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException(VALUE_CANNOT_BE_NULL_OR_EMPTY, nameof(key));
 
             var prefixedKey = $"{_keyPrefix}{key}";
 
@@ -81,7 +82,7 @@ namespace RedisKit.Services
         public async Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException(VALUE_CANNOT_BE_NULL_OR_EMPTY, nameof(key));
 
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -179,12 +180,12 @@ namespace RedisKit.Services
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
                 await EnsureLuaScriptSupportChecked();
-                
+
                 await ProcessBatchesAsync(values, expiry, cancellationToken);
 
                 stopwatch.Stop();
                 Logging.LoggingExtensions.LogSetManyAsyncSuccess(_logger, values.Count);
-                
+
                 LogPerformanceIfSlow(stopwatch, values.Count);
             }
             catch (Exception ex)
@@ -211,7 +212,7 @@ namespace RedisKit.Services
             {
                 var serializedPairs = await SerializeChunkAsync(chunk, cancellationToken);
                 await SetChunkAsync(serializedPairs, expiry);
-                
+
                 processedCount += chunk.Count();
                 LogProgressIfNeeded(values.Count, processedCount);
             }
@@ -226,7 +227,7 @@ namespace RedisKit.Services
         private async Task<(RedisKey Key, RedisValue Value)> SerializeKeyValuePairAsync<T>(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) where T : class
         {
             ValidateKeyValuePair(kvp);
-            
+
             var prefixedKey = $"{_keyPrefix}{kvp.Key}";
             var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken).ConfigureAwait(false);
             return ((RedisKey)prefixedKey, (RedisValue)serialized);
@@ -237,12 +238,12 @@ namespace RedisKit.Services
             if (string.IsNullOrEmpty(kvp.Key))
                 throw new ArgumentException("Key cannot be null or empty");
             if (kvp.Value == null)
-                throw new ArgumentNullException("Value cannot be null");
+                throw new ArgumentNullException(nameof(kvp), VALUE_CANNOT_BE_NULL_OR_EMPTY);
         }
 
         private async Task SetChunkAsync((RedisKey Key, RedisValue Value)[] serializedPairs, TimeSpan expiry)
         {
-            if (_supportsLuaScripts.Value && !_useFallbackMode && expiry != TimeSpan.Zero)
+            if (_supportsLuaScripts.GetValueOrDefault() && !_useFallbackMode && expiry != TimeSpan.Zero)
             {
                 await SetManyWithLuaScript(serializedPairs, expiry);
             }
@@ -265,7 +266,7 @@ namespace RedisKit.Services
             if (stopwatch.ElapsedMilliseconds > 1000)
             {
                 Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, count, stopwatch.ElapsedMilliseconds,
-                    _supportsLuaScripts.Value ? "Lua" : "Fallback");
+                    _supportsLuaScripts.GetValueOrDefault() ? "Lua" : "Fallback");
             }
         }
 
@@ -296,7 +297,7 @@ namespace RedisKit.Services
             }
         }
 
-        private int CalculateOptimalChunkSize(int totalCount)
+        private static int CalculateOptimalChunkSize(int totalCount)
         {
             return totalCount switch
             {

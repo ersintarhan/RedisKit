@@ -70,7 +70,7 @@ public class RetryConfiguration
     }
 
     /// <summary>
-    /// Move to dead letter queue after max retries (Stream-specific)
+    /// Move to the dead letter queue after max retries (Stream-specific)
     /// </summary>
     public bool MoveToDeadLetterQueue { get; set; } = true;
 

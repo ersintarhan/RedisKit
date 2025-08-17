@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
-using RedisKit.Serialization;
 using System.Collections.Concurrent;
 
 namespace RedisKit.Benchmarks;
@@ -16,7 +15,8 @@ public class PubSubBenchmarks : IDisposable
     private ServiceProvider _serviceProvider = null!;
     private IRedisPubSubService _pubSubService = null!;
     private readonly TestMessage _testMessage;
-    private readonly ConcurrentBag<TestMessage> _receivedMessages = new();
+    // ReSharper disable once CollectionNeverQueried.Local
+    private readonly ConcurrentBag<TestMessage> _receivedMessages = [];
     private bool _disposed;
 
     public PubSubBenchmarks()
@@ -49,7 +49,7 @@ public class PubSubBenchmarks : IDisposable
         // Setup subscriber for receive benchmarks
         await _pubSubService.SubscribeAsync<TestMessage>(
             "benchmark:channel",
-            async (message, ct) =>
+            async (message, _) =>
             {
                 _receivedMessages.Add(message);
                 await Task.CompletedTask;
@@ -85,7 +85,7 @@ public class PubSubBenchmarks : IDisposable
     {
         var token = await _pubSubService.SubscribeAsync<TestMessage>(
             "benchmark:temp",
-            async (msg, ct) => await Task.CompletedTask);
+            async (_, _) => await Task.CompletedTask);
 
         await token.UnsubscribeAsync();
     }

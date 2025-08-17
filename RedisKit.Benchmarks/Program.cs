@@ -5,8 +5,9 @@ using BenchmarkDotNet.Environments;
 
 namespace RedisKit.Benchmarks;
 
-public class Program
+public static class Program
 {
+   
     public static void Main(string[] args)
     {
         var config = DefaultConfig.Instance;
