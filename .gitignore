@@ -41,3 +41,4 @@ logs/
 .junie/guidelines.md
 CLAUDE.md
 /.sonarqube
+.claude/settings.local.json

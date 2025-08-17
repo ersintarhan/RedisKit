@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "jetbrains": {
+      "type": "stdio",
+      "env": {
+        "IJ_MCP_SERVER_PORT": "64342"
+      },
+      "command": "/Users/ersin/Applications/Rider.app/Contents/jbr/Contents/Home/bin/java",
+      "args": [
+        "-classpath",
+        "/Users/ersin/Applications/Rider.app/Contents/plugins/mcpserver/lib/mcpserver-frontend.jar:/Users/ersin/Applications/Rider.app/Contents/lib/util-8.jar",
+        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+      ]
+    }
+  }
+}
