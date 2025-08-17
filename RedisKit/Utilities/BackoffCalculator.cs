@@ -32,7 +32,7 @@ namespace RedisKit.Utilities
                 BackoffStrategy.Linear => CalculateLinear(attempt, config),
                 BackoffStrategy.Exponential => CalculateExponential(attempt, config),
                 BackoffStrategy.ExponentialWithJitter => CalculateExponentialWithJitter(attempt, config),
-                BackoffStrategy.DecorrelatedJitter => CalculateDecorrelatedJitter(attempt, config, previousDelay),
+                BackoffStrategy.DecorrelatedJitter => CalculateDecorrelatedJitter(config, previousDelay),
                 _ => config.InitialDelay
             };
 
@@ -71,7 +71,7 @@ namespace RedisKit.Utilities
             return baseDelay + jitter;
         }
 
-        private static TimeSpan CalculateDecorrelatedJitter(int attempt, RetryConfiguration config, TimeSpan? previousDelay)
+        private static TimeSpan CalculateDecorrelatedJitter(RetryConfiguration config, TimeSpan? previousDelay)
         {
             // AWS recommended decorrelated jitter
             // sleep = min(cap, random_between(base, sleep * 3))

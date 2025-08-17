@@ -484,54 +484,46 @@ namespace RedisKit.Services
 
             var prefixedStream = $"{_keyPrefix}{stream}";
 
-            try
+            _logger.LogDebug("Claiming {Count} messages from stream {Stream} for consumer {Consumer}",
+                messageIds.Length, prefixedStream, consumerName);
+
+            // Convert string array to RedisValue array
+            var redisMessageIds = Array.ConvertAll(messageIds, id => (RedisValue)id);
+
+            // Claim the messages
+            var entries = await _database.StreamClaimAsync(
+                prefixedStream,
+                groupName,
+                consumerName,
+                minIdleTime,
+                redisMessageIds);
+
+            var result = new Dictionary<string, T?>();
+
+            foreach (var entry in entries)
             {
-                _logger.LogDebug("Claiming {Count} messages from stream {Stream} for consumer {Consumer}",
-                    messageIds.Length, prefixedStream, consumerName);
+                // Extract the data field and deserialize
+                var value = entry.Values.FirstOrDefault(fv => fv.Name == "data").Value;
 
-                // Convert string array to RedisValue array
-                var redisMessageIds = Array.ConvertAll(messageIds, id => (RedisValue)id);
-
-                // Claim the messages
-                var entries = await _database.StreamClaimAsync(
-                    prefixedStream,
-                    groupName,
-                    consumerName,
-                    minIdleTime,
-                    redisMessageIds);
-
-                var result = new Dictionary<string, T?>();
-
-                foreach (var entry in entries)
+                if (!value.IsNullOrEmpty)
                 {
-                    // Extract the data field and deserialize
-                    var value = entry.Values.FirstOrDefault(fv => fv.Name == "data").Value;
-
-                    if (!value.IsNullOrEmpty)
+                    try
                     {
-                        try
-                        {
-                            var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken: cancellationToken);
-                            result[entry.Id!] = deserialized;
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error deserializing claimed message from stream {Stream} with ID {Id}",
-                                prefixedStream, entry.Id);
-                            result[entry.Id!] = null;
-                        }
+                        var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken: cancellationToken);
+                        result[entry.Id!] = deserialized;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error deserializing claimed message from stream {Stream} with ID {Id}",
+                            prefixedStream, entry.Id);
+                        result[entry.Id!] = null;
                     }
                 }
+            }
 
-                _logger.LogInformation("Claimed {Count} messages from stream {Stream} for consumer {Consumer}",
-                    result.Count, prefixedStream, consumerName);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error claiming messages from stream {Stream}", prefixedStream);
-                throw;
-            }
+            _logger.LogInformation("Claimed {Count} messages from stream {Stream} for consumer {Consumer}",
+                result.Count, prefixedStream, consumerName);
+            return result;
         }
 
         public async Task<StreamInfo> GetInfoAsync(string stream, CancellationToken cancellationToken = default)
@@ -541,23 +533,15 @@ namespace RedisKit.Services
 
             var prefixedStream = $"{_keyPrefix}{stream}";
 
-            try
-            {
-                _logger.LogDebug("Getting info for stream {Stream}", prefixedStream);
+            _logger.LogDebug("Getting info for stream {Stream}", prefixedStream);
 
-                // Get stream info
-                var info = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
+            // Get stream info
+            var info = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
 
-                _logger.LogDebug("Retrieved info for stream {Stream}: Length={Length}, FirstEntry={FirstEntry}, LastEntry={LastEntry}",
-                    prefixedStream, info.Length, info.FirstEntry.Id, info.LastEntry.Id);
+            _logger.LogDebug("Retrieved info for stream {Stream}: Length={Length}, FirstEntry={FirstEntry}, LastEntry={LastEntry}",
+                prefixedStream, info.Length, info.FirstEntry.Id, info.LastEntry.Id);
 
-                return info;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting info for stream {Stream}", prefixedStream);
-                throw;
-            }
+            return info;
         }
 
         public async Task<StreamPendingMessageInfo[]> GetPendingAsync(string stream, string groupName, int count = 10, string? consumerName = null, CancellationToken cancellationToken = default)
@@ -634,73 +618,65 @@ namespace RedisKit.Services
             var prefixedSourceStream = $"{_keyPrefix}{sourceStream}";
             var prefixedDeadLetterStream = $"{_keyPrefix}{deadLetterStream}";
 
-            try
+            _logger.LogInformation("Moving message {MessageId} from {Source} to dead letter queue {DLQ}",
+                messageId, prefixedSourceStream, prefixedDeadLetterStream);
+
+            // Read the original message
+            var entries = await _database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1).ConfigureAwait(false);
+
+            if (entries.Length == 0)
             {
-                _logger.LogInformation("Moving message {MessageId} from {Source} to dead letter queue {DLQ}",
-                    messageId, prefixedSourceStream, prefixedDeadLetterStream);
-
-                // Read the original message
-                var entries = await _database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1).ConfigureAwait(false);
-
-                if (entries.Length == 0)
-                {
-                    _logger.LogWarning("Message {MessageId} not found in stream {Stream}", messageId, prefixedSourceStream);
-                    return string.Empty;
-                }
-
-                var entry = entries[0];
-                var value = entry.Values.FirstOrDefault(fv => fv.Name == "data").Value;
-
-                T? originalMessage = null;
-                if (!value.IsNullOrEmpty)
-                {
-                    try
-                    {
-                        originalMessage = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to deserialize message {MessageId} for DLQ", messageId);
-                    }
-                }
-
-                // Create dead letter message
-                var deadLetterMessage = new DeadLetterMessage<T>
-                {
-                    OriginalMessage = originalMessage,
-                    FailureReason = reason,
-                    FailedAt = DateTime.UtcNow,
-                    OriginalStream = sourceStream,
-                    OriginalMessageId = messageId,
-                    RetryCount = retryCount,
-                    ConsumerName = consumerName,
-                    GroupName = groupName
-                };
-
-                // Add to dead letter queue
-                var dlqId = await AddAsync(deadLetterStream, deadLetterMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-                // Acknowledge the original message if group name is provided
-                if (!string.IsNullOrEmpty(groupName))
-                {
-                    try
-                    {
-                        await AcknowledgeAsync(sourceStream, groupName, messageId, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to acknowledge message {MessageId} after moving to DLQ", messageId);
-                    }
-                }
-
-                _logger.LogInformation("Successfully moved message {MessageId} to DLQ with new ID {DLQId}", messageId, dlqId);
-                return dlqId;
+                _logger.LogWarning("Message {MessageId} not found in stream {Stream}", messageId, prefixedSourceStream);
+                return string.Empty;
             }
-            catch (Exception ex)
+
+            var entry = entries[0];
+            var value = entry.Values.FirstOrDefault(fv => fv.Name == "data").Value;
+
+            T? originalMessage = null;
+            if (!value.IsNullOrEmpty)
             {
-                _logger.LogError(ex, "Error moving message {MessageId} to dead letter queue", messageId);
-                throw;
+                try
+                {
+                    originalMessage = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to deserialize message {MessageId} for DLQ", messageId);
+                }
             }
+
+            // Create dead letter message
+            var deadLetterMessage = new DeadLetterMessage<T>
+            {
+                OriginalMessage = originalMessage,
+                FailureReason = reason,
+                FailedAt = DateTime.UtcNow,
+                OriginalStream = sourceStream,
+                OriginalMessageId = messageId,
+                RetryCount = retryCount,
+                ConsumerName = consumerName,
+                GroupName = groupName
+            };
+
+            // Add to dead letter queue
+            var dlqId = await AddAsync(deadLetterStream, deadLetterMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            // Acknowledge the original message if group name is provided
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                try
+                {
+                    await AcknowledgeAsync(sourceStream, groupName, messageId, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to acknowledge message {MessageId} after moving to DLQ", messageId);
+                }
+            }
+
+            _logger.LogInformation("Successfully moved message {MessageId} to DLQ with new ID {DLQId}", messageId, dlqId);
+            return dlqId;
         }
 
         public async Task<RetryResult<T>> RetryPendingAsync<T>(
@@ -711,18 +687,8 @@ namespace RedisKit.Services
             RetryConfiguration? retryConfig = null,
             CancellationToken cancellationToken = default) where T : class
         {
-            if (string.IsNullOrEmpty(stream))
-                throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
-            if (string.IsNullOrEmpty(groupName))
-                throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
-
-            if (string.IsNullOrEmpty(consumerName))
-                throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
-
-            if (processor == null)
-                throw new ArgumentNullException(nameof(processor));
-
+            ValidateRetryParameters(stream, groupName, consumerName, processor);
+            
             retryConfig ??= new RetryConfiguration();
             var result = new RetryResult<T>();
             var startTime = DateTime.UtcNow;
@@ -731,13 +697,7 @@ namespace RedisKit.Services
             {
                 _logger.LogInformation("Starting retry for pending messages in stream {Stream}, group {Group}", stream, groupName);
 
-                // Get pending messages
-                var pendingMessages = await GetPendingAsync(stream, groupName, 100, consumerName, cancellationToken).ConfigureAwait(false);
-
-                // Filter messages that have exceeded idle timeout
-                var timedOutMessages = pendingMessages.Where(p =>
-                    p.IdleTimeInMilliseconds > retryConfig.IdleTimeout.TotalMilliseconds).ToList();
-
+                var timedOutMessages = await GetTimedOutMessagesAsync(stream, groupName, consumerName, retryConfig, cancellationToken);
                 _logger.LogDebug("Found {Count} timed out messages to retry", timedOutMessages.Count);
 
                 foreach (var pendingMessage in timedOutMessages)
@@ -745,115 +705,14 @@ namespace RedisKit.Services
                     if (cancellationToken.IsCancellationRequested)
                         break;
 
-                    var messageId = pendingMessage.MessageId.ToString();
-                    var currentRetry = 0;
-                    var processed = false;
-
-                    while (currentRetry < retryConfig.MaxRetries && !processed)
-                    {
-                        try
-                        {
-                            // Claim the message
-                            var claimed = await ClaimAsync<T>(
-                                stream,
-                                groupName,
-                                consumerName,
-                                (long)retryConfig.IdleTimeout.TotalMilliseconds,
-                                new[] { messageId },
-                                cancellationToken);
-
-                            if (claimed.Count > 0 && claimed.ContainsKey(messageId))
-                            {
-                                var message = claimed[messageId];
-                                if (message != null)
-                                {
-                                    // Process the message
-                                    var success = await processor(message);
-
-                                    if (success)
-                                    {
-                                        // Acknowledge the message
-                                        await AcknowledgeAsync(stream, groupName, messageId, cancellationToken).ConfigureAwait(false);
-                                        result.SuccessCount++;
-                                        result.ProcessedMessages[messageId] = message;
-                                        processed = true;
-
-                                        _logger.LogDebug("Successfully processed message {MessageId} on retry {Retry}",
-                                            messageId, currentRetry + 1);
-                                    }
-                                    else
-                                    {
-                                        currentRetry++;
-
-                                        if (currentRetry < retryConfig.MaxRetries)
-                                        {
-                                            // Wait before retry with exponential backoff if configured
-                                            var delay = retryConfig.UseExponentialBackoff
-                                                ? TimeSpan.FromMilliseconds(retryConfig.RetryDelay.TotalMilliseconds * Math.Pow(2, currentRetry))
-                                                : retryConfig.RetryDelay;
-
-                                            await Task.Delay(delay, cancellationToken);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                _logger.LogWarning("Failed to claim message {MessageId}", messageId);
-                                break;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error processing message {MessageId} on retry {Retry}",
-                                messageId, currentRetry + 1);
-
-                            result.FailedMessages[messageId] = ex.Message;
-                            currentRetry++;
-
-                            if (currentRetry < retryConfig.MaxRetries)
-                            {
-                                await Task.Delay(retryConfig.RetryDelay, cancellationToken);
-                            }
-                        }
-                    }
-
-                    // Move to dead letter queue if all retries failed
-                    if (!processed)
-                    {
-                        result.FailureCount++;
-
-                        if (retryConfig.MoveToDeadLetterQueue)
-                        {
-                            try
-                            {
-                                var dlqStream = $"{stream}{retryConfig.DeadLetterSuffix}";
-                                await MoveToDeadLetterAsync<T>(
-                                    stream,
-                                    dlqStream,
-                                    messageId,
-                                    $"Failed after {retryConfig.MaxRetries} retries",
-                                    retryConfig.MaxRetries,
-                                    groupName,
-                                    consumerName,
-                                    cancellationToken);
-
-                                result.DeadLetterCount++;
-                                _logger.LogWarning("Moved message {MessageId} to dead letter queue after {MaxRetries} retries",
-                                    messageId, retryConfig.MaxRetries);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, "Failed to move message {MessageId} to dead letter queue", messageId);
-                            }
-                        }
-                    }
+                    await ProcessPendingMessageAsync(
+                        stream, groupName, consumerName, 
+                        pendingMessage.MessageId.ToString(),
+                        processor, retryConfig, result, cancellationToken);
                 }
 
                 result.ElapsedTime = DateTime.UtcNow - startTime;
-
-                _logger.LogInformation("Retry operation completed. Success: {Success}, Failed: {Failed}, DLQ: {DLQ}, Time: {Time}ms",
-                    result.SuccessCount, result.FailureCount, result.DeadLetterCount, result.ElapsedTime.TotalMilliseconds);
+                LogRetryCompletion(result);
 
                 return result;
             }
@@ -864,6 +723,161 @@ namespace RedisKit.Services
             }
         }
 
+        private static void ValidateRetryParameters<T>(string stream, string groupName, string consumerName, Func<T, Task<bool>> processor) where T : class
+        {
+            if (string.IsNullOrEmpty(stream))
+                throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+            if (string.IsNullOrEmpty(groupName))
+                throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
+            if (string.IsNullOrEmpty(consumerName))
+                throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
+            if (processor == null)
+                throw new ArgumentNullException(nameof(processor));
+        }
+
+        private async Task<List<StreamPendingMessageInfo>> GetTimedOutMessagesAsync(
+            string stream, string groupName, string consumerName, 
+            RetryConfiguration retryConfig, CancellationToken cancellationToken)
+        {
+            var pendingMessages = await GetPendingAsync(stream, groupName, 100, consumerName, cancellationToken).ConfigureAwait(false);
+            return pendingMessages.Where(p => p.IdleTimeInMilliseconds > retryConfig.IdleTimeout.TotalMilliseconds).ToList();
+        }
+
+        private async Task ProcessPendingMessageAsync<T>(
+            string stream, string groupName, string consumerName,
+            string messageId, Func<T, Task<bool>> processor,
+            RetryConfiguration retryConfig, RetryResult<T> result,
+            CancellationToken cancellationToken) where T : class
+        {
+            var processed = await RetryMessageProcessingAsync(
+                stream, groupName, consumerName, messageId,
+                processor, retryConfig, result, cancellationToken);
+
+            if (!processed)
+            {
+                result.FailureCount++;
+                await HandleFailedMessageAsync(stream, messageId, retryConfig, result, groupName, consumerName, cancellationToken);
+            }
+        }
+
+        private async Task<bool> RetryMessageProcessingAsync<T>(
+            string stream, string groupName, string consumerName,
+            string messageId, Func<T, Task<bool>> processor,
+            RetryConfiguration retryConfig, RetryResult<T> result,
+            CancellationToken cancellationToken) where T : class
+        {
+            var currentRetry = 0;
+
+            while (currentRetry < retryConfig.MaxRetries)
+            {
+                try
+                {
+                    var success = await TryProcessMessageAsync(
+                        stream, groupName, consumerName, messageId,
+                        processor, result, retryConfig, cancellationToken);
+
+                    if (success)
+                    {
+                        _logger.LogDebug("Successfully processed message {MessageId} on retry {Retry}",
+                            messageId, currentRetry + 1);
+                        return true;
+                    }
+
+                    currentRetry++;
+                    await DelayBeforeRetryAsync(currentRetry, retryConfig, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing message {MessageId} on retry {Retry}",
+                        messageId, currentRetry + 1);
+                    
+                    result.FailedMessages[messageId] = ex.Message;
+                    currentRetry++;
+                    
+                    if (currentRetry < retryConfig.MaxRetries)
+                        await Task.Delay(retryConfig.RetryDelay, cancellationToken);
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<bool> TryProcessMessageAsync<T>(
+            string stream, string groupName, string consumerName,
+            string messageId, Func<T, Task<bool>> processor,
+            RetryResult<T> result, RetryConfiguration retryConfig,
+            CancellationToken cancellationToken) where T : class
+        {
+            var claimed = await ClaimAsync<T>(
+                stream, groupName, consumerName,
+                (long)retryConfig.IdleTimeout.TotalMilliseconds,
+                new[] { messageId }, cancellationToken);
+
+            if (claimed.Count == 0 || !claimed.ContainsKey(messageId))
+            {
+                _logger.LogWarning("Failed to claim message {MessageId}", messageId);
+                return false;
+            }
+
+            var message = claimed[messageId];
+            if (message == null)
+                return false;
+
+            var success = await processor(message);
+            if (success)
+            {
+                await AcknowledgeAsync(stream, groupName, messageId, cancellationToken).ConfigureAwait(false);
+                result.SuccessCount++;
+                result.ProcessedMessages[messageId] = message;
+            }
+
+            return success;
+        }
+
+        private async Task DelayBeforeRetryAsync(int currentRetry, RetryConfiguration retryConfig, CancellationToken cancellationToken)
+        {
+            if (currentRetry >= retryConfig.MaxRetries)
+                return;
+
+            var delay = retryConfig.UseExponentialBackoff
+                ? TimeSpan.FromMilliseconds(retryConfig.RetryDelay.TotalMilliseconds * Math.Pow(2, currentRetry))
+                : retryConfig.RetryDelay;
+
+            await Task.Delay(delay, cancellationToken);
+        }
+
+        private async Task HandleFailedMessageAsync<T>(
+            string stream, string messageId, RetryConfiguration retryConfig,
+            RetryResult<T> result, string groupName, string consumerName,
+            CancellationToken cancellationToken) where T : class
+        {
+            if (!retryConfig.MoveToDeadLetterQueue)
+                return;
+
+            try
+            {
+                var dlqStream = $"{stream}{retryConfig.DeadLetterSuffix}";
+                await MoveToDeadLetterAsync<T>(
+                    stream, dlqStream, messageId,
+                    $"Failed after {retryConfig.MaxRetries} retries",
+                    retryConfig.MaxRetries, groupName, consumerName, cancellationToken);
+
+                result.DeadLetterCount++;
+                _logger.LogWarning("Moved message {MessageId} to dead letter queue after {MaxRetries} retries",
+                    messageId, retryConfig.MaxRetries);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to move message {MessageId} to dead letter queue", messageId);
+            }
+        }
+
+        private void LogRetryCompletion<T>(RetryResult<T> result) where T : class
+        {
+            _logger.LogInformation("Retry operation completed. Success: {Success}, Failed: {Failed}, DLQ: {DLQ}, Time: {Time}ms",
+                result.SuccessCount, result.FailureCount, result.DeadLetterCount, result.ElapsedTime.TotalMilliseconds);
+        }
+
         // ============= Important Features Implementation =============
 
         public async Task<string[]> AddBatchAsync<T>(
@@ -872,61 +886,16 @@ namespace RedisKit.Services
             int? maxLength = null,
             CancellationToken cancellationToken = default) where T : class
         {
-            if (string.IsNullOrEmpty(stream))
-                throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
-            if (messages == null || messages.Length == 0)
-                throw new ArgumentException("Messages cannot be null or empty", nameof(messages));
+            ValidateBatchParameters(stream, messages);
 
             try
             {
                 var startTime = DateTime.UtcNow;
                 _logger.LogDebug("Adding {Count} messages to stream {Stream} in batch", messages.Length, stream);
 
-                // Use ConcurrentBag to collect results in thread-safe manner
-                var results = new System.Collections.Concurrent.ConcurrentBag<(int index, string id)>();
-
-                // Process messages in parallel with controlled concurrency using Parallel.ForEachAsync
-                await Parallel.ForEachAsync(
-                    messages.Select((msg, idx) => (message: msg, index: idx)),
-                    new ParallelOptions
-                    {
-                        MaxDegreeOfParallelism = 10, // Max 10 concurrent operations
-                        CancellationToken = cancellationToken
-                    },
-                    async (item, ct) =>
-                    {
-                        try
-                        {
-                            var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
-                            results.Add((item.index, messageId));
-
-                            // Log progress every 100 messages for large batches
-                            if (messages.Length > 100 && (item.index + 1) % 100 == 0)
-                            {
-                                _logger.LogDebug("Batch progress: {Processed}/{Total} messages added to stream {Stream}",
-                                    item.index + 1, messages.Length, stream);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to add message at index {Index} to stream {Stream}",
-                                item.index, stream);
-                            throw; // Re-throw to fail the entire batch
-                        }
-                    });
-
-                // Sort results by original index to maintain order
-                var messageIds = results
-                    .OrderBy(r => r.index)
-                    .Select(r => r.id)
-                    .ToArray();
-
-                var elapsedMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                _logger.LogInformation("Successfully added {Count} messages to stream {Stream} in {ElapsedMs}ms ({Rate} msgs/sec)",
-                    messageIds.Length, stream, elapsedMs,
-                    messageIds.Length / (elapsedMs / 1000));
-
+                var messageIds = await ProcessBatchMessagesAsync(stream, messages, maxLength, cancellationToken);
+                
+                LogBatchCompletion(stream, messageIds.Length, startTime);
                 return messageIds;
             }
             catch (OperationCanceledException)
@@ -934,11 +903,78 @@ namespace RedisKit.Services
                 _logger.LogWarning("Batch add operation was cancelled for stream {Stream}", stream);
                 throw;
             }
+        }
+
+        private static void ValidateBatchParameters<T>(string stream, T[] messages) where T : class
+        {
+            if (string.IsNullOrEmpty(stream))
+                throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+
+            if (messages == null || messages.Length == 0)
+                throw new ArgumentException("Messages cannot be null or empty", nameof(messages));
+        }
+
+        private async Task<string[]> ProcessBatchMessagesAsync<T>(
+            string stream, T[] messages, int? maxLength, 
+            CancellationToken cancellationToken) where T : class
+        {
+            var results = new System.Collections.Concurrent.ConcurrentBag<(int index, string id)>();
+
+            await Parallel.ForEachAsync(
+                messages.Select((msg, idx) => (message: msg, index: idx)),
+                CreateParallelOptions(cancellationToken),
+                async (item, ct) => await AddSingleMessageAsync(stream, item, maxLength, results, messages.Length, ct));
+
+            return results
+                .OrderBy(r => r.index)
+                .Select(r => r.id)
+                .ToArray();
+        }
+
+        private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
+        {
+            return new ParallelOptions
+            {
+                MaxDegreeOfParallelism = 10,
+                CancellationToken = cancellationToken
+            };
+        }
+
+        private async Task AddSingleMessageAsync<T>(
+            string stream, (T message, int index) item, int? maxLength,
+            System.Collections.Concurrent.ConcurrentBag<(int index, string id)> results,
+            int totalMessages, CancellationToken cancellationToken) where T : class
+        {
+            try
+            {
+                var messageId = await AddAsync(stream, item.message, maxLength, cancellationToken).ConfigureAwait(false);
+                results.Add((item.index, messageId));
+                
+                LogBatchProgress(stream, item.index, totalMessages);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding batch messages to stream {Stream}", stream);
+                _logger.LogError(ex, "Failed to add message at index {Index} to stream {Stream}", item.index, stream);
                 throw;
             }
+        }
+
+        private void LogBatchProgress(string stream, int currentIndex, int totalMessages)
+        {
+            if (totalMessages > 100 && (currentIndex + 1) % 100 == 0)
+            {
+                _logger.LogDebug("Batch progress: {Processed}/{Total} messages added to stream {Stream}",
+                    currentIndex + 1, totalMessages, stream);
+            }
+        }
+
+        private void LogBatchCompletion(string stream, int messageCount, DateTime startTime)
+        {
+            var elapsedMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            var rate = elapsedMs > 0 ? messageCount / (elapsedMs / 1000) : 0;
+            
+            _logger.LogInformation("Successfully added {Count} messages to stream {Stream} in {ElapsedMs}ms ({Rate} msgs/sec)",
+                messageCount, stream, elapsedMs, rate);
         }
 
         public async Task<StreamHealthInfo> GetHealthAsync(
