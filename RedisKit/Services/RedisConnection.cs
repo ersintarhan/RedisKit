@@ -111,7 +111,7 @@ public class RedisConnection : IDisposable
                 ? factory.CreateLogger<RedisCircuitBreaker>()
                 : new NullLogger<RedisCircuitBreaker>();
 
-            _circuitBreaker = new RedisCircuitBreaker(circuitBreakerLogger, _options.CircuitBreaker);
+            _circuitBreaker = new RedisCircuitBreaker(circuitBreakerLogger, Options.Create(_options.CircuitBreaker));
         }
 
         // Initialize health status

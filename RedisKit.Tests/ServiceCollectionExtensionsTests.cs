@@ -4,6 +4,7 @@ using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
+using RedisKit.Tests.Helpers;
 using StackExchange.Redis;
 using Xunit;
 
@@ -16,8 +17,6 @@ public class ServiceCollectionExtensionsTests
     public ServiceCollectionExtensionsTests()
     {
         _services = new ServiceCollection();
-        // Add required logging services
-        _services.AddLogging();
     }
 
     #region AddRedisServices Tests
@@ -202,14 +201,21 @@ public class ServiceCollectionExtensionsTests
     [Fact]
     public void AddRedisServices_ServicesCanBeResolved_WithoutErrors()
     {
-        // Arrange
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        // Arrange - Use test helper to create services with all required dependencies
+        var services = RedisTestHelper.CreateTestServices(options => { options.ConnectionString = "localhost:6379"; });
 
-        var serviceProvider = _services.BuildServiceProvider();
+        // Add mock Redis services to avoid actual connection
+        services.AddMockRedisServices();
+
+        // Add the Redis services
+        services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+
+        var serviceProvider = services.BuildServiceProvider();
 
         // Act & Assert - These should not throw
         Assert.NotNull(serviceProvider.GetRequiredService<IOptions<RedisOptions>>());
         Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
 
         // Note: IDatabaseAsync and ISubscriber require actual Redis connection
         // so they would throw in unit tests. These would be tested in integration tests.
@@ -237,6 +243,56 @@ public class ServiceCollectionExtensionsTests
         // Assert - The second registration should be active (last wins in Configure)
         Assert.Equal("second:6379", redisOptions.Value.ConnectionString);
         Assert.Equal("second:", redisOptions.Value.CacheKeyPrefix);
+    }
+
+    #endregion
+
+    #region AddRedisKit Tests
+
+    [Fact]
+    public void AddRedisKit_RegistersAllServices_Correctly()
+    {
+        // Arrange
+        var services = RedisTestHelper.CreateTestServices();
+        services.AddMockRedisServices();
+
+        // Act
+        services.AddRedisKit(options =>
+        {
+            options.ConnectionString = "test-redis:6379";
+            options.DefaultTtl = TimeSpan.FromMinutes(10);
+        }, false); // Skip health check registration for unit test
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        // Assert - All services should be registered
+        Assert.NotNull(serviceProvider.GetRequiredService<IOptions<RedisOptions>>());
+        Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
+
+        var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
+        Assert.Equal("test-redis:6379", redisOptions.Value.ConnectionString);
+        Assert.Equal(TimeSpan.FromMinutes(10), redisOptions.Value.DefaultTtl);
+    }
+
+    [Fact]
+    public void AddRedisKit_WithDefaultConfiguration_RegistersServices()
+    {
+        // Arrange
+        var services = RedisTestHelper.CreateTestServices();
+        services.AddMockRedisServices();
+
+        // Act
+        services.AddRedisKit(); // Use default configuration
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        // Assert
+        var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
+        Assert.Equal("localhost:6379", redisOptions.Value.ConnectionString);
+        Assert.Equal(TimeSpan.FromHours(1), redisOptions.Value.DefaultTtl);
+        Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
     }
 
     #endregion

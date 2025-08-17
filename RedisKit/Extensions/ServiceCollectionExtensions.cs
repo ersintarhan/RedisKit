@@ -36,6 +36,16 @@ public static class ServiceCollectionExtensions
         // Register options
         services.Configure(configureOptions);
 
+        // Register Circuit Breaker settings with defaults
+        services.Configure<CircuitBreakerSettings>(settings =>
+        {
+            settings.Enabled = true;
+            settings.FailureThreshold = 5;
+            settings.SuccessThreshold = 3;
+            settings.BreakDuration = TimeSpan.FromSeconds(30);
+            settings.FailureWindow = TimeSpan.FromMinutes(1);
+        });
+
         // Register Circuit Breaker as a separate service for better testability
         services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
 
@@ -63,6 +73,16 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddRedisKit(this IServiceCollection services)
     {
+        // Register Circuit Breaker settings with defaults
+        services.Configure<CircuitBreakerSettings>(settings =>
+        {
+            settings.Enabled = true;
+            settings.FailureThreshold = 5;
+            settings.SuccessThreshold = 3;
+            settings.BreakDuration = TimeSpan.FromSeconds(30);
+            settings.FailureWindow = TimeSpan.FromMinutes(1);
+        });
+
         return services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
@@ -89,6 +109,16 @@ public static class ServiceCollectionExtensions
 
         // Register options
         services.Configure(configureOptions);
+
+        // Register Circuit Breaker settings with defaults
+        services.Configure<CircuitBreakerSettings>(settings =>
+        {
+            settings.Enabled = true;
+            settings.FailureThreshold = 5;
+            settings.SuccessThreshold = 3;
+            settings.BreakDuration = TimeSpan.FromSeconds(30);
+            settings.FailureWindow = TimeSpan.FromMinutes(1);
+        });
 
         // Register Circuit Breaker
         services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
@@ -160,6 +190,16 @@ public static class ServiceCollectionExtensions
             options.OperationTimeout = TimeSpan.FromSeconds(5);
         });
 
+        // Register Circuit Breaker settings with defaults
+        services.Configure<CircuitBreakerSettings>(settings =>
+        {
+            settings.Enabled = true;
+            settings.FailureThreshold = 5;
+            settings.SuccessThreshold = 3;
+            settings.BreakDuration = TimeSpan.FromSeconds(30);
+            settings.FailureWindow = TimeSpan.FromMinutes(1);
+        });
+
         // Register Circuit Breaker
         services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
 
@@ -213,7 +253,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     ///     Internal helper method to register common Redis services
     /// </summary>
-    private static IServiceCollection AddRedisServicesInternal(IServiceCollection services)
+    private static void AddRedisServicesInternal(IServiceCollection services)
     {
         // Register database and subscriber as separate services to avoid deadlocks
         services.AddSingleton<IDatabaseAsync>(provider =>
@@ -255,7 +295,5 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddSingleton<IDistributedLock, RedisDistributedLock>();
-
-        return services;
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 
@@ -17,10 +18,10 @@ internal class RedisCircuitBreaker : IRedisCircuitBreaker
     private DateTime _openedAt = DateTime.MinValue;
     private int _successCount;
 
-    public RedisCircuitBreaker(ILogger<RedisCircuitBreaker> logger, CircuitBreakerSettings settings)
+    public RedisCircuitBreaker(ILogger<RedisCircuitBreaker> logger, IOptions<CircuitBreakerSettings> settings)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>
