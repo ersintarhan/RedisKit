@@ -4,8 +4,6 @@ using Microsoft.Extensions.Logging;
 using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
-using RedisKit.Serialization;
-using StackExchange.Redis;
 
 namespace RedisKit.Benchmarks;
 
@@ -13,11 +11,11 @@ namespace RedisKit.Benchmarks;
 [SimpleJob]
 public class CacheBenchmarks : IDisposable
 {
-    private ServiceProvider _serviceProvider = null!;
-    private IRedisCacheService _cacheService = null!;
-    private readonly TestData _testObject;
     private readonly Dictionary<string, TestData> _batchData;
+    private readonly TestData _testObject;
+    private IRedisCacheService _cacheService = null!;
     private bool _disposed;
+    private ServiceProvider _serviceProvider = null!;
 
     public CacheBenchmarks()
     {
@@ -39,10 +37,16 @@ public class CacheBenchmarks : IDisposable
                     Id = i,
                     Name = $"User {i}",
                     Email = $"user{i}@example.com",
-                    Age = 20 + (i % 50),
+                    Age = 20 + i % 50,
                     IsActive = i % 2 == 0,
                     Tags = new[] { $"user_{i}" }
                 });
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     [GlobalSetup]
@@ -119,20 +123,11 @@ public class CacheBenchmarks : IDisposable
         await _cacheService.GetAsync<TestData>("benchmark:pipeline");
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
         {
-            if (disposing)
-            {
-                _serviceProvider?.Dispose();
-            }
+            if (disposing) _serviceProvider?.Dispose();
             _disposed = true;
         }
     }

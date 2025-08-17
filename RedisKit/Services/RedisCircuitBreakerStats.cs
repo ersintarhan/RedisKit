@@ -3,7 +3,7 @@ using RedisKit.Models;
 namespace RedisKit.Services;
 
 /// <summary>
-/// Circuit breaker statistics
+///     Circuit breaker statistics
 /// </summary>
 internal class RedisCircuitBreakerStats
 {

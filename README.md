@@ -5,6 +5,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 ## 🚀 Features
 
 ### Core Features
+
 - **Caching**: Generic Get, Set, Delete operations with TTL support
 - **Batch Operations**: GetMany and SetMany for improved performance
 - **Key Prefixing**: Support for cache key prefixes
@@ -16,6 +17,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **Async/Await**: Full async/await support with CancellationToken
 
 ### Enterprise Features
+
 - **🔒 Distributed Locking**: Redlock algorithm implementation with auto-renewal
 - **🔄 Circuit Breaker Pattern**: Automatic failure detection and recovery
 - **📈 Advanced Retry Strategies**: Multiple backoff strategies (Exponential, Decorrelated Jitter, etc.)
@@ -906,6 +908,7 @@ options.RetryConfiguration = new RetryConfiguration
 ## 🚀 Performance Tips & Best Practices
 
 ### 1. **Connection Management**
+
 ```csharp
 // ❌ DON'T: Create new connections for each operation
 public async Task BadExample()
@@ -929,6 +932,7 @@ public class GoodExample
 ```
 
 ### 2. **Batch Operations for Better Performance**
+
 ```csharp
 // ❌ DON'T: Multiple round trips
 public async Task SlowApproach(string[] userIds)
@@ -951,6 +955,7 @@ public async Task FastApproach(string[] userIds)
 ```
 
 ### 3. **Big Key Handling**
+
 ```csharp
 // ❌ DON'T: Store huge objects as single keys
 public async Task BadBigKey()
@@ -986,6 +991,7 @@ public async Task StreamApproach(List<Item> items)
 ```
 
 ### 4. **Pipeline Usage**
+
 ```csharp
 // ❌ DON'T: Sequential operations
 public async Task SlowSequential()
@@ -1012,6 +1018,7 @@ public async Task FastPipeline()
 ```
 
 ### 5. **Memory Optimization**
+
 ```csharp
 // ✅ Use appropriate serializers
 services.AddRedisServices(options =>
@@ -1045,6 +1052,7 @@ public class CompressedCacheService
 ```
 
 ### 6. **Key Expiration Strategies**
+
 ```csharp
 // ✅ Use sliding expiration for frequently accessed data
 public async Task<T?> GetWithSlidingExpirationAsync<T>(string key) where T : class
@@ -1069,6 +1077,7 @@ public async Task SetDailyReportAsync(Report report)
 ```
 
 ### 7. **Avoid Hot Keys**
+
 ```csharp
 // ❌ DON'T: Single key for global counter
 public async Task IncrementGlobalCounter()
@@ -1099,6 +1108,7 @@ public async Task<int> GetTotalCount()
 ```
 
 ### 8. **Circuit Breaker for Resilience**
+
 ```csharp
 // ✅ Configure circuit breaker to prevent cascade failures
 services.AddRedisServices(options =>
@@ -1114,6 +1124,7 @@ services.AddRedisServices(options =>
 ```
 
 ### 9. **Monitoring & Metrics**
+
 ```csharp
 // ✅ Track cache hit rates
 public class MetricsCacheService
@@ -1136,6 +1147,7 @@ public class MetricsCacheService
 ```
 
 ### 10. **Pub/Sub Performance**
+
 ```csharp
 // ✅ Use pattern subscriptions wisely
 public class EfficientPubSub
@@ -1167,12 +1179,12 @@ We've implemented a significant performance optimization for batch operations us
 
 #### Before vs After Performance
 
-| Batch Size | Before (ms) | After (ms) | Improvement |
-|------------|-------------|------------|-------------|
-| 100 items | 52 | 3 | **94% faster** |
-| 500 items | 258 | 14 | **95% faster** |
-| 1000 items | 516 | 28 | **95% faster** |
-| 5000 items | 2,580 | 140 | **95% faster** |
+| Batch Size | Before (ms) | After (ms) | Improvement    |
+|------------|-------------|------------|----------------|
+| 100 items  | 52          | 3          | **94% faster** |
+| 500 items  | 258         | 14         | **95% faster** |
+| 1000 items | 516         | 28         | **95% faster** |
+| 5000 items | 2,580       | 140        | **95% faster** |
 
 *Benchmarks on local Redis with 1KB objects*
 
@@ -1180,25 +1192,25 @@ We've implemented a significant performance optimization for batch operations us
 
 ### Serializer Performance Comparison
 
-| Method | JSON (ns) | MessagePack (ns) | Speed Improvement | Memory Improvement |
-|--------|-----------|------------------|-------------------|-------------------|
-| **Small Object Serialize** | 331.8 | 143.2 | **2.3x faster** | **5.6x less memory** |
-| **Large Object Serialize** | 3,569.1 | 1,940.7 | **1.8x faster** | **Similar memory** |
-| **Array Serialize (100 items)** | 28,143.8 | 11,556.8 | **2.4x faster** | **3.2x less memory** |
-| **Small Object Deserialize** | 628.0 | 256.5 | **2.4x faster** | **2.1x less memory** |
-| **Async Serialize** | 355.9 | 173.8 | **2.0x faster** | **2.8x less memory** |
-| **Async Deserialize** | 823.8 | 290.0 | **2.8x faster** | **2.0x less memory** |
+| Method                          | JSON (ns) | MessagePack (ns) | Speed Improvement | Memory Improvement   |
+|---------------------------------|-----------|------------------|-------------------|----------------------|
+| **Small Object Serialize**      | 331.8     | 143.2            | **2.3x faster**   | **5.6x less memory** |
+| **Large Object Serialize**      | 3,569.1   | 1,940.7          | **1.8x faster**   | **Similar memory**   |
+| **Array Serialize (100 items)** | 28,143.8  | 11,556.8         | **2.4x faster**   | **3.2x less memory** |
+| **Small Object Deserialize**    | 628.0     | 256.5            | **2.4x faster**   | **2.1x less memory** |
+| **Async Serialize**             | 355.9     | 173.8            | **2.0x faster**   | **2.8x less memory** |
+| **Async Deserialize**           | 823.8     | 290.0            | **2.8x faster**   | **2.0x less memory** |
 
 > **Recommendation**: Use MessagePack for production workloads requiring high performance and low memory usage.
 
 ### Redis Operations Performance
 
-| Operation | Single Item | Batch (100 items) | Batch (1000 items) |
-|-----------|------------|-------------------|-------------------|
-| Set | ~1ms | ~5ms | ~40ms |
-| Get | ~0.8ms | ~4ms | ~35ms |
-| Pub/Sub | ~0.5ms | N/A | N/A |
-| Stream Add | ~1.2ms | ~8ms | ~70ms |
+| Operation  | Single Item | Batch (100 items) | Batch (1000 items) |
+|------------|-------------|-------------------|--------------------|
+| Set        | ~1ms        | ~5ms              | ~40ms              |
+| Get        | ~0.8ms      | ~4ms              | ~35ms              |
+| Pub/Sub    | ~0.5ms      | N/A               | N/A                |
+| Stream Add | ~1.2ms      | ~8ms              | ~70ms              |
 
 *Benchmarks on local Redis, actual performance depends on network latency and Redis server specs*
 
@@ -1241,7 +1253,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 
 ## 📚 Documentation
 

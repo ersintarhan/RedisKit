@@ -1,32 +1,32 @@
 namespace RedisKit.Models;
 
 /// <summary>
-/// Backoff strategy for retry logic
+///     Backoff strategy for retry logic
 /// </summary>
 public enum BackoffStrategy
 {
     /// <summary>
-    /// Fixed delay between retries
+    ///     Fixed delay between retries
     /// </summary>
     Fixed,
 
     /// <summary>
-    /// Linear increase in delay
+    ///     Linear increase in delay
     /// </summary>
     Linear,
 
     /// <summary>
-    /// Exponential increase in delay
+    ///     Exponential increase in delay
     /// </summary>
     Exponential,
 
     /// <summary>
-    /// Exponential with random jitter to prevent thundering herd
+    ///     Exponential with random jitter to prevent thundering herd
     /// </summary>
     ExponentialWithJitter,
 
     /// <summary>
-    /// Decorrelated jitter backoff (AWS recommended)
+    ///     Decorrelated jitter backoff (AWS recommended)
     /// </summary>
     DecorrelatedJitter
 }

@@ -1,13 +1,13 @@
 namespace RedisKit.Models;
 
 /// <summary>
-/// Subscription statistics
+///     Subscription statistics
 /// </summary>
 public class SubscriptionStats
 {
-    private long _messagesReceived;
-    private long _messagesProcessed;
     private long _messagesFailed;
+    private long _messagesProcessed;
+    private long _messagesReceived;
 
     public string ChannelOrPattern { get; set; } = string.Empty;
     public SubscriptionType Type { get; set; }
@@ -34,7 +34,18 @@ public class SubscriptionStats
     public DateTime? LastMessageAt { get; set; }
     public TimeSpan AverageProcessingTime { get; set; }
 
-    public void IncrementMessagesReceived() => Interlocked.Increment(ref _messagesReceived);
-    public void IncrementMessagesProcessed() => Interlocked.Increment(ref _messagesProcessed);
-    public void IncrementMessagesFailed() => Interlocked.Increment(ref _messagesFailed);
+    public void IncrementMessagesReceived()
+    {
+        Interlocked.Increment(ref _messagesReceived);
+    }
+
+    public void IncrementMessagesProcessed()
+    {
+        Interlocked.Increment(ref _messagesProcessed);
+    }
+
+    public void IncrementMessagesFailed()
+    {
+        Interlocked.Increment(ref _messagesFailed);
+    }
 }

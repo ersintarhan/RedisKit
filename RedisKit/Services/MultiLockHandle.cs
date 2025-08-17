@@ -7,12 +7,12 @@ internal sealed class MultiLockHandle : IMultiLockHandle
     private readonly List<ILockHandle> _locks;
     private bool _disposed;
 
-    public IReadOnlyList<ILockHandle> Locks => _locks.AsReadOnly();
-
     public MultiLockHandle(List<ILockHandle> locks)
     {
         _locks = locks ?? throw new ArgumentNullException(nameof(locks));
     }
+
+    public IReadOnlyList<ILockHandle> Locks => _locks.AsReadOnly();
 
     public async Task ReleaseAllAsync(CancellationToken cancellationToken = default)
     {
@@ -26,13 +26,13 @@ internal sealed class MultiLockHandle : IMultiLockHandle
     public async ValueTask DisposeAsync()
     {
         await DisposeAsyncCore();
-        Dispose(disposing: false);
+        Dispose(false);
         GC.SuppressFinalize(this);
     }
 
     public void Dispose()
     {
-        Dispose(disposing: true);
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 
@@ -41,12 +41,10 @@ internal sealed class MultiLockHandle : IMultiLockHandle
         if (!_disposed)
         {
             if (disposing)
-            {
                 // Synchronous dispose of managed resources
                 // Since we only have async operations, we need to block here
                 // This is not ideal but required for IDisposable pattern
                 Task.Run(async () => await ReleaseAllAsync()).Wait(TimeSpan.FromSeconds(5));
-            }
 
             _disposed = true;
         }

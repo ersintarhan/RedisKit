@@ -3,7 +3,7 @@ using RedisKit.Interfaces;
 namespace RedisKit.Services;
 
 /// <summary>
-/// Handle for multiple locks acquired atomically
+///     Handle for multiple locks acquired atomically
 /// </summary>
 public interface IMultiLockHandle : IAsyncDisposable, IDisposable
 {

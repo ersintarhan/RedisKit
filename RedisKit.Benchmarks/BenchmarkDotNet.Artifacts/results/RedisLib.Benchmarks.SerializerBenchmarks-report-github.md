@@ -8,8 +8,9 @@ Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
 
 
 ```
-| Method                             | Mean        | Error     | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-|----------------------------------- |------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+
+| Method                             |        Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|------------------------------------|------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
 | Json_Serialize_Small               |    331.8 ns |   0.71 ns |   0.63 ns |  1.00 |    0.00 | 0.0854 |     536 B |        1.00 |
 | MessagePack_Serialize_Small        |    143.2 ns |   0.22 ns |   0.21 ns |  0.43 |    0.00 | 0.0153 |      96 B |        0.18 |
 | Json_Serialize_Large               |  3,569.1 ns |  71.11 ns |  94.93 ns | 10.76 |    0.28 | 1.6365 |   10288 B |       19.19 |

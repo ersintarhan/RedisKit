@@ -1,13 +1,10 @@
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Running;
 
 namespace RedisKit.Benchmarks;
 
 public static class Program
 {
-   
     public static void Main(string[] args)
     {
         var config = DefaultConfig.Instance;

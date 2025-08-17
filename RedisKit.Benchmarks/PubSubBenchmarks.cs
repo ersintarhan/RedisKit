@@ -1,10 +1,11 @@
+using System.Collections.Concurrent;
 using BenchmarkDotNet.Attributes;
+using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
-using System.Collections.Concurrent;
 
 namespace RedisKit.Benchmarks;
 
@@ -12,12 +13,12 @@ namespace RedisKit.Benchmarks;
 [SimpleJob]
 public class PubSubBenchmarks : IDisposable
 {
-    private ServiceProvider _serviceProvider = null!;
-    private IRedisPubSubService _pubSubService = null!;
-    private readonly TestMessage _testMessage;
     // ReSharper disable once CollectionNeverQueried.Local
     private readonly ConcurrentBag<TestMessage> _receivedMessages = [];
+    private readonly TestMessage _testMessage;
     private bool _disposed;
+    private IRedisPubSubService _pubSubService = null!;
+    private ServiceProvider _serviceProvider = null!;
 
     public PubSubBenchmarks()
     {
@@ -28,6 +29,12 @@ public class PubSubBenchmarks : IDisposable
             Timestamp = DateTime.UtcNow,
             Tags = new[] { "benchmark", "test", "performance" }
         };
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     [GlobalSetup]
@@ -72,11 +79,12 @@ public class PubSubBenchmarks : IDisposable
     public async Task Publish_Multiple_Channels()
     {
         var tasks = new Task[5];
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             var channel = $"benchmark:multi:{i}";
             tasks[i] = _pubSubService.PublishAsync(channel, _testMessage);
         }
+
         await Task.WhenAll(tasks);
     }
 
@@ -109,58 +117,42 @@ public class PubSubBenchmarks : IDisposable
     [Benchmark]
     public async Task Publish_Batch_Sequential()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            await _pubSubService.PublishAsync($"benchmark:batch:{i}", _testMessage);
-        }
+        for (var i = 0; i < 10; i++) await _pubSubService.PublishAsync($"benchmark:batch:{i}", _testMessage);
     }
 
     [Benchmark]
     public async Task Publish_Batch_Parallel()
     {
         var tasks = new Task[10];
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             var channel = $"benchmark:batch:{i}";
             tasks[i] = _pubSubService.PublishAsync(channel, _testMessage);
         }
-        await Task.WhenAll(tasks);
-    }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        await Task.WhenAll(tasks);
     }
 
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
         {
-            if (disposing)
-            {
-                _serviceProvider?.Dispose();
-            }
+            if (disposing) _serviceProvider?.Dispose();
             _disposed = true;
         }
     }
 }
 
-[MessagePack.MessagePackObject]
+[MessagePackObject]
 public class TestMessage
 {
-    [MessagePack.Key(0)]
-    public Guid Id { get; set; }
+    [Key(0)] public Guid Id { get; set; }
 
-    [MessagePack.Key(1)]
-    public string Content { get; set; } = string.Empty;
+    [Key(1)] public string Content { get; set; } = string.Empty;
 
-    [MessagePack.Key(2)]
-    public DateTime Timestamp { get; set; }
+    [Key(2)] public DateTime Timestamp { get; set; }
 
-    [MessagePack.Key(3)]
-    public string[] Tags { get; set; } = Array.Empty<string>();
+    [Key(3)] public string[] Tags { get; set; } = Array.Empty<string>();
 
-    [MessagePack.Key(4)]
-    public Dictionary<string, object> Data { get; set; } = new();
+    [Key(4)] public Dictionary<string, object> Data { get; set; } = new();
 }

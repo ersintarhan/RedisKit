@@ -1,7 +1,7 @@
 namespace RedisKit.Models;
 
 /// <summary>
-/// Type of subscription
+///     Type of subscription
 /// </summary>
 public enum SubscriptionType
 {

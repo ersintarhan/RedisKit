@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
+using MessagePack;
 using RedisKit.Serialization;
-using System.Text.Json;
 
 namespace RedisKit.Benchmarks;
 
@@ -9,10 +9,10 @@ namespace RedisKit.Benchmarks;
 public class SerializerBenchmarks
 {
     private readonly SystemTextJsonRedisSerializer _jsonSerializer;
-    private readonly MessagePackRedisSerializer _messagePackSerializer;
-    private readonly TestData _smallObject;
     private readonly TestData _largeObject;
+    private readonly MessagePackRedisSerializer _messagePackSerializer;
     private readonly TestData[] _objectArray;
+    private readonly TestData _smallObject;
     private byte[] _jsonData = Array.Empty<byte>();
     private byte[] _messagePackData = Array.Empty<byte>();
 
@@ -48,7 +48,7 @@ public class SerializerBenchmarks
                 Id = i,
                 Name = $"User {i}",
                 Email = $"user{i}@example.com",
-                Age = 20 + (i % 50),
+                Age = 20 + i % 50,
                 IsActive = i % 2 == 0,
                 Tags = new[] { $"user_{i}", "batch" }
             })
@@ -63,69 +63,96 @@ public class SerializerBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public byte[] Json_Serialize_Small() => _jsonSerializer.Serialize(_smallObject);
+    public byte[] Json_Serialize_Small()
+    {
+        return _jsonSerializer.Serialize(_smallObject);
+    }
 
     [Benchmark]
-    public byte[] MessagePack_Serialize_Small() => _messagePackSerializer.Serialize(_smallObject);
+    public byte[] MessagePack_Serialize_Small()
+    {
+        return _messagePackSerializer.Serialize(_smallObject);
+    }
 
     [Benchmark]
-    public byte[] Json_Serialize_Large() => _jsonSerializer.Serialize(_largeObject);
+    public byte[] Json_Serialize_Large()
+    {
+        return _jsonSerializer.Serialize(_largeObject);
+    }
 
     [Benchmark]
-    public byte[] MessagePack_Serialize_Large() => _messagePackSerializer.Serialize(_largeObject);
+    public byte[] MessagePack_Serialize_Large()
+    {
+        return _messagePackSerializer.Serialize(_largeObject);
+    }
 
     [Benchmark]
-    public byte[] Json_Serialize_Array() => _jsonSerializer.Serialize(_objectArray);
+    public byte[] Json_Serialize_Array()
+    {
+        return _jsonSerializer.Serialize(_objectArray);
+    }
 
     [Benchmark]
-    public byte[] MessagePack_Serialize_Array() => _messagePackSerializer.Serialize(_objectArray);
+    public byte[] MessagePack_Serialize_Array()
+    {
+        return _messagePackSerializer.Serialize(_objectArray);
+    }
 
     [Benchmark]
-    public TestData? Json_Deserialize_Small() => _jsonSerializer.Deserialize<TestData>(_jsonData);
+    public TestData? Json_Deserialize_Small()
+    {
+        return _jsonSerializer.Deserialize<TestData>(_jsonData);
+    }
 
     [Benchmark]
-    public TestData? MessagePack_Deserialize_Small() => _messagePackSerializer.Deserialize<TestData>(_messagePackData);
+    public TestData? MessagePack_Deserialize_Small()
+    {
+        return _messagePackSerializer.Deserialize<TestData>(_messagePackData);
+    }
 
     [Benchmark]
-    public async Task<byte[]> Json_SerializeAsync_Small() => await _jsonSerializer.SerializeAsync(_smallObject);
+    public async Task<byte[]> Json_SerializeAsync_Small()
+    {
+        return await _jsonSerializer.SerializeAsync(_smallObject);
+    }
 
     [Benchmark]
-    public async Task<byte[]> MessagePack_SerializeAsync_Small() => await _messagePackSerializer.SerializeAsync(_smallObject);
+    public async Task<byte[]> MessagePack_SerializeAsync_Small()
+    {
+        return await _messagePackSerializer.SerializeAsync(_smallObject);
+    }
 
     [Benchmark]
-    public async Task<TestData?> Json_DeserializeAsync_Small() => await _jsonSerializer.DeserializeAsync<TestData>(_jsonData);
+    public async Task<TestData?> Json_DeserializeAsync_Small()
+    {
+        return await _jsonSerializer.DeserializeAsync<TestData>(_jsonData);
+    }
 
     [Benchmark]
-    public async Task<TestData?> MessagePack_DeserializeAsync_Small() => await _messagePackSerializer.DeserializeAsync<TestData>(_messagePackData);
+    public async Task<TestData?> MessagePack_DeserializeAsync_Small()
+    {
+        return await _messagePackSerializer.DeserializeAsync<TestData>(_messagePackData);
+    }
 }
 
-[MessagePack.MessagePackObject]
+[MessagePackObject]
 public class TestData
 {
-    [MessagePack.Key(0)]
-    public int Id { get; set; }
+    [Key(0)] public int Id { get; set; }
 
-    [MessagePack.Key(1)]
-    public string Name { get; set; } = string.Empty;
+    [Key(1)] public string Name { get; set; } = string.Empty;
 
-    [MessagePack.Key(2)]
-    public string Email { get; set; } = string.Empty;
+    [Key(2)] public string Email { get; set; } = string.Empty;
 
-    [MessagePack.Key(3)]
-    public int Age { get; set; }
+    [Key(3)] public int Age { get; set; }
 
-    [MessagePack.Key(4)]
-    public bool IsActive { get; set; }
+    [Key(4)] public bool IsActive { get; set; }
 
-    [MessagePack.Key(5)]
-    public string[] Tags { get; set; } = Array.Empty<string>();
+    [Key(5)] public string[] Tags { get; set; } = Array.Empty<string>();
 
-    [MessagePack.Key(6)]
-    public string? Description { get; set; }
+    [Key(6)] public string? Description { get; set; }
 
-    [MessagePack.Key(7)]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    [Key(7)] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [MessagePack.Key(8)]
-    public Dictionary<string, object> Metadata { get; set; } = new();
+    [Key(8)] public Dictionary<string, object> Metadata { get; set; } = new();
 }

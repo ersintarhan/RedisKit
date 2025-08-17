@@ -1,12 +1,11 @@
-namespace RedisKit.Models
+namespace RedisKit.Models;
+
+/// <summary>
+///     Available serializer types
+/// </summary>
+public enum SerializerType
 {
-    /// <summary>
-    /// Available serializer types
-    /// </summary>
-    public enum SerializerType
-    {
-        MessagePack,
-        SystemTextJson,
-        Custom
-    }
+    MessagePack,
+    SystemTextJson,
+    Custom
 }

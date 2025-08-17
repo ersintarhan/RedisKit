@@ -1,7 +1,7 @@
 namespace RedisKit.Models;
 
 /// <summary>
-/// Connection health status
+///     Connection health status
 /// </summary>
 public class ConnectionHealthStatus
 {

@@ -8,8 +8,9 @@ Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
 
 
 ```
-| Method               | Mean     | Error   | StdDev  | Ratio | Gen0   | Allocated | Alloc Ratio |
-|--------------------- |---------:|--------:|--------:|------:|-------:|----------:|------------:|
+
+| Method               |     Mean |   Error |  StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
+|----------------------|---------:|--------:|--------:|------:|-------:|----------:|------------:|
 | Set_Single_Object    | 121.8 μs | 0.65 μs | 0.58 μs |  1.00 |      - |     792 B |        1.00 |
 | Get_Single_Object    | 120.8 μs | 0.81 μs | 0.76 μs |  0.99 |      - |    1224 B |        1.55 |
 | Set_Many_Objects_10  | 148.3 μs | 0.52 μs | 0.43 μs |  1.22 | 0.9766 |    6712 B |        8.47 |
