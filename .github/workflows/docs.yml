@@ -1,16 +1,27 @@
 name: Build and Deploy Documentation
 
 on:
+  # Manual trigger
+  workflow_dispatch:
+  
+  # Auto-deploy on releases
+  release:
+    types: [published]
+  
+  # Auto-deploy when docs are changed
   push:
     branches: [ main, master ]
     paths:
-      - 'RedisKit/**'
+      - 'docs/**'
       - 'docfx.json'
       - 'toc.yml'
       - 'index.md'
       - 'articles/**'
       - '.github/workflows/docs.yml'
-  workflow_dispatch:
+  
+  # Weekly scheduled build to keep docs fresh
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight
 
 permissions:
   contents: read
