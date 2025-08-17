@@ -47,13 +47,11 @@ public static class ServiceCollectionExtensions
 
         // Add health check if requested
         if (addHealthCheck)
-        {
             services.AddHealthChecks()
                 .AddTypeActivatedCheck<RedisHealthCheck>(
                     "redis",
-                    failureStatus: HealthStatus.Unhealthy,
+                    HealthStatus.Unhealthy,
                     tags: new[] { "redis", "cache", "database" });
-        }
 
         return services;
     }

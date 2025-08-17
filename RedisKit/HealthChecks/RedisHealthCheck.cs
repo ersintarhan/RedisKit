@@ -39,7 +39,7 @@ public class RedisHealthCheck : IHealthCheck
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            
+
             // Check if connection is available
             var multiplexer = await _connection.GetMultiplexerAsync().ConfigureAwait(false);
             if (multiplexer == null || !multiplexer.IsConnected)
@@ -51,15 +51,15 @@ public class RedisHealthCheck : IHealthCheck
             // Get database and perform PING
             var database = await _connection.GetDatabaseAsync().ConfigureAwait(false);
             var pingResult = await database.PingAsync().ConfigureAwait(false);
-            
+
             stopwatch.Stop();
-            
+
             // Check response time
             if (pingResult > _responseTimeThreshold)
             {
                 _logger.LogWarning("Redis health check degraded: Response time {ResponseTime}ms exceeds threshold {Threshold}ms",
                     pingResult.TotalMilliseconds, _responseTimeThreshold.TotalMilliseconds);
-                
+
                 return HealthCheckResult.Degraded(
                     $"Redis response time ({pingResult.TotalMilliseconds:F2}ms) exceeds threshold ({_responseTimeThreshold.TotalMilliseconds:F2}ms)",
                     data: new Dictionary<string, object>
@@ -71,7 +71,7 @@ public class RedisHealthCheck : IHealthCheck
 
             // Get connection health status
             var healthStatus = await _connection.CheckHealthAsync().ConfigureAwait(false);
-            
+
             // Build health check data
             var data = new Dictionary<string, object>
             {
@@ -83,13 +83,10 @@ public class RedisHealthCheck : IHealthCheck
                 ["ConsecutiveFailures"] = healthStatus.ConsecutiveFailures
             };
 
-            if (healthStatus.LastResponseTime.HasValue)
-            {
-                data["LastResponseTime"] = healthStatus.LastResponseTime.Value.TotalMilliseconds;
-            }
+            if (healthStatus.LastResponseTime.HasValue) data["LastResponseTime"] = healthStatus.LastResponseTime.Value.TotalMilliseconds;
 
             _logger.LogDebug("Redis health check passed: Response time {ResponseTime}ms", pingResult.TotalMilliseconds);
-            
+
             return HealthCheckResult.Healthy(
                 $"Redis is healthy (Response: {pingResult.TotalMilliseconds:F2}ms)",
                 data);

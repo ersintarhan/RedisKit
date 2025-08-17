@@ -6,7 +6,7 @@ using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 
-namespace TestMultiSerializer;
+namespace RedisKit.Example;
 
 [MessagePackObject]
 public class TestData
