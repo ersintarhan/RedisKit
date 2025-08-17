@@ -62,7 +62,7 @@ namespace RedisKit.Services
 
             try
             {
-                var success = await ExtendAsync(_defaultExpiry);
+                var success = await ExtendAsync(_defaultExpiry).ConfigureAwait(false);
                 if (!success)
                 {
                     _logger?.LogWarning("Failed to auto-renew lock for resource: {Resource}", Resource);
@@ -165,13 +165,13 @@ namespace RedisKit.Services
             // Stop renewal timer
             if (_renewalTimer != null)
             {
-                await _renewalTimer.DisposeAsync();
+                await _renewalTimer.DisposeAsync().ConfigureAwait(false);
             }
 
             // Release the lock
             if (_isAcquired)
             {
-                await ReleaseAsync();
+                await ReleaseAsync().ConfigureAwait(false);
             }
         }
 

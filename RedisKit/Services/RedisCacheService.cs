@@ -63,7 +63,7 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogGetAsync(_logger, prefixedKey);
 
-                var value = await _database.StringGetAsync(prefixedKey);
+                var value = await _database.StringGetAsync(prefixedKey).ConfigureAwait(false);
                 if (value.IsNullOrEmpty)
                     return null;
 
@@ -92,10 +92,10 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogSetAsync(_logger, prefixedKey);
 
-                var serializedValue = await _serializer.SerializeAsync(value, cancellationToken: cancellationToken);
+                var serializedValue = await _serializer.SerializeAsync(value, cancellationToken: cancellationToken).ConfigureAwait(false);
                 var expiry = ttl ?? _options.DefaultTtl;
 
-                await _database.StringSetAsync(prefixedKey, serializedValue, expiry);
+                await _database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
 
                 Logging.LoggingExtensions.LogSetAsyncSuccess(_logger, prefixedKey);
             }
@@ -117,7 +117,7 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogDeleteAsync(_logger, prefixedKey);
 
-                await _database.KeyDeleteAsync(prefixedKey);
+                await _database.KeyDeleteAsync(prefixedKey).ConfigureAwait(false);
 
                 Logging.LoggingExtensions.LogDeleteAsyncSuccess(_logger, prefixedKey);
             }
@@ -142,7 +142,7 @@ namespace RedisKit.Services
                 Logging.LoggingExtensions.LogGetManyAsync(_logger, string.Join(", ", prefixedKeys));
 
                 var redisKeys = prefixedKeys.Select(k => (RedisKey)k).ToArray();
-                var values = await _database.StringGetAsync(redisKeys);
+                var values = await _database.StringGetAsync(redisKeys).ConfigureAwait(false);
 
                 // Use StringComparer.Ordinal for better performance
                 var result = new Dictionary<string, T?>(keyArray.Length, StringComparer.Ordinal);
@@ -199,7 +199,7 @@ namespace RedisKit.Services
                             throw new ArgumentNullException(nameof(values));
 
                         var prefixedKey = $"{_keyPrefix}{kvp.Key}";
-                        var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken);
+                        var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken).ConfigureAwait(false);
                         return (Key: (RedisKey)prefixedKey, Value: (RedisValue)serialized);
                     }).ToArray();
 
@@ -247,7 +247,7 @@ namespace RedisKit.Services
             {
                 // Test with a simple Lua script
                 var testScript = "return redis.call('PING')";
-                var result = await _database.ScriptEvaluateAsync(testScript);
+                var result = await _database.ScriptEvaluateAsync(testScript).ConfigureAwait(false);
                 var supported = result.ToString() == "PONG";
 
                 if (supported)
@@ -288,7 +288,7 @@ namespace RedisKit.Services
                     .Concat(new[] { (RedisValue)expiry.TotalSeconds })
                     .ToArray();
 
-                var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values);
+                var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
 
                 var successCount = (int)result;
                 if (successCount != pairs.Length)
@@ -319,7 +319,7 @@ namespace RedisKit.Services
                 var kvpArray = pairs
                     .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
                     .ToArray();
-                await _database.StringSetAsync(kvpArray);
+                await _database.StringSetAsync(kvpArray).ConfigureAwait(false);
             }
             else
             {
@@ -329,7 +329,7 @@ namespace RedisKit.Services
                     .ToArray();
 
                 // First: MSET
-                await _database.StringSetAsync(kvpArray);
+                await _database.StringSetAsync(kvpArray).ConfigureAwait(false);
 
                 // Then: parallel EXPIRE to minimize round-trips
                 var expireTasks = pairs
@@ -350,7 +350,7 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogExistsAsync(_logger, prefixedKey);
 
-                var result = await _database.KeyExistsAsync(prefixedKey);
+                var result = await _database.KeyExistsAsync(prefixedKey).ConfigureAwait(false);
 
                 Logging.LoggingExtensions.LogExistsAsyncSuccess(_logger, prefixedKey, result);
                 return result;

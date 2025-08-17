@@ -163,9 +163,9 @@ namespace RedisKit.Serialization
         /// </remarks>
         /// <example>
         /// <code>
-        /// var largeDataset = await LoadDatasetAsync();
-        /// byte[] data = await serializer.SerializeAsync(largeDataset, cancellationToken);
-        /// await StoreInRedisAsync("dataset:latest", data);
+        /// var largeDataset = await LoadDatasetAsync().ConfigureAwait(false);
+        /// byte[] data = await serializer.SerializeAsync(largeDataset, cancellationToken).ConfigureAwait(false);
+        /// await StoreInRedisAsync("dataset:latest", data).ConfigureAwait(false);
         /// </code>
         /// </example>
         Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default);
@@ -193,11 +193,11 @@ namespace RedisKit.Serialization
         /// </remarks>
         /// <example>
         /// <code>
-        /// byte[] data = await GetFromRedisAsync("dataset:latest");
+        /// byte[] data = await GetFromRedisAsync("dataset:latest").ConfigureAwait(false);
         /// var dataset = await serializer.DeserializeAsync&lt;Dataset&gt;(data, cancellationToken);
         /// if (dataset != null)
         /// {
-        ///     await ProcessDatasetAsync(dataset);
+        ///     await ProcessDatasetAsync(dataset).ConfigureAwait(false);
         /// }
         /// </code>
         /// </example>
@@ -232,8 +232,8 @@ namespace RedisKit.Serialization
         /// <code>
         /// // Dynamic type deserialization
         /// Type entityType = GetEntityType(entityName);
-        /// byte[] data = await GetFromRedisAsync($"entity:{entityId}");
-        /// object? entity = await serializer.DeserializeAsync(data, entityType, cancellationToken);
+        /// byte[] data = await GetFromRedisAsync($"entity:{entityId}").ConfigureAwait(false);
+        /// object? entity = await serializer.DeserializeAsync(data, entityType, cancellationToken).ConfigureAwait(false);
         /// 
         /// if (entity != null)
         /// {

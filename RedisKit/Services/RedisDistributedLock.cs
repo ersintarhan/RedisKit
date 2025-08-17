@@ -96,7 +96,7 @@ namespace RedisKit.Services
             {
                 attempts++;
 
-                var handle = await AcquireLockAsync(resource, expiry, cancellationToken);
+                var handle = await AcquireLockAsync(resource, expiry, cancellationToken).ConfigureAwait(false);
                 if (handle != null)
                 {
                     _logger?.LogDebug("Acquired lock for resource: {Resource} after {Attempts} attempts", resource, attempts);
@@ -129,7 +129,7 @@ namespace RedisKit.Services
                 var database = _connectionMultiplexer.GetDatabase();
                 var lockKey = GetLockKey(resource);
 
-                return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster);
+                return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -149,7 +149,7 @@ namespace RedisKit.Services
             if (expiry <= TimeSpan.Zero)
                 throw new ArgumentException("Expiry must be positive", nameof(expiry));
 
-            return await handle.ExtendAsync(expiry, cancellationToken);
+            return await handle.ExtendAsync(expiry, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace RedisKit.Services
                 // Try to acquire all locks
                 foreach (var resource in resources)
                 {
-                    var handle = await AcquireLockAsync(resource, expiry, cancellationToken);
+                    var handle = await AcquireLockAsync(resource, expiry, cancellationToken).ConfigureAwait(false);
                     if (handle != null)
                     {
                         acquiredLocks.Add(handle);
@@ -182,7 +182,7 @@ namespace RedisKit.Services
 
                         foreach (var acquired in acquiredLocks)
                         {
-                            await acquired.ReleaseAsync(cancellationToken);
+                            await acquired.ReleaseAsync(cancellationToken).ConfigureAwait(false);
                         }
 
                         return null;
@@ -201,7 +201,7 @@ namespace RedisKit.Services
                 {
                     try
                     {
-                        await acquired.ReleaseAsync(cancellationToken);
+                        await acquired.ReleaseAsync(cancellationToken).ConfigureAwait(false);
                     }
                     catch
                     {

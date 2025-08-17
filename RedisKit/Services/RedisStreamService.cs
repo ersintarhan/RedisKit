@@ -179,7 +179,7 @@ namespace RedisKit.Services
 
         public async Task<string> AddAsync<T>(string stream, T message, CancellationToken cancellationToken = default) where T : class
         {
-            return await AddAsync(stream, message, null, cancellationToken);
+            return await AddAsync(stream, message, null, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<string> AddAsync<T>(string stream, T message, int? maxLength, CancellationToken cancellationToken = default) where T : class
@@ -196,7 +196,7 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogAddAsync(_logger, prefixedStream);
 
-                var serializedMessage = await _serializer.SerializeAsync(message, cancellationToken: cancellationToken);
+                var serializedMessage = await _serializer.SerializeAsync(message, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 // Create a NameValueEntry array for the stream entry
                 var entry = new NameValueEntry[]
@@ -235,7 +235,7 @@ namespace RedisKit.Services
                 Logging.LoggingExtensions.LogReadAsync(_logger, prefixedStream, start ?? "0", end ?? "+", count);
 
                 // Read from stream
-                var entries = await _database.StreamRangeAsync(prefixedStream, start ?? "0", end ?? "+", count);
+                var entries = await _database.StreamRangeAsync(prefixedStream, start ?? "0", end ?? "+", count).ConfigureAwait(false);
 
                 var result = new Dictionary<string, T?>();
 
@@ -397,7 +397,7 @@ namespace RedisKit.Services
                 Logging.LoggingExtensions.LogAcknowledgeAsync(_logger, prefixedStream, groupName, messageId);
 
                 // Acknowledge the message
-                await _database.StreamAcknowledgeAsync(prefixedStream, groupName, messageId);
+                await _database.StreamAcknowledgeAsync(prefixedStream, groupName, messageId).ConfigureAwait(false);
 
                 Logging.LoggingExtensions.LogAcknowledgeAsyncSuccess(_logger, prefixedStream, groupName, messageId);
             }
@@ -426,7 +426,7 @@ namespace RedisKit.Services
                 var redisMessageIds = Array.ConvertAll(messageIds, id => (RedisValue)id);
 
                 // Delete messages from stream
-                var deletedCount = await _database.StreamDeleteAsync(prefixedStream, redisMessageIds);
+                var deletedCount = await _database.StreamDeleteAsync(prefixedStream, redisMessageIds).ConfigureAwait(false);
 
                 _logger.LogInformation("Deleted {Count} messages from stream {Stream}", deletedCount, prefixedStream);
                 return deletedCount;
@@ -546,7 +546,7 @@ namespace RedisKit.Services
                 _logger.LogDebug("Getting info for stream {Stream}", prefixedStream);
 
                 // Get stream info
-                var info = await _database.StreamInfoAsync(prefixedStream);
+                var info = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
 
                 _logger.LogDebug("Retrieved info for stream {Stream}: Length={Length}, FirstEntry={FirstEntry}, LastEntry={LastEntry}",
                     prefixedStream, info.Length, info.FirstEntry.Id, info.LastEntry.Id);
@@ -640,7 +640,7 @@ namespace RedisKit.Services
                     messageId, prefixedSourceStream, prefixedDeadLetterStream);
 
                 // Read the original message
-                var entries = await _database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1);
+                var entries = await _database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1).ConfigureAwait(false);
 
                 if (entries.Length == 0)
                 {
@@ -678,14 +678,14 @@ namespace RedisKit.Services
                 };
 
                 // Add to dead letter queue
-                var dlqId = await AddAsync(deadLetterStream, deadLetterMessage, cancellationToken: cancellationToken);
+                var dlqId = await AddAsync(deadLetterStream, deadLetterMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 // Acknowledge the original message if group name is provided
                 if (!string.IsNullOrEmpty(groupName))
                 {
                     try
                     {
-                        await AcknowledgeAsync(sourceStream, groupName, messageId, cancellationToken);
+                        await AcknowledgeAsync(sourceStream, groupName, messageId, cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -732,7 +732,7 @@ namespace RedisKit.Services
                 _logger.LogInformation("Starting retry for pending messages in stream {Stream}, group {Group}", stream, groupName);
 
                 // Get pending messages
-                var pendingMessages = await GetPendingAsync(stream, groupName, 100, consumerName, cancellationToken);
+                var pendingMessages = await GetPendingAsync(stream, groupName, 100, consumerName, cancellationToken).ConfigureAwait(false);
 
                 // Filter messages that have exceeded idle timeout
                 var timedOutMessages = pendingMessages.Where(p =>
@@ -773,7 +773,7 @@ namespace RedisKit.Services
                                     if (success)
                                     {
                                         // Acknowledge the message
-                                        await AcknowledgeAsync(stream, groupName, messageId, cancellationToken);
+                                        await AcknowledgeAsync(stream, groupName, messageId, cancellationToken).ConfigureAwait(false);
                                         result.SuccessCount++;
                                         result.ProcessedMessages[messageId] = message;
                                         processed = true;
@@ -898,7 +898,7 @@ namespace RedisKit.Services
                     {
                         try
                         {
-                            var messageId = await AddAsync(stream, item.message, maxLength, ct);
+                            var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
                             results.Add((item.index, messageId));
 
                             // Log progress every 100 messages for large batches
@@ -957,7 +957,7 @@ namespace RedisKit.Services
                 _logger.LogDebug("Checking health for stream {Stream}", prefixedStream);
 
                 // Get stream info
-                var streamInfo = await _database.StreamInfoAsync(prefixedStream);
+                var streamInfo = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
                 health.Length = streamInfo.Length;
 
                 if (includeGroups)
@@ -965,7 +965,7 @@ namespace RedisKit.Services
                     try
                     {
                         // Get consumer groups info
-                        var groups = await _database.StreamGroupInfoAsync(prefixedStream);
+                        var groups = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                         health.ConsumerGroupCount = groups.Length;
 
                         // Calculate total pending messages and oldest pending age
@@ -977,7 +977,7 @@ namespace RedisKit.Services
                             totalPending += group.PendingMessageCount;
 
                             // Get detailed pending info for the group
-                            var pendingInfo = await _database.StreamPendingAsync(prefixedStream, group.Name);
+                            var pendingInfo = await _database.StreamPendingAsync(prefixedStream, group.Name).ConfigureAwait(false);
                             if (pendingInfo.LowestPendingMessageId != RedisValue.Null && pendingInfo.HighestPendingMessageId != RedisValue.Null)
                             {
                                 // Parse the timestamp from the message ID (format: timestamp-sequence)
@@ -1048,7 +1048,7 @@ namespace RedisKit.Services
                 _logger.LogDebug("Collecting metrics for stream {Stream}", prefixedStream);
 
                 // Get stream info
-                var streamInfo = await _database.StreamInfoAsync(prefixedStream);
+                var streamInfo = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
                 metrics.TotalMessages = streamInfo.Length;
                 metrics.MeasurementWindow = measurementWindow;
 
@@ -1058,7 +1058,7 @@ namespace RedisKit.Services
                 var startId = $"{new DateTimeOffset(startTime).ToUnixTimeMilliseconds()}-0";
                 var endId = $"{new DateTimeOffset(endTime).ToUnixTimeMilliseconds()}-0";
 
-                var recentMessages = await _database.StreamRangeAsync(prefixedStream, startId, endId, count: -1);
+                var recentMessages = await _database.StreamRangeAsync(prefixedStream, startId, endId, count: -1).ConfigureAwait(false);
                 metrics.MessagesPerSecond = recentMessages.Length / measurementWindow.TotalSeconds;
 
                 // Get consumer group metrics if specified
@@ -1066,7 +1066,7 @@ namespace RedisKit.Services
                 {
                     try
                     {
-                        var groupInfo = await _database.StreamGroupInfoAsync(prefixedStream);
+                        var groupInfo = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                         var group = groupInfo.FirstOrDefault(g => g.Name == groupName);
 
                         if (!string.IsNullOrEmpty(group.Name))
@@ -1096,7 +1096,7 @@ namespace RedisKit.Services
                     // Get metrics for all groups
                     try
                     {
-                        var groups = await _database.StreamGroupInfoAsync(prefixedStream);
+                        var groups = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                         metrics.PendingMessages = groups.Sum(g => g.PendingMessageCount);
                         metrics.TotalConsumers = groups.Sum(g => g.ConsumerCount);
                     }
@@ -1110,7 +1110,7 @@ namespace RedisKit.Services
                 var dlqStream = $"{stream}:dlq";
                 try
                 {
-                    var dlqInfo = await _database.StreamInfoAsync($"{_keyPrefix}{dlqStream}");
+                    var dlqInfo = await _database.StreamInfoAsync($"{_keyPrefix}{dlqStream}").ConfigureAwait(false);
                     metrics.DeadLetterCount = dlqInfo.Length;
                 }
                 catch
@@ -1174,7 +1174,7 @@ namespace RedisKit.Services
 
                             if (success)
                             {
-                                await AcknowledgeAsync(stream, groupName, kvp.Key, cancellationToken);
+                                await AcknowledgeAsync(stream, groupName, kvp.Key, cancellationToken).ConfigureAwait(false);
                                 successCount++;
 
                                 _logger.LogDebug("Successfully processed and acknowledged message {MessageId}", kvp.Key);

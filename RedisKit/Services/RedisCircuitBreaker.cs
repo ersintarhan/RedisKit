@@ -36,7 +36,7 @@ namespace RedisKit.Services
             if (!_settings.Enabled)
                 return true;
 
-            await _stateLock.WaitAsync();
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 return _state switch
@@ -61,7 +61,7 @@ namespace RedisKit.Services
             if (!_settings.Enabled)
                 return;
 
-            await _stateLock.WaitAsync();
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 switch (_state)
@@ -99,7 +99,7 @@ namespace RedisKit.Services
             if (!_settings.Enabled)
                 return;
 
-            await _stateLock.WaitAsync();
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _lastFailureTime = DateTime.UtcNow;
@@ -139,7 +139,7 @@ namespace RedisKit.Services
         /// </summary>
         public async Task ResetAsync()
         {
-            await _stateLock.WaitAsync();
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 TransitionTo(CircuitState.Closed);

@@ -98,7 +98,7 @@ namespace RedisKit.Services
     ///     {
     ///         foreach (var token in _subscriptions)
     ///         {
-    ///             await _pubSub.UnsubscribeAsync(token);
+    ///             await _pubSub.UnsubscribeAsync(token).ConfigureAwait(false);
     ///         }
     ///     }
     /// }
@@ -176,7 +176,7 @@ namespace RedisKit.Services
             {
                 Logging.LoggingExtensions.LogPublishAsync(_logger, channel);
 
-                var serialized = await _serializer.SerializeAsync(message, cancellationToken: cancellationToken);
+                var serialized = await _serializer.SerializeAsync(message, cancellationToken: cancellationToken).ConfigureAwait(false);
                 var subscriberCount = await _subscriber.PublishAsync(RedisChannel.Literal(channel), serialized);
 
                 Logging.LoggingExtensions.LogPublishAsyncSuccess(_logger, channel);
@@ -214,7 +214,7 @@ namespace RedisKit.Services
 
             ThrowIfDisposed();
 
-            await _subscriptionLock.WaitAsync(cancellationToken);
+            await _subscriptionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 _logger.LogDebug("Subscribing to {Type}: {Key}", type, key);
@@ -255,7 +255,7 @@ namespace RedisKit.Services
                 // Subscribe to Redis if this is the first handler
                 if (handlerDict[key].Count == 1)
                 {
-                    await SubscribeToRedisAsync(key, type, cancellationToken);
+                    await SubscribeToRedisAsync(key, type, cancellationToken).ConfigureAwait(false);
                 }
 
                 _logger.LogDebug("Successfully subscribed to {Type}: {Key}", type, key);
@@ -263,7 +263,7 @@ namespace RedisKit.Services
                 // Create unsubscribe action
                 var unsubscribeAction = new Func<Task>(async () =>
                 {
-                    await UnsubscribeHandlerAsync(handlerId, cancellationToken);
+                    await UnsubscribeHandlerAsync(handlerId, cancellationToken).ConfigureAwait(false);
                 });
 
                 return new SubscriptionToken(handlerId, key, type, unsubscribeAction);
@@ -328,7 +328,7 @@ namespace RedisKit.Services
             Func<T, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
-            return await SubscribeInternalAsync(channel, SubscriptionType.Channel, handler, null, cancellationToken);
+            return await SubscribeInternalAsync(channel, SubscriptionType.Channel, handler, null, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionToken> SubscribeWithMetadataAsync<T>(
@@ -354,7 +354,7 @@ namespace RedisKit.Services
             Func<T, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
-            return await SubscribeInternalAsync(pattern, SubscriptionType.Pattern, handler, null, cancellationToken);
+            return await SubscribeInternalAsync(pattern, SubscriptionType.Pattern, handler, null, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionToken> SubscribePatternWithMetadataAsync<T>(
@@ -456,7 +456,7 @@ namespace RedisKit.Services
         {
             try
             {
-                var deserialized = await _serializer.DeserializeAsync(value!, handler.MessageType, cancellationToken);
+                var deserialized = await _serializer.DeserializeAsync(value!, handler.MessageType, cancellationToken).ConfigureAwait(false);
                 if (deserialized != null)
                 {
                     await handler.Handler(deserialized, cancellationToken);
@@ -478,12 +478,12 @@ namespace RedisKit.Services
 
         public async Task UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)
         {
-            await UnsubscribeInternalAsync(channel, SubscriptionType.Channel, cancellationToken);
+            await UnsubscribeInternalAsync(channel, SubscriptionType.Channel, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)
         {
-            await UnsubscribeInternalAsync(pattern, SubscriptionType.Pattern, cancellationToken);
+            await UnsubscribeInternalAsync(pattern, SubscriptionType.Pattern, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task UnsubscribeInternalAsync(string key, SubscriptionType type, CancellationToken cancellationToken)
@@ -493,7 +493,7 @@ namespace RedisKit.Services
 
             ThrowIfDisposed();
 
-            await _subscriptionLock.WaitAsync(cancellationToken);
+            await _subscriptionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 _logger.LogDebug("Unsubscribing from {Type}: {Key}", type, key);
@@ -535,7 +535,7 @@ namespace RedisKit.Services
             if (!_handlerMap.TryGetValue(handlerId, out var metadata))
                 return;
 
-            await _subscriptionLock.WaitAsync(cancellationToken);
+            await _subscriptionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 var handlerDict = metadata.Type == SubscriptionType.Channel ? _channelHandlers : _patternHandlers;
@@ -547,7 +547,7 @@ namespace RedisKit.Services
                     if (updatedHandlers.Count == 0)
                     {
                         // Last handler, unsubscribe from Redis
-                        await UnsubscribeInternalAsync(metadata.Key, metadata.Type, cancellationToken);
+                        await UnsubscribeInternalAsync(metadata.Key, metadata.Type, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -567,7 +567,7 @@ namespace RedisKit.Services
         {
             ThrowIfDisposed();
 
-            await _subscriptionLock.WaitAsync(cancellationToken);
+            await _subscriptionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 _logger.LogDebug("Unsubscribing from all channels and patterns");
@@ -630,7 +630,7 @@ namespace RedisKit.Services
                 // Remove inactive handlers
                 foreach (var handlerId in handlersToRemove)
                 {
-                    await UnsubscribeHandlerAsync(handlerId, CancellationToken.None);
+                    await UnsubscribeHandlerAsync(handlerId, CancellationToken.None).ConfigureAwait(false);
                 }
 
                 if (handlersToRemove.Count > 0)
@@ -695,7 +695,7 @@ namespace RedisKit.Services
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
 
-            await token.UnsubscribeAsync();
+            await token.UnsubscribeAsync().ConfigureAwait(false);
         }
 
         public async Task<SubscriptionToken> SubscribePatternWithChannelAsync<T>(
@@ -703,7 +703,7 @@ namespace RedisKit.Services
             Func<T, string, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
-            return await SubscribePatternWithMetadataAsync(pattern, handler, cancellationToken);
+            return await SubscribePatternWithMetadataAsync(pattern, handler, cancellationToken).ConfigureAwait(false);
         }
 
         public Task<SubscriptionStats[]> GetSubscriptionStatsAsync(CancellationToken cancellationToken = default)
@@ -717,7 +717,7 @@ namespace RedisKit.Services
             if (string.IsNullOrEmpty(channel))
                 throw new ArgumentException("Channel cannot be null or empty", nameof(channel));
 
-            var count = await GetSubscriberCountAsync(channel, cancellationToken);
+            var count = await GetSubscriberCountAsync(channel, cancellationToken).ConfigureAwait(false);
             return count > 0;
         }
 

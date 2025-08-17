@@ -29,7 +29,7 @@ internal class MultiLockHandle : IMultiLockHandle
             return;
 
         _disposed = true;
-        await ReleaseAllAsync();
+        await ReleaseAllAsync().ConfigureAwait(false);
     }
 
     public void Dispose()

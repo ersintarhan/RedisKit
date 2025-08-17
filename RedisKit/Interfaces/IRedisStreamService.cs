@@ -81,7 +81,7 @@ namespace RedisKit.Interfaces
         /// <example>
         /// <code>
         /// var payment = new PaymentEvent { Amount = 100.50m, Currency = "USD" };
-        /// var messageId = await streamService.AddAsync("payments:stream", payment);
+        /// var messageId = await streamService.AddAsync("payments:stream", payment).ConfigureAwait(false);
         /// Console.WriteLine($"Added message with ID: {messageId}");
         /// </code>
         /// </example>
@@ -105,7 +105,7 @@ namespace RedisKit.Interfaces
         /// <example>
         /// <code>
         /// // Keep only last 1000 messages in stream
-        /// await streamService.AddAsync("events:stream", eventData, maxLength: 1000);
+        /// await streamService.AddAsync("events:stream", eventData, maxLength: 1000).ConfigureAwait(false);
         /// </code>
         /// </example>
         Task<string> AddAsync<T>(string stream, T message, int? maxLength, CancellationToken cancellationToken = default) where T : class;
@@ -157,7 +157,7 @@ namespace RedisKit.Interfaces
         /// <example>
         /// <code>
         /// // Create consumer group for order processing
-        /// await streamService.CreateConsumerGroupAsync("orders:stream", "order-processors");
+        /// await streamService.CreateConsumerGroupAsync("orders:stream", "order-processors").ConfigureAwait(false);
         /// </code>
         /// </example>
         Task CreateConsumerGroupAsync(string stream, string groupName, CancellationToken cancellationToken = default);
@@ -190,7 +190,7 @@ namespace RedisKit.Interfaces
         /// {
         ///     if (await ProcessOrder(order))
         ///     {
-        ///         await streamService.AcknowledgeAsync("orders:stream", "order-processors", messageId);
+        ///         await streamService.AcknowledgeAsync("orders:stream", "order-processors", messageId).ConfigureAwait(false);
         ///     }
         /// }
         /// </code>
@@ -245,7 +245,7 @@ namespace RedisKit.Interfaces
         /// <example>
         /// <code>
         /// // Keep approximately last 1000 messages
-        /// var trimmed = await streamService.TrimByLengthAsync("events:stream", 1000);
+        /// var trimmed = await streamService.TrimByLengthAsync("events:stream", 1000).ConfigureAwait(false);
         /// Console.WriteLine($"Trimmed {trimmed} old messages");
         /// </code>
         /// </example>

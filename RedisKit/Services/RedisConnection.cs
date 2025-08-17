@@ -72,7 +72,7 @@ namespace RedisKit.Services
     /// };
     /// 
     /// var connection = new RedisConnection(logger, Options.Create(options));
-    /// var db = await connection.GetDatabaseAsync();
+    /// var db = await connection.GetDatabaseAsync().ConfigureAwait(false);
     /// </code>
     /// </remarks>
     internal class RedisConnection : IDisposable
@@ -172,19 +172,19 @@ namespace RedisKit.Services
             // First check without locking
             if (_connection != null && _connection.IsConnected)
             {
-                await _circuitBreaker.RecordSuccessAsync();
+                await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
                 UpdateHealthStatus(true, TimeSpan.Zero);
                 return _connection;
             }
 
             // Use semaphore for connection creation
-            await _connectionLock.WaitAsync();
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 // Double-check pattern
                 if (_connection != null && _connection.IsConnected)
                 {
-                    await _circuitBreaker.RecordSuccessAsync();
+                    await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
                     UpdateHealthStatus(true, TimeSpan.Zero);
                     return _connection;
                 }
@@ -196,17 +196,17 @@ namespace RedisKit.Services
                 ApplyTimeoutSettings(config);
 
                 // Retry with advanced backoff strategy
-                var connection = await ConnectWithRetryAsync(config);
+                var connection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
 
                 if (connection == null || !connection.IsConnected)
                 {
-                    await _circuitBreaker.RecordFailureAsync();
+                    await _circuitBreaker.RecordFailureAsync().ConfigureAwait(false);
                     UpdateHealthStatus(false, TimeSpan.Zero, "Failed to establish connection");
                     throw new InvalidOperationException("Failed to establish Redis connection after all retry attempts");
                 }
 
                 _connection = connection;
-                await _circuitBreaker.RecordSuccessAsync();
+                await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
                 UpdateHealthStatus(true, TimeSpan.Zero);
 
                 // Setup connection event handlers
@@ -217,7 +217,7 @@ namespace RedisKit.Services
             }
             catch (Exception ex)
             {
-                await _circuitBreaker.RecordFailureAsync(ex);
+                await _circuitBreaker.RecordFailureAsync(ex).ConfigureAwait(false);
                 UpdateHealthStatus(false, TimeSpan.Zero, ex.Message);
                 throw;
             }
@@ -239,7 +239,7 @@ namespace RedisKit.Services
                     _logger.LogDebug("Connection attempt {Attempt}/{MaxAttempts}", attempt + 1, retryConfig.MaxAttempts);
 
                     var attemptStopwatch = Stopwatch.StartNew();
-                    var connection = await ConnectionMultiplexer.ConnectAsync(config);
+                    var connection = await ConnectionMultiplexer.ConnectAsync(config).ConfigureAwait(false);
                     attemptStopwatch.Stop();
 
                     if (connection.IsConnected)
@@ -364,9 +364,9 @@ namespace RedisKit.Services
                 if (_connection != null && _connection.IsConnected)
                 {
                     var db = _connection.GetDatabase();
-                    var cts = new CancellationTokenSource(_options.HealthMonitoring.CheckTimeout);
+                    using var cts = new CancellationTokenSource(_options.HealthMonitoring.CheckTimeout);
 
-                    await db.PingAsync();
+                    await db.PingAsync().ConfigureAwait(false);
                     stopwatch.Stop();
 
                     UpdateHealthStatus(true, stopwatch.Elapsed);
@@ -388,7 +388,7 @@ namespace RedisKit.Services
                         {
                             try
                             {
-                                await GetConnection();
+                                await GetConnection().ConfigureAwait(false);
                             }
                             catch (Exception ex)
                             {
@@ -481,12 +481,12 @@ namespace RedisKit.Services
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                var connection = await GetConnection();
+                var connection = await GetConnection().ConfigureAwait(false);
 
                 if (connection.IsConnected)
                 {
                     var db = connection.GetDatabase();
-                    await db.PingAsync();
+                    await db.PingAsync().ConfigureAwait(false);
                     stopwatch.Stop();
 
                     UpdateHealthStatus(true, stopwatch.Elapsed);
@@ -518,7 +518,7 @@ namespace RedisKit.Services
         /// </remarks>
         public async Task ResetCircuitBreakerAsync()
         {
-            await _circuitBreaker.ResetAsync();
+            await _circuitBreaker.ResetAsync().ConfigureAwait(false);
             _logger.LogInformation("Circuit breaker has been reset");
         }
 
