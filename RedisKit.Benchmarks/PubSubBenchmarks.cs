@@ -17,6 +17,7 @@ public class PubSubBenchmarks : IDisposable
     private IRedisPubSubService _pubSubService = null!;
     private readonly TestMessage _testMessage;
     private readonly ConcurrentBag<TestMessage> _receivedMessages = new();
+    private bool _disposed;
 
     public PubSubBenchmarks()
     {
@@ -128,7 +129,20 @@ public class PubSubBenchmarks : IDisposable
 
     public void Dispose()
     {
-        _serviceProvider?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _serviceProvider?.Dispose();
+            }
+            _disposed = true;
+        }
     }
 }
 

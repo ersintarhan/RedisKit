@@ -17,6 +17,7 @@ public class CacheBenchmarks : IDisposable
     private IRedisCacheService _cacheService = null!;
     private readonly TestData _testObject;
     private readonly Dictionary<string, TestData> _batchData;
+    private bool _disposed;
 
     public CacheBenchmarks()
     {
@@ -120,6 +121,19 @@ public class CacheBenchmarks : IDisposable
 
     public void Dispose()
     {
-        _serviceProvider?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _serviceProvider?.Dispose();
+            }
+            _disposed = true;
+        }
     }
 }
