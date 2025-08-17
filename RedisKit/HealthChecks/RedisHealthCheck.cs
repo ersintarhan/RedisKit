@@ -42,7 +42,7 @@ public class RedisHealthCheck : IHealthCheck
 
             // Check if connection is available
             var multiplexer = await _connection.GetMultiplexerAsync().ConfigureAwait(false);
-            if (multiplexer == null || !multiplexer.IsConnected)
+            if (!multiplexer.IsConnected)
             {
                 _logger.LogWarning("Redis health check failed: Connection not available");
                 return HealthCheckResult.Unhealthy("Redis connection is not available");
