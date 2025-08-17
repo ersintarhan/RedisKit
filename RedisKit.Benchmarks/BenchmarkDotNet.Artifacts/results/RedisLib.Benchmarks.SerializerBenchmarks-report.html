@@ -1,15 +1,32 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-<meta charset='utf-8' />
-<title>RedisLib.Benchmarks.SerializerBenchmarks-20250816-014206</title>
+    <meta charset='utf-8'/>
+    <title>RedisLib.Benchmarks.SerializerBenchmarks-20250816-014206</title>
 
-<style type="text/css">
-	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
-	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
-	tr { background-color: #fff; border-top: 1px solid #ccc; }
-	tr:nth-child(even) { background: #f8f8f8; }
-</style>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+            display: block;
+            width: 100%;
+            overflow: auto;
+        }
+
+        td, th {
+            padding: 6px 13px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        tr {
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+    </style>
 </head>
 <body>
 <pre><code>
@@ -22,20 +39,153 @@ Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
 <pre><code></code></pre>
 
 <table>
-<thead><tr><th>Method                      </th><th>Mean </th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
-</tr>
-</thead><tbody><tr><td>Json_Serialize_Small</td><td>331.8 ns</td><td>0.71 ns</td><td>0.63 ns</td><td>1.00</td><td>0.00</td><td>0.0854</td><td>536 B</td><td>1.00</td>
-</tr><tr><td>MessagePack_Serialize_Small</td><td>143.2 ns</td><td>0.22 ns</td><td>0.21 ns</td><td>0.43</td><td>0.00</td><td>0.0153</td><td>96 B</td><td>0.18</td>
-</tr><tr><td>Json_Serialize_Large</td><td>3,569.1 ns</td><td>71.11 ns</td><td>94.93 ns</td><td>10.76</td><td>0.28</td><td>1.6365</td><td>10288 B</td><td>19.19</td>
-</tr><tr><td>MessagePack_Serialize_Large</td><td>1,940.7 ns</td><td>26.77 ns</td><td>25.04 ns</td><td>5.85</td><td>0.07</td><td>1.5373</td><td>9664 B</td><td>18.03</td>
-</tr><tr><td>Json_Serialize_Array</td><td>28,143.8 ns</td><td>555.47 ns</td><td>594.35 ns</td><td>84.82</td><td>1.75</td><td>2.9602</td><td>18640 B</td><td>34.78</td>
-</tr><tr><td>MessagePack_Serialize_Array</td><td>11,556.8 ns</td><td>22.25 ns</td><td>19.73 ns</td><td>34.83</td><td>0.09</td><td>0.9155</td><td>5800 B</td><td>10.82</td>
-</tr><tr><td>Json_Deserialize_Small</td><td>628.0 ns</td><td>2.22 ns</td><td>2.08 ns</td><td>1.89</td><td>0.01</td><td>0.1688</td><td>1064 B</td><td>1.99</td>
-</tr><tr><td>MessagePack_Deserialize_Small</td><td>256.5 ns</td><td>1.03 ns</td><td>0.91 ns</td><td>0.77</td><td>0.00</td><td>0.0801</td><td>504 B</td><td>0.94</td>
-</tr><tr><td>Json_SerializeAsync_Small</td><td>355.9 ns</td><td>3.26 ns</td><td>3.05 ns</td><td>1.07</td><td>0.01</td><td>0.1082</td><td>680 B</td><td>1.27</td>
-</tr><tr><td>MessagePack_SerializeAsync_Small</td><td>173.8 ns</td><td>1.19 ns</td><td>1.11 ns</td><td>0.52</td><td>0.00</td><td>0.0381</td><td>240 B</td><td>0.45</td>
-</tr><tr><td>Json_DeserializeAsync_Small</td><td>823.8 ns</td><td>1.33 ns</td><td>1.25 ns</td><td>2.48</td><td>0.01</td><td>0.2022</td><td>1272 B</td><td>2.37</td>
-</tr><tr><td>MessagePack_DeserializeAsync_Small</td><td>290.0 ns</td><td>0.83 ns</td><td>0.69 ns</td><td>0.87</td><td>0.00</td><td>0.1030</td><td>648 B</td><td>1.21</td>
-</tr></tbody></table>
+    <thead>
+    <tr>
+        <th>Method</th>
+        <th>Mean</th>
+        <th>Error</th>
+        <th>StdDev</th>
+        <th>Ratio</th>
+        <th>RatioSD</th>
+        <th>Gen0</th>
+        <th>Allocated</th>
+        <th>Alloc Ratio</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Json_Serialize_Small</td>
+        <td>331.8 ns</td>
+        <td>0.71 ns</td>
+        <td>0.63 ns</td>
+        <td>1.00</td>
+        <td>0.00</td>
+        <td>0.0854</td>
+        <td>536 B</td>
+        <td>1.00</td>
+    </tr>
+    <tr>
+        <td>MessagePack_Serialize_Small</td>
+        <td>143.2 ns</td>
+        <td>0.22 ns</td>
+        <td>0.21 ns</td>
+        <td>0.43</td>
+        <td>0.00</td>
+        <td>0.0153</td>
+        <td>96 B</td>
+        <td>0.18</td>
+    </tr>
+    <tr>
+        <td>Json_Serialize_Large</td>
+        <td>3,569.1 ns</td>
+        <td>71.11 ns</td>
+        <td>94.93 ns</td>
+        <td>10.76</td>
+        <td>0.28</td>
+        <td>1.6365</td>
+        <td>10288 B</td>
+        <td>19.19</td>
+    </tr>
+    <tr>
+        <td>MessagePack_Serialize_Large</td>
+        <td>1,940.7 ns</td>
+        <td>26.77 ns</td>
+        <td>25.04 ns</td>
+        <td>5.85</td>
+        <td>0.07</td>
+        <td>1.5373</td>
+        <td>9664 B</td>
+        <td>18.03</td>
+    </tr>
+    <tr>
+        <td>Json_Serialize_Array</td>
+        <td>28,143.8 ns</td>
+        <td>555.47 ns</td>
+        <td>594.35 ns</td>
+        <td>84.82</td>
+        <td>1.75</td>
+        <td>2.9602</td>
+        <td>18640 B</td>
+        <td>34.78</td>
+    </tr>
+    <tr>
+        <td>MessagePack_Serialize_Array</td>
+        <td>11,556.8 ns</td>
+        <td>22.25 ns</td>
+        <td>19.73 ns</td>
+        <td>34.83</td>
+        <td>0.09</td>
+        <td>0.9155</td>
+        <td>5800 B</td>
+        <td>10.82</td>
+    </tr>
+    <tr>
+        <td>Json_Deserialize_Small</td>
+        <td>628.0 ns</td>
+        <td>2.22 ns</td>
+        <td>2.08 ns</td>
+        <td>1.89</td>
+        <td>0.01</td>
+        <td>0.1688</td>
+        <td>1064 B</td>
+        <td>1.99</td>
+    </tr>
+    <tr>
+        <td>MessagePack_Deserialize_Small</td>
+        <td>256.5 ns</td>
+        <td>1.03 ns</td>
+        <td>0.91 ns</td>
+        <td>0.77</td>
+        <td>0.00</td>
+        <td>0.0801</td>
+        <td>504 B</td>
+        <td>0.94</td>
+    </tr>
+    <tr>
+        <td>Json_SerializeAsync_Small</td>
+        <td>355.9 ns</td>
+        <td>3.26 ns</td>
+        <td>3.05 ns</td>
+        <td>1.07</td>
+        <td>0.01</td>
+        <td>0.1082</td>
+        <td>680 B</td>
+        <td>1.27</td>
+    </tr>
+    <tr>
+        <td>MessagePack_SerializeAsync_Small</td>
+        <td>173.8 ns</td>
+        <td>1.19 ns</td>
+        <td>1.11 ns</td>
+        <td>0.52</td>
+        <td>0.00</td>
+        <td>0.0381</td>
+        <td>240 B</td>
+        <td>0.45</td>
+    </tr>
+    <tr>
+        <td>Json_DeserializeAsync_Small</td>
+        <td>823.8 ns</td>
+        <td>1.33 ns</td>
+        <td>1.25 ns</td>
+        <td>2.48</td>
+        <td>0.01</td>
+        <td>0.2022</td>
+        <td>1272 B</td>
+        <td>2.37</td>
+    </tr>
+    <tr>
+        <td>MessagePack_DeserializeAsync_Small</td>
+        <td>290.0 ns</td>
+        <td>0.83 ns</td>
+        <td>0.69 ns</td>
+        <td>0.87</td>
+        <td>0.00</td>
+        <td>0.1030</td>
+        <td>648 B</td>
+        <td>1.21</td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

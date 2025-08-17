@@ -5,21 +5,27 @@ This project contains performance benchmarks for the RedisLib library using Benc
 ## Benchmark Categories
 
 ### 1. **SerializerBenchmarks**
+
 Tests the performance of different serialization methods:
+
 - **JSON vs MessagePack** serialization/deserialization
 - **Small, Large, and Array** object scenarios
 - **Sync vs Async** operations
 - **Memory allocation** analysis
 
 ### 2. **CacheBenchmarks**
+
 Tests cache operation performance:
+
 - **Single vs Batch** operations
 - **Set/Get/Delete** operations
 - **Pipeline** effectiveness
 - **TTL handling** performance
 
 ### 3. **PubSubBenchmarks**
+
 Tests pub/sub operation performance:
+
 - **Single vs Multiple** channel publishing
 - **Pattern subscriptions** performance
 - **Subscribe/Unsubscribe** overhead
@@ -28,6 +34,7 @@ Tests pub/sub operation performance:
 ## Running Benchmarks
 
 ### Prerequisites
+
 - .NET 9.0 SDK
 - Redis server running (for integration benchmarks)
 
@@ -65,16 +72,19 @@ dotnet run -c Release --filter "*PubSubBenchmarks*"
 ### Expected Performance Characteristics
 
 #### **Serialization Performance**
+
 - **MessagePack**: ~2-5x faster than JSON, ~60% smaller payload
 - **JSON**: More readable, better tooling support
 - **Memory**: MessagePack generates less garbage
 
 #### **Cache Operations**
+
 - **Batch operations**: ~5-10x more efficient than individual operations
 - **Pipeline**: Reduces network round trips significantly
 - **Memory**: Efficient object pooling reduces allocations
 
 #### **Pub/Sub Operations**
+
 - **Pattern subscriptions**: Slightly higher overhead than direct subscriptions
 - **Parallel publishing**: Better throughput for multiple channels
 - **Subscribe/Unsubscribe**: Low overhead for dynamic subscriptions
@@ -106,6 +116,7 @@ BenchmarkDotNet provides several metrics:
 ## Configuration
 
 Benchmarks use production-like configuration:
+
 - **Release build** for accurate performance measurement
 - **MessagePack** serialization for optimal performance
 - **Connection pooling** enabled
@@ -114,6 +125,7 @@ Benchmarks use production-like configuration:
 ## CI Integration
 
 These benchmarks can be integrated into CI/CD pipelines to:
+
 - **Track performance regressions** over time
 - **Compare branches** for performance impact
 - **Generate performance reports** for releases
