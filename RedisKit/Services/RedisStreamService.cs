@@ -358,13 +358,13 @@ namespace RedisKit.Services
                     {
                         try
                         {
-                            var deserialized = await _serializer.DeserializeAsync<T>(value, cancellationToken: cancellationToken);
-                            result[entry.Id] = deserialized;
+                            var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken: cancellationToken);
+                            result[entry.Id!] = deserialized;
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
-                            result[entry.Id] = null;
+                            result[entry.Id!] = null;
                         }
                     }
                 }
@@ -511,14 +511,14 @@ namespace RedisKit.Services
                     {
                         try
                         {
-                            var deserialized = await _serializer.DeserializeAsync<T>(value, cancellationToken: cancellationToken);
-                            result[entry.Id] = deserialized;
+                            var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken: cancellationToken);
+                            result[entry.Id!] = deserialized;
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Error deserializing claimed message from stream {Stream} with ID {Id}",
                                 prefixedStream, entry.Id);
-                            result[entry.Id] = null;
+                            result[entry.Id!] = null;
                         }
                     }
                 }
@@ -656,7 +656,7 @@ namespace RedisKit.Services
                 {
                     try
                     {
-                        originalMessage = await _serializer.DeserializeAsync<T>(value, cancellationToken);
+                        originalMessage = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
                     }
                     catch (Exception ex)
                     {

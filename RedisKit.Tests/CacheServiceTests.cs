@@ -49,7 +49,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
-                await cacheService.GetAsync<TestModel>(null));
+                await cacheService.GetAsync<TestModel>(null!));
         }
 
         [Fact]

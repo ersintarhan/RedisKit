@@ -44,7 +44,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisStreamService(null, _mockLogger.Object, _options));
+                new RedisStreamService(null!, _mockLogger.Object, _options));
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisStreamService(_mockDatabase.Object, null, _options));
+                new RedisStreamService(_mockDatabase.Object, null!, _options));
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisStreamService(_mockDatabase.Object, _mockLogger.Object, null));
+                new RedisStreamService(_mockDatabase.Object, _mockLogger.Object, null!));
         }
 
         [Fact]
@@ -321,6 +321,13 @@ namespace RedisKit.Tests
 
             // Assert
             // Exception is thrown, but CreateConsumerGroupAsync returns void
+            // Verify the mock was called to ensure the method executed
+            _mockDatabase.Verify(x => x.StreamCreateConsumerGroupAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<RedisValue>(),
+                It.IsAny<RedisValue?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()), Times.Once);
         }
 
         [Fact]

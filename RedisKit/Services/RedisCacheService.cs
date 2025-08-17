@@ -178,66 +178,94 @@ namespace RedisKit.Services
                 Logging.LoggingExtensions.LogSetManyAsync(_logger, values.Count);
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                // Check Lua script support (once)
-                if (_supportsLuaScripts == null)
-                {
-                    _supportsLuaScripts = await CheckLuaScriptSupport();
-                }
-
-                // Adaptive chunk size based on data size
-                var chunkSize = CalculateOptimalChunkSize(values.Count);
-                var processedCount = 0;
-
-                foreach (var chunk in values.Chunk(chunkSize))
-                {
-                    // Parallel serialization for better performance
-                    var serializeTasks = chunk.Select(async kvp =>
-                    {
-                        if (string.IsNullOrEmpty(kvp.Key))
-                            throw new ArgumentException("Key cannot be null or empty", nameof(values));
-                        if (kvp.Value == null)
-                            throw new ArgumentNullException(nameof(values));
-
-                        var prefixedKey = $"{_keyPrefix}{kvp.Key}";
-                        var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken).ConfigureAwait(false);
-                        return (Key: (RedisKey)prefixedKey, Value: (RedisValue)serialized);
-                    }).ToArray();
-
-                    var serializedPairs = await Task.WhenAll(serializeTasks);
-
-                    // Choose strategy based on capabilities and configuration
-                    if (_supportsLuaScripts.Value && !_useFallbackMode && expiry != TimeSpan.Zero)
-                    {
-                        await SetManyWithLuaScript(serializedPairs, expiry);
-                    }
-                    else
-                    {
-                        await SetManyWithFallback(serializedPairs, expiry);
-                    }
-
-                    processedCount += chunk.Count();
-
-                    // Progress logging for large datasets
-                    if (values.Count > 10000 && processedCount % 5000 == 0)
-                    {
-                        Logging.LoggingExtensions.LogSetManyAsyncProgress(_logger, processedCount, values.Count);
-                    }
-                }
+                await EnsureLuaScriptSupportChecked();
+                
+                await ProcessBatchesAsync(values, expiry, cancellationToken);
 
                 stopwatch.Stop();
                 Logging.LoggingExtensions.LogSetManyAsyncSuccess(_logger, values.Count);
-
-                // Performance monitoring
-                if (stopwatch.ElapsedMilliseconds > 1000)
-                {
-                    Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, values.Count, stopwatch.ElapsedMilliseconds,
-                        _supportsLuaScripts.Value ? "Lua" : "Fallback");
-                }
+                
+                LogPerformanceIfSlow(stopwatch, values.Count);
             }
             catch (Exception ex)
             {
                 Logging.LoggingExtensions.LogSetManyAsyncError(_logger, ex);
                 throw;
+            }
+        }
+
+        private async Task EnsureLuaScriptSupportChecked()
+        {
+            if (_supportsLuaScripts == null)
+            {
+                _supportsLuaScripts = await CheckLuaScriptSupport();
+            }
+        }
+
+        private async Task ProcessBatchesAsync<T>(IDictionary<string, T> values, TimeSpan expiry, CancellationToken cancellationToken) where T : class
+        {
+            var chunkSize = CalculateOptimalChunkSize(values.Count);
+            var processedCount = 0;
+
+            foreach (var chunk in values.Chunk(chunkSize))
+            {
+                var serializedPairs = await SerializeChunkAsync(chunk, cancellationToken);
+                await SetChunkAsync(serializedPairs, expiry);
+                
+                processedCount += chunk.Count();
+                LogProgressIfNeeded(values.Count, processedCount);
+            }
+        }
+
+        private async Task<(RedisKey Key, RedisValue Value)[]> SerializeChunkAsync<T>(IEnumerable<KeyValuePair<string, T>> chunk, CancellationToken cancellationToken) where T : class
+        {
+            var serializeTasks = chunk.Select(kvp => SerializeKeyValuePairAsync(kvp, cancellationToken)).ToArray();
+            return await Task.WhenAll(serializeTasks);
+        }
+
+        private async Task<(RedisKey Key, RedisValue Value)> SerializeKeyValuePairAsync<T>(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) where T : class
+        {
+            ValidateKeyValuePair(kvp);
+            
+            var prefixedKey = $"{_keyPrefix}{kvp.Key}";
+            var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken).ConfigureAwait(false);
+            return ((RedisKey)prefixedKey, (RedisValue)serialized);
+        }
+
+        private static void ValidateKeyValuePair<T>(KeyValuePair<string, T> kvp) where T : class
+        {
+            if (string.IsNullOrEmpty(kvp.Key))
+                throw new ArgumentException("Key cannot be null or empty");
+            if (kvp.Value == null)
+                throw new ArgumentNullException("Value cannot be null");
+        }
+
+        private async Task SetChunkAsync((RedisKey Key, RedisValue Value)[] serializedPairs, TimeSpan expiry)
+        {
+            if (_supportsLuaScripts.Value && !_useFallbackMode && expiry != TimeSpan.Zero)
+            {
+                await SetManyWithLuaScript(serializedPairs, expiry);
+            }
+            else
+            {
+                await SetManyWithFallback(serializedPairs, expiry);
+            }
+        }
+
+        private void LogProgressIfNeeded(int totalCount, int processedCount)
+        {
+            if (totalCount > 10000 && processedCount % 5000 == 0)
+            {
+                Logging.LoggingExtensions.LogSetManyAsyncProgress(_logger, processedCount, totalCount);
+            }
+        }
+
+        private void LogPerformanceIfSlow(System.Diagnostics.Stopwatch stopwatch, int count)
+        {
+            if (stopwatch.ElapsedMilliseconds > 1000)
+            {
+                Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, count, stopwatch.ElapsedMilliseconds,
+                    _supportsLuaScripts.Value ? "Lua" : "Fallback");
             }
         }
 

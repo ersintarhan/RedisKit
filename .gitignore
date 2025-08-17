@@ -40,3 +40,4 @@ logs/
 *.temp
 .junie/guidelines.md
 CLAUDE.md
+/.sonarqube

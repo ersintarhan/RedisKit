@@ -51,7 +51,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisPubSubService(null, _mockLogger.Object, _options));
+                new RedisPubSubService(null!, _mockLogger.Object, _options));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisPubSubService(_mockSubscriber.Object, null, _options));
+                new RedisPubSubService(_mockSubscriber.Object, null!, _options));
         }
 
         [Fact]
