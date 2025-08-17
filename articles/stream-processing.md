@@ -235,6 +235,60 @@ public class MessageReclaimer
 }
 ```
 
+### Streaming API (Memory-Efficient Processing)
+
+Process large streams without loading everything into memory:
+
+```csharp
+public class StreamingProcessor
+{
+    private readonly IRedisStreamService _streams;
+    
+    public async Task ProcessLargeStreamAsync(CancellationToken ct)
+    {
+        // Memory-efficient streaming with IAsyncEnumerable
+        await foreach (var (id, data) in _streams.ReadStreamingAsync<OrderEvent>(
+            "orders:stream",
+            start: "-",  // From beginning
+            batchSize: 100,
+            ct))
+        {
+            if (data != null)
+            {
+                Console.WriteLine($"Processing order {id}: {data.OrderId}");
+                await ProcessOrderAsync(data);
+            }
+        }
+    }
+    
+    public async Task ProcessWithAutoAckAsync(CancellationToken ct)
+    {
+        // Streaming with automatic acknowledgment
+        await foreach (var (id, data, ackFunc) in _streams.ReadGroupStreamingAsync<OrderEvent>(
+            "orders:stream",
+            "processing-group",
+            "worker-1",
+            batchSize: 10,
+            ct))
+        {
+            if (data != null)
+            {
+                try
+                {
+                    await ProcessOrderAsync(data);
+                    await ackFunc(); // Acknowledge on success
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to process {id}: {ex.Message}");
+                    // Message remains unacknowledged for retry
+                }
+            }
+        }
+    }
+}
+```
+
 ### Stream Aggregation
 
 Aggregate data from multiple streams:

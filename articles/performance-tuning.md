@@ -102,6 +102,72 @@ public class OptimizedSerializer : IRedisSerializer
 }
 ```
 
+## Memory Optimization
+
+### Object Pooling
+
+RedisKit uses ArrayPool and ObjectPool to minimize allocations:
+
+```csharp
+// RedisKit internally uses memory pooling for batch operations
+public class OptimizedStreamService
+{
+    // Automatic memory optimization features:
+    // - ArrayPool<string> for temporary string arrays
+    // - ObjectPool<List<T>> for result collections
+    // - Optimized batch processing with size-based strategies
+    
+    public async Task ProcessLargeBatchAsync()
+    {
+        // Small batches (≤100 items): Sequential processing with array pooling
+        // Large batches (>100 items): Parallel processing with object pooling
+        
+        var messages = GenerateMessages(1000);
+        
+        // RedisKit automatically optimizes memory usage
+        var messageIds = await _streams.AddBatchAsync(
+            "events:stream",
+            messages,
+            maxLength: 100000);
+    }
+}
+```
+
+### Streaming API for Large Datasets
+
+Process large amounts of data without loading everything into memory:
+
+```csharp
+public class MemoryEfficientProcessor
+{
+    private readonly IRedisStreamService _streams;
+    
+    public async Task ProcessMillionsOfEventsAsync(CancellationToken ct)
+    {
+        // IAsyncEnumerable - processes data in chunks
+        await foreach (var (id, data) in _streams.ReadStreamingAsync<Event>(
+            "events:stream",
+            batchSize: 100,  // Process 100 at a time
+            cancellationToken: ct))
+        {
+            // Each batch is processed and released
+            // Memory usage remains constant regardless of stream size
+            await ProcessEventAsync(data);
+        }
+    }
+}
+```
+
+### Dynamic Parallelism
+
+RedisKit automatically adjusts parallelism based on CPU cores:
+
+```csharp
+// Internally optimized:
+// MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount * 2, 8)
+// This ensures optimal CPU utilization without overwhelming the system
+```
+
 ## Batching and Pipelining
 
 ### Batch Operations

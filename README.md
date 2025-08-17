@@ -30,6 +30,15 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **🚀 Lua Script Optimization**: 90-95% performance improvement for batch operations
 - **📝 Source-Generated Logging**: Zero-allocation high-performance logging
 
+### Performance & Memory Optimizations
+
+- **💾 Object Pooling**: ArrayPool and ObjectPool for reduced GC pressure
+- **🌊 Streaming API**: IAsyncEnumerable for processing large datasets without memory overhead
+- **🎛️ Dynamic Parallelism**: CPU-aware parallel processing (auto-scales with cores)
+- **📦 Smart Batching**: Size-based strategy selection for optimal performance
+- **⚡ Inline Optimizations**: AggressiveInlining for hot paths
+- **🔄 Zero-Copy Operations**: Minimal allocations in critical paths
+
 ## 📦 Installation
 
 Install the package via NuGet:
