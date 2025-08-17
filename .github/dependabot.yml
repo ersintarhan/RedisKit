@@ -1,0 +1,92 @@
+# Dependabot configuration for automatic dependency updates
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for NuGet packages
+  - package-ecosystem: "nuget"
+    # Look for NuGet packages in the repository root
+    directory: "/"
+    # Check for updates weekly on Monday
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Istanbul"
+    # Limit open pull requests for NuGet updates
+    open-pull-requests-limit: 10
+    # Allow both direct and indirect (transitive) dependency updates
+    allow:
+      - dependency-type: "all"
+    # Group related updates together
+    groups:
+      # Group all Microsoft.Extensions packages together
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group all test-related packages
+      test-dependencies:
+        patterns:
+          - "xunit*"
+          - "Moq"
+          - "NSubstitute"
+          - "coverlet.*"
+          - "Microsoft.NET.Test.Sdk"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group all StackExchange.Redis updates
+      redis:
+        patterns:
+          - "StackExchange.Redis*"
+          - "Pipelines.Sockets.Unofficial"
+        update-types:
+          - "minor"
+          - "patch"
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "nuget"
+      - "automated"
+    # Add reviewers
+    reviewers:
+      - "ersintarhan"
+    # Commit message prefix
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Target branch for PRs
+    target-branch: "master"
+    # Ignore specific updates if needed
+    ignore:
+      # Example: Ignore major version updates for StackExchange.Redis
+      # - dependency-name: "StackExchange.Redis"
+      #   update-types: ["version-update:semver-major"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Istanbul"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    reviewers:
+      - "ersintarhan"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    target-branch: "master"
+
+  # Enable security updates (these are handled separately from version updates)
+  # Security updates are automatically enabled and cannot be disabled
+  # They create PRs immediately when vulnerabilities are discovered

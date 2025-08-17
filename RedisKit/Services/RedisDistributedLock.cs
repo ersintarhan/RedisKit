@@ -63,7 +63,7 @@ namespace RedisKit.Services
                         lockId,
                         expiry,
                         _options.EnableAutoRenewal,
-                        _logger as ILogger<RedisLockHandle>);
+                        null); // Logger type mismatch - RedisLockHandle will work without logger
                 }
 
                 _logger?.LogDebug("Failed to acquire lock for resource: {Resource} - already locked", resource);
