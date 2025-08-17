@@ -206,7 +206,7 @@ namespace RedisKit.Tests
 
             // Assert - Should complete without deadlock
             var allCompleted = Task.WaitAll(tasks, TimeSpan.FromSeconds(10)); // Increased timeout for CI
-            Assert.True(allCompleted, "Concurrent connection attempts should not deadlock")
+            Assert.True(allCompleted, "Concurrent connection attempts should not deadlock");
         }
 
         #endregion
