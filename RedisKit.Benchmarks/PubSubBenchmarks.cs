@@ -33,9 +33,9 @@ public class PubSubBenchmarks : IDisposable
     public async Task Setup()
     {
         var services = new ServiceCollection();
-        
+
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
-        
+
         services.AddRedisServices(options =>
         {
             options.ConnectionString = "localhost:6379"; // Will be mocked
@@ -85,7 +85,7 @@ public class PubSubBenchmarks : IDisposable
         var token = await _pubSubService.SubscribeAsync<TestMessage>(
             "benchmark:temp",
             async (msg, ct) => await Task.CompletedTask);
-        
+
         await token.UnsubscribeAsync();
     }
 
@@ -95,7 +95,7 @@ public class PubSubBenchmarks : IDisposable
         var token = await _pubSubService.SubscribePatternAsync<TestMessage>(
             "benchmark:pattern:*",
             async (msg, ct) => await Task.CompletedTask);
-        
+
         await token.UnsubscribeAsync();
     }
 

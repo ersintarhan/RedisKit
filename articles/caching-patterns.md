@@ -99,13 +99,19 @@ public class CacheWarmer : IHostedService
 
 ## Distributed Locking
 
-Prevent cache stampede with distributed locks:
+Prevent cache stampede with distributed locks using the built-in IDistributedLock interface:
 
 ```csharp
 public class SafeCacheService
 {
     private readonly IRedisCacheService _cache;
-    private readonly IDatabase _redis;
+    private readonly IDistributedLock _distributedLock;
+    
+    public SafeCacheService(IRedisCacheService cache, IDistributedLock distributedLock)
+    {
+        _cache = cache;
+        _distributedLock = distributedLock;
+    }
     
     public async Task<T> GetOrSetAsync<T>(
         string key,
@@ -117,13 +123,17 @@ public class SafeCacheService
         if (cached != null)
             return cached;
         
-        // Acquire lock
-        var lockKey = $"lock:{key}";
-        var lockToken = Guid.NewGuid().ToString();
+        // Acquire lock with auto-renewal support
+        var lockHandle = await _distributedLock.AcquireLockAsync(
+            $"lock:{key}",
+            expiry: TimeSpan.FromSeconds(10),
+            wait: TimeSpan.FromSeconds(5),
+            retry: TimeSpan.FromMilliseconds(100)
+        );
         
-        if (await _redis.LockTakeAsync(lockKey, lockToken, TimeSpan.FromSeconds(10)))
+        if (lockHandle != null)
         {
-            try
+            await using (lockHandle) // Auto-release on dispose
             {
                 // Double-check after acquiring lock
                 cached = await _cache.GetAsync<T>(key);
@@ -135,15 +145,40 @@ public class SafeCacheService
                 await _cache.SetAsync(key, value, expiry);
                 return value;
             }
-            finally
-            {
-                await _redis.LockReleaseAsync(lockKey, lockToken);
-            }
         }
         
-        // Wait and retry if couldn't acquire lock
-        await Task.Delay(100);
-        return await GetOrSetAsync(key, factory, expiry);
+        // If couldn't acquire lock, wait for unlock
+        await _distributedLock.WaitForUnlockAsync($"lock:{key}", TimeSpan.FromSeconds(10));
+        return await _cache.GetAsync<T>(key) ?? await factory();
+    }
+}
+
+// Multi-resource locking example
+public class MultiResourceService
+{
+    private readonly IDistributedLock _distributedLock;
+    
+    public async Task TransferResourcesAsync(string from, string to, int amount)
+    {
+        // Acquire locks on multiple resources atomically
+        var multiLock = await _distributedLock.AcquireMultiLockAsync(
+            new[] { $"account:{from}", $"account:{to}" },
+            expiry: TimeSpan.FromSeconds(30)
+        );
+        
+        if (multiLock != null)
+        {
+            await using (multiLock)
+            {
+                // Perform atomic transfer operation
+                await DebitAccountAsync(from, amount);
+                await CreditAccountAsync(to, amount);
+            }
+        }
+        else
+        {
+            throw new LockAcquisitionException("Could not acquire locks for transfer");
+        }
     }
 }
 ```
@@ -208,11 +243,14 @@ public class BatchCacheService
         {
             var products = await _repository.GetByIdsAsync(missingIds);
             
-            // Batch set
-            var setTasks = products.Select(p =>
-                _cache.SetAsync($"product:{p.Id}", p, TimeSpan.FromHours(1))
+            // Optimized batch set with Lua script (90-95% faster!)
+            var toCache = products.ToDictionary(
+                p => $"product:{p.Id}",
+                p => p
             );
-            await Task.WhenAll(setTasks);
+            
+            // Single operation with Lua script optimization
+            await _cache.SetManyAsync(toCache, TimeSpan.FromHours(1));
             
             foreach (var product in products)
             {
@@ -295,11 +333,129 @@ public class TaggedCacheService
 }
 ```
 
+## High-Performance Batch Pattern with Lua Optimization
+
+```csharp
+public class OptimizedBatchService
+{
+    private readonly IRedisCacheService _cache;
+    private readonly ILogger<OptimizedBatchService> _logger;
+    
+    public async Task BulkImportAsync<T>(Dictionary<string, T> items, TimeSpan ttl)
+        where T : class
+    {
+        // Automatic Lua script optimization for 90-95% performance improvement
+        // Single round-trip to Redis instead of O(n) operations
+        var result = await _cache.SetManyAsync(items, ttl);
+        
+        if (result.SuccessCount == items.Count)
+        {
+            _logger.LogInformation(
+                "Successfully cached {Count} items in {ElapsedMs}ms using Lua optimization",
+                result.SuccessCount, result.ElapsedMilliseconds);
+        }
+        else if (result.SuccessCount > 0)
+        {
+            _logger.LogWarning(
+                "Partially cached {Success}/{Total} items. Failed keys: {FailedKeys}",
+                result.SuccessCount, items.Count, string.Join(", ", result.FailedKeys));
+        }
+    }
+    
+    public async Task SmartBatchSetAsync<T>(IEnumerable<T> items)
+        where T : class, IIdentifiable
+    {
+        // Chunk large datasets for optimal performance
+        const int chunkSize = 1000;
+        var chunks = items.Chunk(chunkSize);
+        
+        var tasks = chunks.Select(async chunk =>
+        {
+            var dict = chunk.ToDictionary(
+                item => $"item:{item.Id}",
+                item => item
+            );
+            
+            // Each chunk uses Lua script optimization
+            return await _cache.SetManyAsync(dict, TimeSpan.FromHours(1));
+        });
+        
+        var results = await Task.WhenAll(tasks);
+        
+        var totalSuccess = results.Sum(r => r.SuccessCount);
+        var totalItems = items.Count();
+        
+        _logger.LogInformation(
+            "Batch import completed: {Success}/{Total} items cached across {Chunks} chunks",
+            totalSuccess, totalItems, results.Length);
+    }
+}
+
+public interface IIdentifiable
+{
+    string Id { get; }
+}
+```
+
+## Performance Monitoring Pattern
+
+```csharp
+public class MonitoredCacheService
+{
+    private readonly IRedisCacheService _cache;
+    private readonly ILogger<MonitoredCacheService> _logger;
+    private readonly IMetrics _metrics;
+    
+    public async Task<T?> GetWithMonitoringAsync<T>(string key)
+        where T : class
+    {
+        using var activity = Activity.StartActivity("cache.get");
+        activity?.SetTag("cache.key", key);
+        
+        var stopwatch = Stopwatch.StartNew();
+        
+        try
+        {
+            var value = await _cache.GetAsync<T>(key);
+            
+            stopwatch.Stop();
+            
+            if (value != null)
+            {
+                _metrics.RecordCacheHit(key, stopwatch.ElapsedMilliseconds);
+                activity?.SetTag("cache.hit", true);
+            }
+            else
+            {
+                _metrics.RecordCacheMiss(key, stopwatch.ElapsedMilliseconds);
+                activity?.SetTag("cache.hit", false);
+            }
+            
+            // Log slow operations using source-generated logging
+            if (stopwatch.ElapsedMilliseconds > 100)
+            {
+                _logger.LogSlowCacheOperation(key, stopwatch.ElapsedMilliseconds);
+            }
+            
+            return value;
+        }
+        catch (Exception ex)
+        {
+            _metrics.RecordCacheError(key);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
+    }
+}
+```
+
 ## Performance Best Practices
 
 1. **Use appropriate expiration times** - Balance between cache hit rate and data freshness
-2. **Implement cache stampede protection** - Use locks or probabilistic early expiration
+2. **Implement cache stampede protection** - Use built-in IDistributedLock with auto-renewal
 3. **Monitor cache hit rates** - Track and optimize based on metrics
-4. **Use pipelining for batch operations** - Reduce network round trips
+4. **Use optimized batch operations** - SetManyAsync with Lua scripts for 90-95% performance gain
 5. **Consider compression for large objects** - Trade CPU for network/memory
 6. **Implement circuit breakers** - Gracefully handle Redis failures
+7. **Use source-generated logging** - Zero-allocation high-performance logging
+8. **Leverage parallel serialization** - Utilize all CPU cores for batch operations

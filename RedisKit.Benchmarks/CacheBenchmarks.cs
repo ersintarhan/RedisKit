@@ -48,9 +48,9 @@ public class CacheBenchmarks : IDisposable
     public async Task Setup()
     {
         var services = new ServiceCollection();
-        
+
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
-        
+
         // Mock Redis for benchmarking (we'll use in-memory mock)
         services.AddRedisServices(options =>
         {
