@@ -50,24 +50,31 @@ namespace RedisKit.Tests
         }
 
         [Fact]
-        public void MessagePackSerializer_Serialize_WithNullObject_ThrowsArgumentNullException()
+        public void MessagePackSerializer_Serialize_WithNullObject_ReturnsValidBytes()
         {
             // Arrange
             var serializer = new MessagePackRedisSerializer();
 
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null!));
+            // Act
+            var result = serializer.Serialize<TestModel>(null!);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result); // MessagePack serializes null as a valid value
         }
 
         [Fact]
-        public async Task MessagePackSerializer_SerializeAsync_WithNullObject_ThrowsArgumentNullException()
+        public async Task MessagePackSerializer_SerializeAsync_WithNullObject_ReturnsValidBytes()
         {
             // Arrange
             var serializer = new MessagePackRedisSerializer();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                serializer.SerializeAsync<TestModel>(null!));
+            // Act
+            var result = await serializer.SerializeAsync<TestModel>(null!);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result); // MessagePack serializes null as a valid value
         }
 
         [Fact]
@@ -249,24 +256,35 @@ namespace RedisKit.Tests
         }
 
         [Fact]
-        public void JsonSerializer_Serialize_WithNullObject_ThrowsArgumentNullException()
+        public void JsonSerializer_Serialize_WithNullObject_ReturnsValidBytes()
         {
             // Arrange
             var serializer = new SystemTextJsonRedisSerializer();
 
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null!));
+            // Act
+            var result = serializer.Serialize<TestModel>(null!);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result); // JSON serializes null as "null"
+            var json = System.Text.Encoding.UTF8.GetString(result);
+            Assert.Equal("null", json);
         }
 
         [Fact]
-        public async Task JsonSerializer_SerializeAsync_WithNullObject_ThrowsArgumentNullException()
+        public async Task JsonSerializer_SerializeAsync_WithNullObject_ReturnsValidBytes()
         {
             // Arrange
             var serializer = new SystemTextJsonRedisSerializer();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                serializer.SerializeAsync<TestModel>(null!));
+            // Act
+            var result = await serializer.SerializeAsync<TestModel>(null!);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result); // JSON serializes null as "null"
+            var json = System.Text.Encoding.UTF8.GetString(result);
+            Assert.Equal("null", json);
         }
 
         [Fact]

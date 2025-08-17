@@ -139,6 +139,9 @@ namespace RedisKit.Services
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
 
             // Create serializer based on configuration
             _serializer = RedisSerializerFactory.Create(options.Serializer);
