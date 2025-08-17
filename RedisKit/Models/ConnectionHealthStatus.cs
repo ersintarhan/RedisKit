@@ -8,6 +8,7 @@ public class ConnectionHealthStatus
     public bool IsHealthy { get; set; }
     public DateTime LastCheckTime { get; set; }
     public TimeSpan ResponseTime { get; set; }
+    public TimeSpan? LastResponseTime { get; set; }
     public string? LastError { get; set; }
     public int ConsecutiveFailures { get; set; }
     public CircuitState CircuitState { get; set; }

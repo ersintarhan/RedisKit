@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using RedisKit.Exceptions;
+using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Utilities;
 using StackExchange.Redis;
@@ -70,9 +71,9 @@ namespace RedisKit.Services;
 /// var db = await connection.GetDatabaseAsync().ConfigureAwait(false);
 /// </code>
 /// </remarks>
-internal class RedisConnection : IDisposable
+public class RedisConnection : IDisposable
 {
-    private readonly RedisCircuitBreaker _circuitBreaker;
+    private readonly IRedisCircuitBreaker _circuitBreaker;
     private readonly SemaphoreSlim _connectionLock = new(1, 1);
     private readonly Timer? _healthCheckTimer;
     private readonly ConnectionHealthStatus _healthStatus;
@@ -86,16 +87,32 @@ internal class RedisConnection : IDisposable
     public RedisConnection(
         ILogger<RedisConnection> logger,
         IOptions<RedisOptions> options)
+        : this(logger, options, null)
+    {
+    }
+
+    public RedisConnection(
+        ILogger<RedisConnection> logger,
+        IOptions<RedisOptions> options,
+        IRedisCircuitBreaker? circuitBreaker)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
-        // Initialize circuit breaker
-        var circuitBreakerLogger = logger is ILoggerFactory factory
-            ? factory.CreateLogger<RedisCircuitBreaker>()
-            : new NullLogger<RedisCircuitBreaker>();
+        // Use provided circuit breaker or create a new one
+        if (circuitBreaker != null)
+        {
+            _circuitBreaker = circuitBreaker;
+        }
+        else
+        {
+            // Initialize circuit breaker with its own logger
+            var circuitBreakerLogger = logger is ILoggerFactory factory
+                ? factory.CreateLogger<RedisCircuitBreaker>()
+                : new NullLogger<RedisCircuitBreaker>();
 
-        _circuitBreaker = new RedisCircuitBreaker(circuitBreakerLogger, _options.CircuitBreaker);
+            _circuitBreaker = new RedisCircuitBreaker(circuitBreakerLogger, _options.CircuitBreaker);
+        }
 
         // Initialize health status
         _healthStatus = new ConnectionHealthStatus

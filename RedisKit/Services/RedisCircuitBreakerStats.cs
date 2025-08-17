@@ -5,7 +5,7 @@ namespace RedisKit.Services;
 /// <summary>
 ///     Circuit breaker statistics
 /// </summary>
-internal class RedisCircuitBreakerStats
+public class RedisCircuitBreakerStats
 {
     public CircuitState State { get; set; }
     public int FailureCount { get; set; }

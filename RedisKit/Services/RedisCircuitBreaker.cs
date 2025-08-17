@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using RedisKit.Interfaces;
 using RedisKit.Models;
 
 namespace RedisKit.Services;
@@ -6,7 +7,7 @@ namespace RedisKit.Services;
 /// <summary>
 ///     Implements the Circuit Breaker pattern for Redis connections
 /// </summary>
-internal class RedisCircuitBreaker
+internal class RedisCircuitBreaker : IRedisCircuitBreaker
 {
     private readonly ILogger<RedisCircuitBreaker> _logger;
     private readonly CircuitBreakerSettings _settings;
@@ -163,6 +164,35 @@ internal class RedisCircuitBreaker
             OpenedAt = _openedAt,
             TimeUntilHalfOpen = GetTimeUntilHalfOpen()
         };
+    }
+
+    /// <summary>
+    ///     Manually opens the circuit breaker
+    /// </summary>
+    public async Task OpenAsync()
+    {
+        await _stateLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            TransitionTo(CircuitState.Open);
+            _openedAt = DateTime.UtcNow;
+            _failureCount = _settings.FailureThreshold; // Set to threshold to keep it open
+        }
+        finally
+        {
+            _stateLock.Release();
+        }
+    }
+
+    /// <summary>
+    ///     Gets the time when the circuit breaker will attempt to transition from Open to HalfOpen
+    /// </summary>
+    public DateTime? GetNextRetryTime()
+    {
+        if (State != CircuitState.Open)
+            return null;
+
+        return _openedAt.Add(_settings.BreakDuration);
     }
 
     private Task<bool> CheckIfCanTransitionToHalfOpen()
