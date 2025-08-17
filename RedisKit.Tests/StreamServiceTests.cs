@@ -96,7 +96,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                _streamService.AddAsync<TestMessage>("test-stream", null));
+                _streamService.AddAsync<TestMessage>("test-stream", null!));
         }
 
         [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -179,7 +179,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.ReadAsync<TestMessage>(null));
+                _streamService.ReadAsync<TestMessage>(null!));
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.CreateConsumerGroupAsync("stream", null));
+                _streamService.CreateConsumerGroupAsync("stream", null!));
         }
 
         [Fact]
@@ -475,7 +475,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.DeleteAsync("stream", null));
+                _streamService.DeleteAsync("stream", null!));
         }
 
         [Fact]

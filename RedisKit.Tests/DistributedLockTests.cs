@@ -350,7 +350,7 @@ namespace RedisKit.Tests
         }
 
         [Theory]
-        [InlineData(null)]
+        [InlineData(null!)]
         [InlineData("")]
         [InlineData(" ")]
         public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string? resource)

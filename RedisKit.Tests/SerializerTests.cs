@@ -43,7 +43,7 @@ namespace RedisKit.Tests
             var mockLogger = new Mock<ILogger<MessagePackRedisSerializer>>();
 
             // Act
-            var serializer = new MessagePackRedisSerializer(mockLogger.Object, null);
+            var serializer = new MessagePackRedisSerializer(mockLogger.Object, null!);
 
             // Assert
             Assert.NotNull(serializer);
@@ -56,7 +56,7 @@ namespace RedisKit.Tests
             var serializer = new MessagePackRedisSerializer();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null));
+            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null!));
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                serializer.SerializeAsync<TestModel>(null));
+                serializer.SerializeAsync<TestModel>(null!));
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace RedisKit.Tests
             var serializer = new MessagePackRedisSerializer();
 
             // Act
-            var result = serializer.Deserialize<TestModel>(null);
+            var result = serializer.Deserialize<TestModel>(null!);
 
             // Assert
             Assert.Null(result);
@@ -133,7 +133,7 @@ namespace RedisKit.Tests
             var serializer = new MessagePackRedisSerializer();
 
             // Act
-            var result = await serializer.DeserializeAsync<TestModel>(null);
+            var result = await serializer.DeserializeAsync<TestModel>(null!);
 
             // Assert
             Assert.Null(result);
@@ -242,7 +242,7 @@ namespace RedisKit.Tests
             var mockLogger = new Mock<ILogger<SystemTextJsonRedisSerializer>>();
 
             // Act
-            var serializer = new SystemTextJsonRedisSerializer(mockLogger.Object, null);
+            var serializer = new SystemTextJsonRedisSerializer(mockLogger.Object, null!);
 
             // Assert
             Assert.NotNull(serializer);
@@ -255,7 +255,7 @@ namespace RedisKit.Tests
             var serializer = new SystemTextJsonRedisSerializer();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null));
+            Assert.Throws<ArgumentNullException>(() => serializer.Serialize<TestModel>(null!));
         }
 
         [Fact]
@@ -266,7 +266,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                serializer.SerializeAsync<TestModel>(null));
+                serializer.SerializeAsync<TestModel>(null!));
         }
 
         [Fact]
@@ -307,7 +307,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                serializer.Deserialize<TestModel>(null));
+                serializer.Deserialize<TestModel>(null!));
         }
 
         [Fact]
@@ -330,7 +330,7 @@ namespace RedisKit.Tests
             var serializer = new SystemTextJsonRedisSerializer();
 
             // Act
-            var result = await serializer.DeserializeAsync<TestModel>(null);
+            var result = await serializer.DeserializeAsync<TestModel>(null!);
 
             // Assert
             Assert.Null(result);
@@ -434,7 +434,7 @@ namespace RedisKit.Tests
             var mockLogger = new Mock<ILogger<SystemTextJsonRedisSerializer>>();
             mockLogger.Setup(x => x.IsEnabled(LogLevel.Warning)).Returns(true);
 
-            var serializer = new SystemTextJsonRedisSerializer(mockLogger.Object, null);
+            var serializer = new SystemTextJsonRedisSerializer(mockLogger.Object, null!);
 
             // Create a large object (>1MB when serialized)
             var largeData = new TestModel
@@ -482,7 +482,7 @@ namespace RedisKit.Tests
         public void SerializerFactory_Create_WithMessagePack_ReturnsCorrectSerializer()
         {
             // Act
-            var serializer = RedisSerializerFactory.Create(Models.SerializerType.MessagePack, null);
+            var serializer = RedisSerializerFactory.Create(Models.SerializerType.MessagePack, null!);
 
             // Assert
             Assert.NotNull(serializer);
@@ -494,7 +494,7 @@ namespace RedisKit.Tests
         public void SerializerFactory_Create_WithSystemTextJson_ReturnsCorrectSerializer()
         {
             // Act
-            var serializer = RedisSerializerFactory.Create(Models.SerializerType.SystemTextJson, null);
+            var serializer = RedisSerializerFactory.Create(Models.SerializerType.SystemTextJson, null!);
 
             // Assert
             Assert.NotNull(serializer);
@@ -542,7 +542,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                RedisSerializerFactory.Create((Models.SerializerType)999, null));
+                RedisSerializerFactory.Create((Models.SerializerType)999, null!));
         }
 
         #endregion

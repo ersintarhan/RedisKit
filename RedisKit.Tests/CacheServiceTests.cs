@@ -69,7 +69,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
-                await cacheService.SetAsync<TestModel>(null, new TestModel()));
+                await cacheService.SetAsync<TestModel>(null!, new TestModel()));
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
-                await cacheService.DeleteAsync(null));
+                await cacheService.DeleteAsync(null!));
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                cacheService.SetKeyPrefix(null));
+                cacheService.SetKeyPrefix(null!));
         }
 
         [Fact]

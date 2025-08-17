@@ -95,7 +95,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                _pubSubService.PublishAsync<TestMessage>("test-channel", null));
+                _pubSubService.PublishAsync<TestMessage>("test-channel", null!));
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                _pubSubService.SubscribeAsync<TestMessage>("test-channel", null));
+                _pubSubService.SubscribeAsync<TestMessage>("test-channel", null!));
         }
 
         [Fact]
@@ -261,7 +261,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                _pubSubService.SubscribePatternAsync<TestMessage>("test-*", null));
+                _pubSubService.SubscribePatternAsync<TestMessage>("test-*", null!));
         }
 
         [Fact]
@@ -292,7 +292,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.UnsubscribePatternAsync(null));
+                _pubSubService.UnsubscribePatternAsync(null!));
         }
 
         [Fact]

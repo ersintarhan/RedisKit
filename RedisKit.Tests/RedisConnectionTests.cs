@@ -40,7 +40,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisConnection(null, _mockOptions.Object));
+                new RedisConnection(null!, _mockOptions.Object));
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisConnection(_mockLogger.Object, null));
+                new RedisConnection(_mockLogger.Object, null!));
         }
 
         [Fact]
