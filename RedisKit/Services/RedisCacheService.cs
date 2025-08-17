@@ -3,6 +3,7 @@ using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Serialization;
 using StackExchange.Redis;
+using System.Diagnostics;
 
 namespace RedisKit.Services
 {
@@ -16,6 +17,22 @@ namespace RedisKit.Services
         private readonly RedisOptions _options;
         private readonly IRedisSerializer _serializer;
         private string _keyPrefix = string.Empty;
+        
+        // Lua script support detection
+        private bool? _supportsLuaScripts = null;
+        private bool _useFallbackMode = false;
+        
+        // Lua script for SET with EXPIRE
+        private const string SetWithExpireScript = @"
+            local count = 0
+            local ttl = tonumber(ARGV[#ARGV])
+            for i=1,#KEYS do
+                if redis.call('SET', KEYS[i], ARGV[i], 'EX', ttl) then
+                    count = count + 1
+                end
+            end
+            return count
+        ";
 
         public RedisCacheService(
             IDatabaseAsync database,
@@ -158,34 +175,166 @@ namespace RedisKit.Services
             try
             {
                 Logging.LoggingExtensions.LogSetManyAsync(_logger, values.Count);
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                // For better performance, we'll use parallel execution instead of batch
-                var tasks = new List<Task>();
-
-                foreach (var kvp in values)
+                // Check Lua script support (once)
+                if (_supportsLuaScripts == null)
                 {
-                    if (string.IsNullOrEmpty(kvp.Key))
-                        throw new ArgumentException("Key cannot be null or empty", nameof(values));
-
-                    if (kvp.Value == null)
-                        throw new ArgumentNullException(nameof(values));
-
-                    var prefixedKey = $"{_keyPrefix}{kvp.Key}";
-                    var serializedValue = await _serializer.SerializeAsync(kvp.Value, cancellationToken: cancellationToken);
-
-                    // Execute operations in parallel
-                    var task = _database.StringSetAsync(prefixedKey, serializedValue, expiry);
-                    tasks.Add(task);
+                    _supportsLuaScripts = await CheckLuaScriptSupport();
                 }
 
-                await Task.WhenAll(tasks);
+                // Adaptive chunk size based on data size
+                var chunkSize = CalculateOptimalChunkSize(values.Count);
+                var processedCount = 0;
 
+                foreach (var chunk in values.Chunk(chunkSize))
+                {
+                    // Parallel serialization for better performance
+                    var serializeTasks = chunk.Select(async kvp =>
+                    {
+                        if (string.IsNullOrEmpty(kvp.Key))
+                            throw new ArgumentException("Key cannot be null or empty", nameof(values));
+                        if (kvp.Value == null)
+                            throw new ArgumentNullException(nameof(values));
+
+                        var prefixedKey = $"{_keyPrefix}{kvp.Key}";
+                        var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken);
+                        return (Key: (RedisKey)prefixedKey, Value: (RedisValue)serialized);
+                    }).ToArray();
+
+                    var serializedPairs = await Task.WhenAll(serializeTasks);
+
+                    // Choose strategy based on capabilities and configuration
+                    if (_supportsLuaScripts.Value && !_useFallbackMode && expiry != TimeSpan.Zero)
+                    {
+                        await SetManyWithLuaScript(serializedPairs, expiry);
+                    }
+                    else
+                    {
+                        await SetManyWithFallback(serializedPairs, expiry);
+                    }
+
+                    processedCount += chunk.Count();
+                    
+                    // Progress logging for large datasets
+                    if (values.Count > 10000 && processedCount % 5000 == 0)
+                    {
+                        Logging.LoggingExtensions.LogSetManyAsyncProgress(_logger, processedCount, values.Count);
+                    }
+                }
+
+                stopwatch.Stop();
                 Logging.LoggingExtensions.LogSetManyAsyncSuccess(_logger, values.Count);
+                
+                // Performance monitoring
+                if (stopwatch.ElapsedMilliseconds > 1000)
+                {
+                    Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, values.Count, stopwatch.ElapsedMilliseconds, 
+                        _supportsLuaScripts.Value ? "Lua" : "Fallback");
+                }
             }
             catch (Exception ex)
             {
                 Logging.LoggingExtensions.LogSetManyAsyncError(_logger, ex);
                 throw;
+            }
+        }
+
+        private async Task<bool> CheckLuaScriptSupport()
+        {
+            try
+            {
+                // Test with a simple Lua script
+                var testScript = "return redis.call('PING')";
+                var result = await _database.ScriptEvaluateAsync(testScript);
+                var supported = result.ToString() == "PONG";
+                
+                if (supported)
+                {
+                    Logging.LoggingExtensions.LogLuaScriptSupported(_logger);
+                }
+                else
+                {
+                    Logging.LoggingExtensions.LogLuaScriptTestFailed(_logger);
+                }
+                
+                return supported;
+            }
+            catch (Exception ex)
+            {
+                Logging.LoggingExtensions.LogLuaScriptNotSupported(_logger, ex);
+                return false;
+            }
+        }
+
+        private int CalculateOptimalChunkSize(int totalCount)
+        {
+            return totalCount switch
+            {
+                < 100 => totalCount,        // No chunking for small sets
+                < 1000 => 500,              // Medium chunk for medium sets
+                < 10000 => 1000,            // Standard chunk for large sets
+                _ => 2000                   // Large chunk for very large sets
+            };
+        }
+
+        private async Task SetManyWithLuaScript((RedisKey Key, RedisValue Value)[] pairs, TimeSpan expiry)
+        {
+            try
+            {
+                var keys = pairs.Select(p => p.Key).ToArray();
+                var values = pairs.Select(p => p.Value)
+                    .Concat(new[] { (RedisValue)expiry.TotalSeconds })
+                    .ToArray();
+
+                var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values);
+                
+                var successCount = (int)result;
+                if (successCount != pairs.Length)
+                {
+                    Logging.LoggingExtensions.LogSetManyPartialSuccess(_logger, pairs.Length, successCount);
+                }
+            }
+            catch (RedisServerException ex) when (ex.Message.Contains("NOSCRIPT"))
+            {
+                // Script not in cache, switch to fallback
+                Logging.LoggingExtensions.LogLuaScriptNotInCache(_logger);
+                _useFallbackMode = true;
+                await SetManyWithFallback(pairs, expiry);
+            }
+            catch (Exception ex)
+            {
+                Logging.LoggingExtensions.LogLuaScriptExecutionFailed(_logger, ex);
+                _useFallbackMode = true;
+                await SetManyWithFallback(pairs, expiry);
+            }
+        }
+
+        private async Task SetManyWithFallback((RedisKey Key, RedisValue Value)[] pairs, TimeSpan? expiry)
+        {
+            if (expiry == TimeSpan.Zero || expiry == null)
+            {
+                // No TTL: use MSET for single round-trip
+                var kvpArray = pairs
+                    .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
+                    .ToArray();
+                await _database.StringSetAsync(kvpArray);
+            }
+            else
+            {
+                // With TTL: MSET followed by parallel EXPIRE
+                var kvpArray = pairs
+                    .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
+                    .ToArray();
+                
+                // First: MSET
+                await _database.StringSetAsync(kvpArray);
+                
+                // Then: parallel EXPIRE to minimize round-trips
+                var expireTasks = pairs
+                    .Select(p => _database.KeyExpireAsync(p.Key, expiry.Value))
+                    .ToArray();
+                await Task.WhenAll(expireTasks);
             }
         }
 

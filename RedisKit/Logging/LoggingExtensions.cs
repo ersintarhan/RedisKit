@@ -59,6 +59,31 @@ namespace RedisKit.Logging
         [LoggerMessage(18, LogLevel.Error, "Error checking if key exists in cache: {Key}")]
         public static partial void LogExistsAsyncError(this ILogger logger, string key, Exception ex);
 
+        // Lua Script Support and Performance Log Methods
+        [LoggerMessage(19, LogLevel.Information, "Lua scripts are supported, using optimized path")]
+        public static partial void LogLuaScriptSupported(this ILogger logger);
+
+        [LoggerMessage(20, LogLevel.Warning, "Lua scripts test failed, using fallback mode")]
+        public static partial void LogLuaScriptTestFailed(this ILogger logger);
+
+        [LoggerMessage(21, LogLevel.Warning, "Lua scripts not supported, falling back to standard commands")]
+        public static partial void LogLuaScriptNotSupported(this ILogger logger, Exception ex);
+
+        [LoggerMessage(22, LogLevel.Debug, "SetManyAsync progress: {Processed}/{Total} items")]
+        public static partial void LogSetManyAsyncProgress(this ILogger logger, int processed, int total);
+
+        [LoggerMessage(23, LogLevel.Warning, "Slow SetManyAsync detected: Count={Count}, Duration={Duration}ms, Strategy={Strategy}")]
+        public static partial void LogSlowSetManyAsync(this ILogger logger, int count, long duration, string strategy);
+
+        [LoggerMessage(24, LogLevel.Warning, "Some keys were not set successfully. Expected: {Expected}, Actual: {Actual}")]
+        public static partial void LogSetManyPartialSuccess(this ILogger logger, int expected, int actual);
+
+        [LoggerMessage(25, LogLevel.Warning, "Lua script not in cache, switching to fallback mode")]
+        public static partial void LogLuaScriptNotInCache(this ILogger logger);
+
+        [LoggerMessage(26, LogLevel.Error, "Lua script execution failed, switching to fallback mode")]
+        public static partial void LogLuaScriptExecutionFailed(this ILogger logger, Exception ex);
+
         // PubSub Service Log Methods
         [LoggerMessage(101, LogLevel.Debug, "Publishing message to channel: {Channel}")]
         public static partial void LogPublishAsync(this ILogger logger, string channel);

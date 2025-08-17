@@ -38,3 +38,5 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+.junie/guidelines.md
+CLAUDE.md
