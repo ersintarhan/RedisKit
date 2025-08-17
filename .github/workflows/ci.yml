@@ -92,21 +92,25 @@ jobs:
     # - name: Publish to NuGet
     #   run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-  security-scan:
+  code-quality:
     runs-on: ubuntu-latest
     continue-on-error: true  # Don't fail the whole workflow
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Run security scan
-      uses: github/super-linter@v5
-      env:
-        DEFAULT_BRANCH: master
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VALIDATE_CSHARP: false  # Disable C# validation (we already have dotnet build)
-        VALIDATE_YAML: true
-        VALIDATE_JSON: true
-        VALIDATE_MARKDOWN: false  # Disable markdown validation (too strict)
-        VALIDATE_ALL_CODEBASE: false  # Only validate changed files
-        FILTER_REGEX_EXCLUDE: .*\.md$  # Exclude markdown files
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Check formatting
+      run: dotnet format --verify-no-changes --verbosity diagnostic
+      continue-on-error: true
+    
+    - name: Run code analysis
+      run: dotnet build -warnaserror
+      continue-on-error: true
