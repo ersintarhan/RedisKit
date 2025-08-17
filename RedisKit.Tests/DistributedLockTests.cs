@@ -250,7 +250,6 @@ namespace RedisKit.Tests
             // Arrange
             var resources = new[] { "resource1", "resource2", "resource3" };
             var expiry = TimeSpan.FromSeconds(10);
-            var callCount = 0;
 
             // Setup for lock acquisition (different script for acquire vs release)
             _mockDatabase.SetupSequence(db => db.ScriptEvaluateAsync(
@@ -360,7 +359,7 @@ namespace RedisKit.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _distributedLock.AcquireLockAsync(resource, expiry));
+                await _distributedLock.AcquireLockAsync(resource!, expiry));
         }
 
         [Theory]

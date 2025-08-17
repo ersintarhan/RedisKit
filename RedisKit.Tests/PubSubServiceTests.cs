@@ -1,11 +1,7 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StackExchange.Redis;
 using Xunit;
-using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
 
@@ -67,7 +63,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, null));
+                new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, null!));
         }
 
         #endregion
@@ -79,7 +75,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.PublishAsync<TestMessage>(null, new TestMessage()));
+                _pubSubService.PublishAsync(null!, new TestMessage()));
         }
 
         [Fact]
@@ -87,7 +83,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.PublishAsync<TestMessage>("", new TestMessage()));
+                _pubSubService.PublishAsync("", new TestMessage()));
         }
 
         [Fact]
@@ -131,7 +127,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.SubscribeAsync<TestMessage>(null, (msg, ct) => Task.CompletedTask));
+                _pubSubService.SubscribeAsync<TestMessage>(null!, (_, _) => Task.CompletedTask));
         }
 
         [Fact]
@@ -155,10 +151,8 @@ namespace RedisKit.Tests
         {
             // Arrange
             var channel = "test-channel";
-            var handlerCalled = false;
             Func<TestMessage, CancellationToken, Task> handler = (msg, ct) =>
             {
-                handlerCalled = true;
                 return Task.CompletedTask;
             };
 
@@ -203,8 +197,7 @@ namespace RedisKit.Tests
         {
             // Arrange
             var channel = "test-channel";
-            var message = new TestMessage { Content = "Test" };
-            var handlerCalled = false;
+            //var message = new TestMessage { Content = "Test" };
 
             // First subscribe to create a handler
             _mockSubscriber.Setup(x => x.SubscribeAsync(
@@ -220,11 +213,7 @@ namespace RedisKit.Tests
                 .Returns(Task.CompletedTask);
 
             // Act - Subscribe first
-            var token = await _pubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) =>
-            {
-                handlerCalled = true;
-                await Task.CompletedTask;
-            });
+            await _pubSubService.SubscribeAsync<TestMessage>(channel, Handler);
 
             // Then unsubscribe
             await _pubSubService.UnsubscribeAsync(channel);
@@ -236,6 +225,12 @@ namespace RedisKit.Tests
                 It.IsAny<CommandFlags>()), Times.Once);
         }
 
+        private async Task Handler(TestMessage msg, CancellationToken ct)
+        {
+            _ = true;
+            await Task.CompletedTask;
+        }
+
         #endregion
 
         #region Pattern Subscription Tests
@@ -245,7 +240,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.SubscribePatternAsync<TestMessage>(null, (msg, ct) => Task.CompletedTask));
+                _pubSubService.SubscribePatternAsync<TestMessage>(null!, (msg, ct) => Task.CompletedTask));
         }
 
         [Fact]
@@ -253,7 +248,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _pubSubService.SubscribePatternAsync<TestMessage>("", (msg, ct) => Task.CompletedTask));
+                _pubSubService.SubscribePatternAsync<TestMessage>("", (_, _) => Task.CompletedTask));
         }
 
         [Fact]
@@ -358,6 +353,9 @@ namespace RedisKit.Tests
         {
             // This would require making IsChannelMatch method public or internal
             // For now, we're testing the behavior indirectly through subscription tests
+            Assert.NotNull(pattern);
+            Assert.NotNull(channel);
+            Assert.IsType<bool>(expectedMatch);
             Assert.True(true); // Placeholder - actual implementation would test the method
         }
 

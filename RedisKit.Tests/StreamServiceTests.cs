@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -80,7 +75,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.AddAsync<TestMessage>(null, new TestMessage { Content = "Test" }));
+                _streamService.AddAsync(null!, new TestMessage { Content = "Test" }));
         }
 
         [Fact]
@@ -88,7 +83,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.AddAsync<TestMessage>("", new TestMessage { Content = "Test" }));
+                _streamService.AddAsync("", new TestMessage { Content = "Test" }));
         }
 
         [Fact]
@@ -262,7 +257,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.CreateConsumerGroupAsync(null, "group"));
+                _streamService.CreateConsumerGroupAsync(null!, "group"));
         }
 
         [Fact]
@@ -335,13 +330,13 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.ReadGroupAsync<TestMessage>(null, "group", "consumer"));
+                _streamService.ReadGroupAsync<TestMessage>(null!, "group", "consumer"));
 
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.ReadGroupAsync<TestMessage>("stream", null, "consumer"));
+                _streamService.ReadGroupAsync<TestMessage>("stream", null!, "consumer"));
 
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.ReadGroupAsync<TestMessage>("stream", "group", null));
+                _streamService.ReadGroupAsync<TestMessage>("stream", "group", null!));
         }
 
         [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -386,13 +381,13 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.AcknowledgeAsync(null, "group", "123"));
+                _streamService.AcknowledgeAsync(null!, "group", "123"));
 
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.AcknowledgeAsync("stream", null, "123"));
+                _streamService.AcknowledgeAsync("stream", null!, "123"));
 
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.AcknowledgeAsync("stream", "group", null));
+                _streamService.AcknowledgeAsync("stream", "group", null!));
         }
 
         [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -467,7 +462,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.DeleteAsync(null, new[] { "123" }));
+                _streamService.DeleteAsync(null!, ["123"]));
         }
 
         [Fact]
@@ -483,7 +478,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.DeleteAsync("stream", Array.Empty<string>()));
+                _streamService.DeleteAsync("stream", []));
         }
 
         [Fact]
@@ -519,7 +514,7 @@ namespace RedisKit.Tests
         {
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _streamService.TrimByLengthAsync(null, 100));
+                _streamService.TrimByLengthAsync(null!, 100));
         }
 
         [Fact]
@@ -564,7 +559,7 @@ namespace RedisKit.Tests
 
         #region Test Models
 
-        public class TestMessage
+        private class TestMessage
         {
             public string Content { get; set; } = string.Empty;
             public DateTime Timestamp { get; set; } = DateTime.UtcNow;
