@@ -12,25 +12,25 @@ public class SubscriptionStats
     public string ChannelOrPattern { get; set; } = string.Empty;
     public SubscriptionType Type { get; set; }
     public int HandlerCount { get; set; }
-        
-    public long MessagesReceived 
-    { 
+
+    public long MessagesReceived
+    {
         get => _messagesReceived;
         set => _messagesReceived = value;
     }
-        
-    public long MessagesProcessed 
-    { 
+
+    public long MessagesProcessed
+    {
         get => _messagesProcessed;
         set => _messagesProcessed = value;
     }
-        
-    public long MessagesFailed 
-    { 
+
+    public long MessagesFailed
+    {
         get => _messagesFailed;
         set => _messagesFailed = value;
     }
-        
+
     public DateTime? LastMessageAt { get; set; }
     public TimeSpan AverageProcessingTime { get; set; }
 

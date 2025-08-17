@@ -37,17 +37,17 @@ namespace RedisKit.Models
         /// Timeout for Redis operations
         /// </summary>
         public TimeSpan OperationTimeout { get; set; } = TimeSpan.FromSeconds(5);
-        
+
         /// <summary>
         /// Serializer type to use for serialization
         /// </summary>
         public SerializerType Serializer { get; set; } = SerializerType.MessagePack;
-        
+
         /// <summary>
         /// JSON serializer options (used when Serializer is SystemTextJson)
         /// </summary>
         public JsonSerializerOptions? JsonOptions { get; set; }
-        
+
         /// <summary>
         /// MessagePack serializer options (used when Serializer is MessagePack)
         /// </summary>

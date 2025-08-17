@@ -82,7 +82,7 @@ namespace RedisKit.Services
         private readonly RedisCircuitBreaker _circuitBreaker;
         private readonly ConnectionHealthStatus _healthStatus;
         private readonly Timer? _healthCheckTimer;
-        
+
         private ConnectionMultiplexer? _connection;
         private bool _disposed = false;
         private readonly SemaphoreSlim _connectionLock = new(1, 1);
@@ -94,14 +94,14 @@ namespace RedisKit.Services
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            
+
             // Initialize circuit breaker
-            var circuitBreakerLogger = logger is ILoggerFactory factory 
-                ? factory.CreateLogger<RedisCircuitBreaker>() 
+            var circuitBreakerLogger = logger is ILoggerFactory factory
+                ? factory.CreateLogger<RedisCircuitBreaker>()
                 : new Microsoft.Extensions.Logging.Abstractions.NullLogger<RedisCircuitBreaker>();
-            
+
             _circuitBreaker = new RedisCircuitBreaker(circuitBreakerLogger, _options.CircuitBreaker);
-            
+
             // Initialize health status
             _healthStatus = new ConnectionHealthStatus
             {
@@ -197,7 +197,7 @@ namespace RedisKit.Services
 
                 // Retry with advanced backoff strategy
                 var connection = await ConnectWithRetryAsync(config);
-                
+
                 if (connection == null || !connection.IsConnected)
                 {
                     await _circuitBreaker.RecordFailureAsync();
@@ -208,10 +208,10 @@ namespace RedisKit.Services
                 _connection = connection;
                 await _circuitBreaker.RecordSuccessAsync();
                 UpdateHealthStatus(true, TimeSpan.Zero);
-                
+
                 // Setup connection event handlers
                 SetupConnectionEventHandlers(_connection);
-                
+
                 _logger.LogInformation("Successfully connected to Redis at: {ConnectionString}", _options.ConnectionString);
                 return _connection;
             }
@@ -237,16 +237,16 @@ namespace RedisKit.Services
                 try
                 {
                     _logger.LogDebug("Connection attempt {Attempt}/{MaxAttempts}", attempt + 1, retryConfig.MaxAttempts);
-                    
+
                     var attemptStopwatch = Stopwatch.StartNew();
                     var connection = await ConnectionMultiplexer.ConnectAsync(config);
                     attemptStopwatch.Stop();
-                    
+
                     if (connection.IsConnected)
                     {
-                        _logger.LogInformation("Connected to Redis on attempt {Attempt} after {Duration}ms", 
+                        _logger.LogInformation("Connected to Redis on attempt {Attempt} after {Duration}ms",
                             attempt + 1, attemptStopwatch.ElapsedMilliseconds);
-                        
+
                         _healthStatus.TotalRequests++;
                         return connection;
                     }
@@ -255,8 +255,8 @@ namespace RedisKit.Services
                 {
                     _healthStatus.TotalRequests++;
                     _healthStatus.FailedRequests++;
-                    
-                    _logger.LogWarning(ex, "Failed to connect to Redis (attempt {Attempt}/{MaxAttempts})", 
+
+                    _logger.LogWarning(ex, "Failed to connect to Redis (attempt {Attempt}/{MaxAttempts})",
                         attempt + 1, retryConfig.MaxAttempts);
 
                     if (attempt < retryConfig.MaxAttempts - 1)
@@ -264,15 +264,15 @@ namespace RedisKit.Services
                         // Calculate delay with advanced backoff strategy
                         var delay = BackoffCalculator.CalculateDelay(attempt, retryConfig, _lastRetryDelay);
                         _lastRetryDelay = delay;
-                        
-                        _logger.LogDebug("Waiting {DelayMs}ms before retry (strategy: {Strategy})", 
+
+                        _logger.LogDebug("Waiting {DelayMs}ms before retry (strategy: {Strategy})",
                             delay.TotalMilliseconds, retryConfig.Strategy);
-                        
+
                         await Task.Delay(delay);
                     }
                     else
                     {
-                        _logger.LogError(ex, "Failed to connect to Redis after {Attempts} attempts in {Duration}ms", 
+                        _logger.LogError(ex, "Failed to connect to Redis after {Attempts} attempts in {Duration}ms",
                             retryConfig.MaxAttempts, stopwatch.ElapsedMilliseconds);
                     }
                 }
@@ -284,7 +284,7 @@ namespace RedisKit.Services
         private void ApplyTimeoutSettings(ConfigurationOptions config)
         {
             var timeouts = _options.TimeoutSettings;
-            
+
             config.ConnectTimeout = (int)timeouts.ConnectTimeout.TotalMilliseconds;
             config.SyncTimeout = (int)timeouts.SyncTimeout.TotalMilliseconds;
             config.AsyncTimeout = (int)timeouts.AsyncTimeout.TotalMilliseconds;
@@ -292,7 +292,7 @@ namespace RedisKit.Services
             // ResponseTimeout is obsolete in StackExchange.Redis 2.7+ and will be removed in 3.0
             // Removed: config.ResponseTimeout = (int)timeouts.ResponseTimeout.TotalMilliseconds;
             config.ConfigCheckSeconds = (int)timeouts.ConfigCheckSeconds.TotalSeconds;
-            
+
             // Additional configuration
             config.ConnectRetry = _options.RetryConfiguration.MaxAttempts;
             config.ReconnectRetryPolicy = new ExponentialRetry((int)_options.RetryConfiguration.InitialDelay.TotalMilliseconds);
@@ -303,9 +303,9 @@ namespace RedisKit.Services
         {
             connection.ConnectionFailed += (sender, args) =>
             {
-                _logger.LogError("Redis connection failed: {FailureType} - {Exception}", 
+                _logger.LogError("Redis connection failed: {FailureType} - {Exception}",
                     args.FailureType, args.Exception?.Message);
-                
+
                 _healthStatus.ConsecutiveFailures++;
                 _healthStatus.LastError = args.Exception?.Message;
                 UpdateHealthStatus(false, TimeSpan.Zero, args.Exception?.Message);
@@ -335,12 +335,12 @@ namespace RedisKit.Services
             _healthStatus.LastCheckTime = DateTime.UtcNow;
             _healthStatus.ResponseTime = responseTime;
             _healthStatus.CircuitState = _circuitBreaker.State;
-            
+
             if (error != null)
             {
                 _healthStatus.LastError = error;
             }
-            
+
             if (!isHealthy)
             {
                 _healthStatus.ConsecutiveFailures++;
@@ -359,16 +359,16 @@ namespace RedisKit.Services
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                
+
                 // Try to ping Redis
                 if (_connection != null && _connection.IsConnected)
                 {
                     var db = _connection.GetDatabase();
                     var cts = new CancellationTokenSource(_options.HealthMonitoring.CheckTimeout);
-                    
+
                     await db.PingAsync();
                     stopwatch.Stop();
-                    
+
                     UpdateHealthStatus(true, stopwatch.Elapsed);
                     _logger.LogDebug("Health check succeeded in {Duration}ms", stopwatch.ElapsedMilliseconds);
                 }
@@ -376,14 +376,14 @@ namespace RedisKit.Services
                 {
                     // Connection is not available
                     UpdateHealthStatus(false, TimeSpan.Zero, "Connection not available");
-                    
+
                     // Auto-reconnect if enabled and threshold reached
-                    if (_options.HealthMonitoring.AutoReconnect && 
+                    if (_options.HealthMonitoring.AutoReconnect &&
                         _healthStatus.ConsecutiveFailures >= _options.HealthMonitoring.ConsecutiveFailuresThreshold)
                     {
-                        _logger.LogWarning("Health check failed {Failures} times, attempting reconnection", 
+                        _logger.LogWarning("Health check failed {Failures} times, attempting reconnection",
                             _healthStatus.ConsecutiveFailures);
-                        
+
                         _ = Task.Run(async () =>
                         {
                             try
@@ -482,13 +482,13 @@ namespace RedisKit.Services
             {
                 var stopwatch = Stopwatch.StartNew();
                 var connection = await GetConnection();
-                
+
                 if (connection.IsConnected)
                 {
                     var db = connection.GetDatabase();
                     await db.PingAsync();
                     stopwatch.Stop();
-                    
+
                     UpdateHealthStatus(true, stopwatch.Elapsed);
                 }
                 else
@@ -534,7 +534,7 @@ namespace RedisKit.Services
             {
                 _healthCheckTimer?.Dispose();
                 _connectionLock?.Dispose();
-                
+
                 try
                 {
                     _connection?.Dispose();
@@ -543,7 +543,7 @@ namespace RedisKit.Services
                 {
                     _logger.LogError(ex, "Error disposing Redis connection");
                 }
-                
+
                 _disposed = true;
             }
         }

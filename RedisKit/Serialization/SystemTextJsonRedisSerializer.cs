@@ -117,7 +117,7 @@ namespace RedisKit.Serialization
         public SystemTextJsonRedisSerializer(ILogger<SystemTextJsonRedisSerializer>? logger, JsonSerializerOptions? options)
         {
             _logger = logger;
-            
+
             // Create default options if none provided, with camelCase naming
             _options = options ?? new JsonSerializerOptions
             {
@@ -155,16 +155,16 @@ namespace RedisKit.Serialization
             try
             {
                 _logger?.LogJsonSerialize(typeof(T).Name);
-                
+
                 // Use JsonSerializer.SerializeToUtf8Bytes for better performance
                 // This avoids creating an intermediate string and directly writes to UTF-8 bytes
                 var result = JsonSerializer.SerializeToUtf8Bytes(obj, _options);
-                
+
                 if (result.Length > 1024 * 1024) // 1MB
                 {
                     _logger?.LogJsonLargeData(typeof(T).Name, result.Length);
                 }
-                
+
                 return result;
             }
             catch (JsonException jsonEx)
@@ -222,7 +222,7 @@ namespace RedisKit.Serialization
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
-            
+
             if (data.Length == 0)
                 return default;
 
@@ -289,9 +289,9 @@ namespace RedisKit.Serialization
                 // JSON serialization is CPU-bound, not I/O-bound, so we don't need true async
                 // Just return the synchronous result wrapped in a completed task
                 _logger?.LogJsonSerialize(typeof(T).Name);
-                
+
                 var json = JsonSerializer.SerializeToUtf8Bytes(obj, _options);
-                
+
                 // Log large objects for monitoring
                 if (json.Length > 1024 * 1024) // >1MB
                 {
@@ -338,21 +338,21 @@ namespace RedisKit.Serialization
             const int maxStringLength = 10 * 1024 * 1024; // 10MB for strings
             const int maxArrayElements = 100000; // 100K elements for arrays
             const int maxCollectionItems = 50000; // 50K items for collections
-            
+
             switch (obj)
             {
                 case string str when str.Length > maxStringLength:
                     _logger?.LogLargeObjectWarning("String", str.Length);
                     break;
-                    
+
                 case Array array when array.Length > maxArrayElements:
                     _logger?.LogLargeObjectWarning("Array", array.Length);
                     break;
-                    
+
                 case System.Collections.ICollection collection when collection.Count > maxCollectionItems:
                     _logger?.LogLargeObjectWarning("Collection", collection.Count);
                     break;
-                    
+
                 case System.Collections.IDictionary dict when dict.Count > maxCollectionItems:
                     _logger?.LogLargeObjectWarning("Dictionary", dict.Count);
                     break;
@@ -400,7 +400,7 @@ namespace RedisKit.Serialization
             try
             {
                 _logger?.LogJsonStreamDeserialize(typeof(T).Name);
-                
+
                 // Use JsonSerializer.DeserializeAsync directly with a MemoryStream for better performance
                 using var stream = new MemoryStream(data);
                 return await JsonSerializer.DeserializeAsync<T>(stream, _options, cancellationToken)
@@ -451,7 +451,7 @@ namespace RedisKit.Serialization
             try
             {
                 _logger?.LogJsonStreamDeserialize(type.Name);
-                
+
                 // Use JsonSerializer.DeserializeAsync directly with a MemoryStream for better performance
                 using var stream = new MemoryStream(data);
                 return await JsonSerializer.DeserializeAsync(stream, type, _options, cancellationToken)

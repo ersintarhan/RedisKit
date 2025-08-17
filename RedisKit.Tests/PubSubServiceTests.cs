@@ -28,7 +28,7 @@ namespace RedisKit.Tests
                 DefaultTtl = TimeSpan.FromHours(1),
                 Serializer = SerializerType.SystemTextJson
             };
-            
+
             _pubSubService = new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
         }
 
@@ -50,7 +50,7 @@ namespace RedisKit.Tests
         public void Constructor_WithNullSubscriber_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new RedisPubSubService(null, _mockLogger.Object, _options));
         }
 
@@ -58,7 +58,7 @@ namespace RedisKit.Tests
         public void Constructor_WithNullLogger_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new RedisPubSubService(_mockSubscriber.Object, null, _options));
         }
 
@@ -66,7 +66,7 @@ namespace RedisKit.Tests
         public void Constructor_WithNullOptions_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, null));
         }
 
@@ -78,7 +78,7 @@ namespace RedisKit.Tests
         public async Task PublishAsync_WithNullChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.PublishAsync<TestMessage>(null, new TestMessage()));
         }
 
@@ -86,7 +86,7 @@ namespace RedisKit.Tests
         public async Task PublishAsync_WithEmptyChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.PublishAsync<TestMessage>("", new TestMessage()));
         }
 
@@ -94,7 +94,7 @@ namespace RedisKit.Tests
         public async Task PublishAsync_WithNullMessage_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _pubSubService.PublishAsync<TestMessage>("test-channel", null));
         }
 
@@ -105,7 +105,7 @@ namespace RedisKit.Tests
             var channel = "test-channel";
             var message = new TestMessage { Content = "Test Content" };
             var tcs = new TaskCompletionSource<bool>();
-            
+
             _mockSubscriber.Setup(x => x.PublishAsync(
                 It.IsAny<RedisChannel>(),
                 It.IsAny<RedisValue>(),
@@ -130,7 +130,7 @@ namespace RedisKit.Tests
         public async Task SubscribeAsync_WithNullChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.SubscribeAsync<TestMessage>(null, (msg, ct) => Task.CompletedTask));
         }
 
@@ -138,7 +138,7 @@ namespace RedisKit.Tests
         public async Task SubscribeAsync_WithEmptyChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.SubscribeAsync<TestMessage>("", (msg, ct) => Task.CompletedTask));
         }
 
@@ -146,7 +146,7 @@ namespace RedisKit.Tests
         public async Task SubscribeAsync_WithNullHandler_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _pubSubService.SubscribeAsync<TestMessage>("test-channel", null));
         }
 
@@ -186,7 +186,7 @@ namespace RedisKit.Tests
         public async Task UnsubscribeAsync_WithNullChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.UnsubscribeAsync((string)null!));
         }
 
@@ -194,7 +194,7 @@ namespace RedisKit.Tests
         public async Task UnsubscribeAsync_WithEmptyChannel_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.UnsubscribeAsync(""));
         }
 
@@ -205,14 +205,14 @@ namespace RedisKit.Tests
             var channel = "test-channel";
             var message = new TestMessage { Content = "Test" };
             var handlerCalled = false;
-            
+
             // First subscribe to create a handler
             _mockSubscriber.Setup(x => x.SubscribeAsync(
                 It.IsAny<RedisChannel>(),
                 It.IsAny<Action<RedisChannel, RedisValue>>(),
                 It.IsAny<CommandFlags>()))
                 .Returns(Task.CompletedTask);
-            
+
             _mockSubscriber.Setup(x => x.UnsubscribeAsync(
                 It.IsAny<RedisChannel>(),
                 null,
@@ -225,7 +225,7 @@ namespace RedisKit.Tests
                 handlerCalled = true;
                 await Task.CompletedTask;
             });
-            
+
             // Then unsubscribe
             await _pubSubService.UnsubscribeAsync(channel);
 
@@ -244,7 +244,7 @@ namespace RedisKit.Tests
         public async Task SubscribePatternAsync_WithNullPattern_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.SubscribePatternAsync<TestMessage>(null, (msg, ct) => Task.CompletedTask));
         }
 
@@ -252,7 +252,7 @@ namespace RedisKit.Tests
         public async Task SubscribePatternAsync_WithEmptyPattern_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.SubscribePatternAsync<TestMessage>("", (msg, ct) => Task.CompletedTask));
         }
 
@@ -260,7 +260,7 @@ namespace RedisKit.Tests
         public async Task SubscribePatternAsync_WithNullHandler_ThrowsArgumentNullException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 _pubSubService.SubscribePatternAsync<TestMessage>("test-*", null));
         }
 
@@ -291,7 +291,7 @@ namespace RedisKit.Tests
         public async Task UnsubscribePatternAsync_WithNullPattern_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.UnsubscribePatternAsync(null));
         }
 
@@ -299,7 +299,7 @@ namespace RedisKit.Tests
         public async Task UnsubscribePatternAsync_WithEmptyPattern_ThrowsArgumentException()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _pubSubService.UnsubscribePatternAsync(""));
         }
 
@@ -308,14 +308,14 @@ namespace RedisKit.Tests
         {
             // Arrange
             var pattern = "test-*";
-            
+
             // First subscribe to create a handler
             _mockSubscriber.Setup(x => x.SubscribeAsync(
                 It.IsAny<RedisChannel>(),
                 It.IsAny<Action<RedisChannel, RedisValue>>(),
                 It.IsAny<CommandFlags>()))
                 .Returns(Task.CompletedTask);
-            
+
             _mockSubscriber.Setup(x => x.UnsubscribeAsync(
                 It.IsAny<RedisChannel>(),
                 null,
@@ -327,7 +327,7 @@ namespace RedisKit.Tests
             {
                 await Task.CompletedTask;
             });
-            
+
             // Then unsubscribe
             await _pubSubService.UnsubscribePatternAsync(pattern);
 
@@ -352,7 +352,9 @@ namespace RedisKit.Tests
         [InlineData("exact-match", "exact-match", true)]
         [InlineData("exact-match", "not-exact", false)]
         public void IsChannelMatch_WithVariousPatterns_ReturnsExpectedResult(
-            string pattern, string channel, bool expectedMatch)
+            string pattern,
+            string channel,
+            bool expectedMatch)
         {
             // This would require making IsChannelMatch method public or internal
             // For now, we're testing the behavior indirectly through subscription tests

@@ -25,7 +25,7 @@ namespace RedisKit.Tests
             _mockMultiplexer = new Mock<IConnectionMultiplexer>();
             _mockDatabase = new Mock<IDatabase>();
             _mockLogger = new Mock<ILogger<RedisDistributedLock>>();
-            
+
             _mockMultiplexer.Setup(m => m.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
                 .Returns(_mockDatabase.Object);
 
@@ -47,7 +47,7 @@ namespace RedisKit.Tests
             // Arrange
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -72,7 +72,7 @@ namespace RedisKit.Tests
             // Arrange
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -97,7 +97,7 @@ namespace RedisKit.Tests
             var wait = TimeSpan.FromSeconds(2);
             var retry = TimeSpan.FromMilliseconds(100);
             var attempts = 0;
-            
+
             _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
                     It.IsAny<string>(),
                     It.IsAny<RedisKey[]>(),
@@ -126,7 +126,7 @@ namespace RedisKit.Tests
             var expiry = TimeSpan.FromSeconds(10);
             var wait = TimeSpan.FromMilliseconds(500);
             var retry = TimeSpan.FromMilliseconds(100);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -152,7 +152,7 @@ namespace RedisKit.Tests
         {
             // Arrange
             var resource = "test-resource";
-            
+
             _mockDatabase.Setup(db => db.KeyExistsAsync(
                     It.Is<RedisKey>(k => k.ToString().Contains(resource)),
                     CommandFlags.DemandMaster))
@@ -170,7 +170,7 @@ namespace RedisKit.Tests
         {
             // Arrange
             var resource = "test-resource";
-            
+
             _mockDatabase.Setup(db => db.KeyExistsAsync(
                     It.Is<RedisKey>(k => k.ToString().Contains(resource)),
                     CommandFlags.DemandMaster))
@@ -190,7 +190,7 @@ namespace RedisKit.Tests
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
             var newExpiry = TimeSpan.FromSeconds(30);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -223,7 +223,7 @@ namespace RedisKit.Tests
             // Arrange
             var resources = new[] { "resource1", "resource2", "resource3" };
             var expiry = TimeSpan.FromSeconds(10);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -251,7 +251,7 @@ namespace RedisKit.Tests
             var resources = new[] { "resource1", "resource2", "resource3" };
             var expiry = TimeSpan.FromSeconds(10);
             var callCount = 0;
-            
+
             // Setup for lock acquisition (different script for acquire vs release)
             _mockDatabase.SetupSequence(db => db.ScriptEvaluateAsync(
                     It.IsAny<string>(),
@@ -276,7 +276,7 @@ namespace RedisKit.Tests
             var resource = "test-resource";
             var timeout = TimeSpan.FromSeconds(2);
             var checkCount = 0;
-            
+
             _mockDatabase.Setup(db => db.KeyExistsAsync(
                     It.Is<RedisKey>(k => k.ToString().Contains(resource)),
                     CommandFlags.DemandMaster))
@@ -299,7 +299,7 @@ namespace RedisKit.Tests
             // Arrange
             var resource = "test-resource";
             var timeout = TimeSpan.FromMilliseconds(500);
-            
+
             _mockDatabase.Setup(db => db.KeyExistsAsync(
                     It.Is<RedisKey>(k => k.ToString().Contains(resource)),
                     CommandFlags.DemandMaster))
@@ -316,7 +316,7 @@ namespace RedisKit.Tests
             // Arrange
             var resource = "test-resource";
             var expiry = TimeSpan.FromSeconds(10);
-            
+
             _mockDatabase.Setup(db => db.StringSetAsync(
                     It.IsAny<RedisKey>(),
                     It.IsAny<RedisValue>(),
@@ -353,7 +353,7 @@ namespace RedisKit.Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string resource)
+        public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string? resource)
         {
             // Arrange
             var expiry = TimeSpan.FromSeconds(10);

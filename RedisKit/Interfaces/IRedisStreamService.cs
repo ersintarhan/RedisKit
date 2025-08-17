@@ -364,7 +364,7 @@ namespace RedisKit.Interfaces
         /// }
         /// </code>
         /// </example>
-        Task<string> MoveToDeadLetterAsync<T>(string sourceStream, string deadLetterStream, string messageId, string reason, 
+        Task<string> MoveToDeadLetterAsync<T>(string sourceStream, string deadLetterStream, string messageId, string reason,
             int retryCount = 0, string? groupName = null, string? consumerName = null, CancellationToken cancellationToken = default) where T : class;
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace RedisKit.Interfaces
         /// Console.WriteLine($"Retried: {result.SuccessCount} succeeded, {result.FailureCount} failed");
         /// </code>
         /// </example>
-        Task<RetryResult<T>> RetryPendingAsync<T>(string stream, string groupName, string consumerName, 
+        Task<RetryResult<T>> RetryPendingAsync<T>(string stream, string groupName, string consumerName,
             Func<T, Task<bool>> processor, RetryConfiguration? retryConfig = null, CancellationToken cancellationToken = default) where T : class;
 
         // ============= Important Features =============
@@ -507,7 +507,7 @@ namespace RedisKit.Interfaces
         /// Console.WriteLine($"Successfully processed {processed} orders");
         /// </code>
         /// </example>
-        Task<int> ReadGroupWithAutoAckAsync<T>(string stream, string groupName, string consumerName, 
+        Task<int> ReadGroupWithAutoAckAsync<T>(string stream, string groupName, string consumerName,
             Func<T, Task<bool>> processor, int count = 10, CancellationToken cancellationToken = default) where T : class;
     }
 }

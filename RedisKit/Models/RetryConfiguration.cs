@@ -36,23 +36,23 @@ public class RetryConfiguration
     public double JitterFactor { get; set; } = 0.2;
 
     // Stream-specific retry settings (compatibility)
-        
+
     /// <summary>
     /// Alias for MaxAttempts (for backward compatibility)
     /// </summary>
-    public int MaxRetries 
-    { 
-        get => MaxAttempts; 
-        set => MaxAttempts = value; 
+    public int MaxRetries
+    {
+        get => MaxAttempts;
+        set => MaxAttempts = value;
     }
 
     /// <summary>
     /// Alias for InitialDelay (for backward compatibility)
     /// </summary>
-    public TimeSpan RetryDelay 
-    { 
-        get => InitialDelay; 
-        set => InitialDelay = value; 
+    public TimeSpan RetryDelay
+    {
+        get => InitialDelay;
+        set => InitialDelay = value;
     }
 
     /// <summary>
@@ -63,8 +63,8 @@ public class RetryConfiguration
     /// <summary>
     /// Use exponential backoff for retries (Stream-specific)
     /// </summary>
-    public bool UseExponentialBackoff 
-    { 
+    public bool UseExponentialBackoff
+    {
         get => Strategy == BackoffStrategy.Exponential || Strategy == BackoffStrategy.ExponentialWithJitter;
         set => Strategy = value ? BackoffStrategy.ExponentialWithJitter : BackoffStrategy.Fixed;
     }

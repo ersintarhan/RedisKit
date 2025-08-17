@@ -202,7 +202,7 @@ namespace RedisKit.Serialization
         /// </code>
         /// </example>
         Task<T?> DeserializeAsync<T>(byte[] data, CancellationToken cancellationToken = default);
-        
+
         /// <summary>
         /// Asynchronously deserializes a byte array to an object using runtime type information.
         /// </summary>

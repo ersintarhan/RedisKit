@@ -39,7 +39,7 @@ namespace RedisKit.Services
             _logger = logger;
             _defaultExpiry = expiry;
             _isAcquired = true;
-            
+
             AcquiredAt = DateTime.UtcNow;
             ExpiresAt = AcquiredAt.Add(expiry);
 
@@ -138,7 +138,7 @@ namespace RedisKit.Services
                     CommandFlags.DemandMaster);
 
                 _isAcquired = false;
-                
+
                 if ((int)result == 1)
                 {
                     _logger?.LogDebug("Released lock for resource: {Resource}", Resource);
@@ -161,7 +161,7 @@ namespace RedisKit.Services
                 return;
 
             _disposed = true;
-            
+
             // Stop renewal timer
             if (_renewalTimer != null)
             {
@@ -181,7 +181,7 @@ namespace RedisKit.Services
                 return;
 
             _disposed = true;
-            
+
             // Stop renewal timer
             _renewalTimer?.Dispose();
 

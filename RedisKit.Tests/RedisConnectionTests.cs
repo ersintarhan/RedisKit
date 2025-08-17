@@ -39,7 +39,7 @@ namespace RedisKit.Tests
         public void Constructor_WithNullLogger_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new RedisConnection(null, _mockOptions.Object));
         }
 
@@ -47,7 +47,7 @@ namespace RedisKit.Tests
         public void Constructor_WithNullOptions_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new RedisConnection(_mockLogger.Object, null));
         }
 
@@ -73,7 +73,7 @@ namespace RedisKit.Tests
             connection.Dispose();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => 
+            await Assert.ThrowsAsync<ObjectDisposedException>(() =>
                 connection.GetConnection());
         }
 
@@ -84,15 +84,15 @@ namespace RedisKit.Tests
             _options.ConnectionString = "invalid:connection:string";
             _options.RetryConfiguration.MaxAttempts = 2;
             _options.RetryConfiguration.InitialDelay = TimeSpan.FromMilliseconds(10);
-            
+
             var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 connection.GetConnection());
-            
+
             Assert.Contains("Failed to establish Redis connection", exception.Message);
-            
+
             // Verify connection attempt was logged
             _mockLogger.Verify(
                 x => x.Log(
@@ -124,7 +124,7 @@ namespace RedisKit.Tests
             connection.Dispose();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => 
+            await Assert.ThrowsAsync<ObjectDisposedException>(() =>
                 connection.GetDatabaseAsync());
         }
 
@@ -140,7 +140,7 @@ namespace RedisKit.Tests
             connection.Dispose();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => 
+            await Assert.ThrowsAsync<ObjectDisposedException>(() =>
                 connection.GetSubscriberAsync());
         }
 
@@ -170,7 +170,7 @@ namespace RedisKit.Tests
             connection.Dispose();
 
             // Assert - After disposal, GetConnection should throw
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => 
+            await Assert.ThrowsAsync<ObjectDisposedException>(() =>
                 connection.GetConnection());
         }
 
@@ -183,7 +183,7 @@ namespace RedisKit.Tests
         {
             // This test verifies the SemaphoreSlim is working correctly
             // Would need integration testing with real Redis for full verification
-            
+
             // Arrange
             var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
             var tasks = new Task[10];
@@ -220,11 +220,11 @@ namespace RedisKit.Tests
             _options.ConnectionString = "unreachable:6379";
             _options.RetryConfiguration.MaxAttempts = 3;
             _options.RetryConfiguration.InitialDelay = TimeSpan.FromMilliseconds(10);
-            
+
             var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 
             // Act
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 connection.GetConnection());
 
             // Assert - Should log initial connection attempt
@@ -257,7 +257,7 @@ namespace RedisKit.Tests
         {
             // Arrange
             _options.OperationTimeout = TimeSpan.FromSeconds(10);
-            
+
             // Act
             var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 

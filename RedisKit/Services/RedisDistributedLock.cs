@@ -35,7 +35,7 @@ namespace RedisKit.Services
         {
             if (string.IsNullOrWhiteSpace(resource))
                 throw new ArgumentException("Resource cannot be null or empty", nameof(resource));
-            
+
             if (expiry <= TimeSpan.Zero)
                 throw new ArgumentException("Expiry must be positive", nameof(expiry));
 
@@ -56,7 +56,7 @@ namespace RedisKit.Services
                 if (acquired)
                 {
                     _logger?.LogDebug("Acquired lock for resource: {Resource}, LockId: {LockId}", resource, lockId);
-                    
+
                     return new RedisLockHandle(
                         database,
                         resource,
@@ -85,7 +85,7 @@ namespace RedisKit.Services
         {
             if (wait <= TimeSpan.Zero)
                 throw new ArgumentException("Wait time must be positive", nameof(wait));
-            
+
             if (retry <= TimeSpan.Zero)
                 throw new ArgumentException("Retry interval must be positive", nameof(retry));
 
@@ -95,7 +95,7 @@ namespace RedisKit.Services
             while (DateTime.UtcNow < deadline && !cancellationToken.IsCancellationRequested)
             {
                 attempts++;
-                
+
                 var handle = await AcquireLockAsync(resource, expiry, cancellationToken);
                 if (handle != null)
                 {
@@ -106,16 +106,16 @@ namespace RedisKit.Services
                 // Calculate next retry delay
                 var remainingTime = deadline - DateTime.UtcNow;
                 var delay = remainingTime < retry ? remainingTime : retry;
-                
+
                 if (delay > TimeSpan.Zero)
                 {
                     await Task.Delay(delay, cancellationToken);
                 }
             }
 
-            _logger?.LogWarning("Failed to acquire lock for resource: {Resource} after {Attempts} attempts within {Wait}ms", 
+            _logger?.LogWarning("Failed to acquire lock for resource: {Resource} after {Attempts} attempts within {Wait}ms",
                 resource, attempts, wait.TotalMilliseconds);
-            
+
             return null;
         }
 
@@ -128,7 +128,7 @@ namespace RedisKit.Services
             {
                 var database = _connectionMultiplexer.GetDatabase();
                 var lockKey = GetLockKey(resource);
-                
+
                 return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster);
             }
             catch (Exception ex)
@@ -145,7 +145,7 @@ namespace RedisKit.Services
         {
             if (handle == null)
                 throw new ArgumentNullException(nameof(handle));
-            
+
             if (expiry <= TimeSpan.Zero)
                 throw new ArgumentException("Expiry must be positive", nameof(expiry));
 
@@ -164,7 +164,7 @@ namespace RedisKit.Services
                 throw new ArgumentException("Resources cannot be null or empty", nameof(resources));
 
             var acquiredLocks = new List<ILockHandle>();
-            
+
             try
             {
                 // Try to acquire all locks
@@ -179,12 +179,12 @@ namespace RedisKit.Services
                     {
                         // Failed to acquire one lock, release all acquired locks
                         _logger?.LogDebug("Failed to acquire multi-lock. Could not lock resource: {Resource}", resource);
-                        
+
                         foreach (var acquired in acquiredLocks)
                         {
                             await acquired.ReleaseAsync(cancellationToken);
                         }
-                        
+
                         return null;
                     }
                 }
@@ -195,7 +195,7 @@ namespace RedisKit.Services
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error acquiring multi-lock for resources");
-                
+
                 // Clean up any acquired locks
                 foreach (var acquired in acquiredLocks)
                 {
@@ -208,7 +208,7 @@ namespace RedisKit.Services
                         // Best effort cleanup
                     }
                 }
-                
+
                 throw;
             }
         }

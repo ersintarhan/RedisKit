@@ -89,7 +89,7 @@ namespace RedisKit.Utilities
                         {
                             inClass = true;
                             regex += "[";
-                            
+
                             // Check for negation
                             if (i + 1 < len && (globPattern[i + 1] == '!' || globPattern[i + 1] == '^'))
                             {
@@ -123,7 +123,7 @@ namespace RedisKit.Utilities
 
                     case '-':
                         // Inside a character class, dash is range operator
-                        if (inClass && i > 0 && i < len - 1 && 
+                        if (inClass && i > 0 && i < len - 1 &&
                             globPattern[i - 1] != '[' && globPattern[i + 1] != ']')
                         {
                             regex += "-";

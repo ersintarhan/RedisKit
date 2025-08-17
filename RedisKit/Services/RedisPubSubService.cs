@@ -110,26 +110,26 @@ namespace RedisKit.Services
         private readonly ILogger<RedisPubSubService> _logger;
         private readonly RedisOptions _options;
         private readonly IRedisSerializer _serializer;
-        
+
         // Channel subscriptions: channel -> list of handlers
         private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _channelHandlers;
-        
+
         // Pattern subscriptions: pattern -> list of handlers
         private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _patternHandlers;
-        
+
         // Handler ID to subscription mapping for fast unsubscribe
         private readonly ConcurrentDictionary<string, HandlerMetadata> _handlerMap;
-        
+
         // Statistics tracking
         private readonly ConcurrentDictionary<string, SubscriptionStats> _statistics;
-        
+
         // Cleanup timer for inactive handlers
         private readonly Timer _cleanupTimer;
         private readonly TimeSpan _handlerTimeout;
-        
+
         // Synchronization
         private readonly SemaphoreSlim _subscriptionLock = new(1, 1);
-        
+
         // Disposal
         private bool _disposed;
 
@@ -149,7 +149,7 @@ namespace RedisKit.Services
             _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
             _handlerMap = new ConcurrentDictionary<string, HandlerMetadata>();
             _statistics = new ConcurrentDictionary<string, SubscriptionStats>();
-            
+
             // Configure cleanup timer for memory leak prevention
             _handlerTimeout = TimeSpan.FromHours(24); // Configurable timeout
             _cleanupTimer = new Timer(
@@ -324,16 +324,16 @@ namespace RedisKit.Services
         #region Channel Subscriptions
 
         public async Task<SubscriptionToken> SubscribeAsync<T>(
-            string channel, 
-            Func<T, CancellationToken, Task> handler, 
+            string channel,
+            Func<T, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
             return await SubscribeInternalAsync(channel, SubscriptionType.Channel, handler, null, cancellationToken);
         }
 
         public async Task<SubscriptionToken> SubscribeWithMetadataAsync<T>(
-            string channel, 
-            Func<T, string, CancellationToken, Task> handler, 
+            string channel,
+            Func<T, string, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
             // Convert metadata handler to match internal signature
@@ -350,16 +350,16 @@ namespace RedisKit.Services
         #region Pattern Subscriptions
 
         public async Task<SubscriptionToken> SubscribePatternAsync<T>(
-            string pattern, 
-            Func<T, CancellationToken, Task> handler, 
+            string pattern,
+            Func<T, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
             return await SubscribeInternalAsync(pattern, SubscriptionType.Pattern, handler, null, cancellationToken);
         }
 
         public async Task<SubscriptionToken> SubscribePatternWithMetadataAsync<T>(
-            string pattern, 
-            Func<T, string, CancellationToken, Task> handler, 
+            string pattern,
+            Func<T, string, CancellationToken, Task> handler,
             CancellationToken cancellationToken = default) where T : class
         {
             // Convert metadata handler to match internal signature
@@ -449,9 +449,9 @@ namespace RedisKit.Services
         }
 
         private async Task ProcessSingleHandler(
-            SubscriptionHandler handler, 
-            RedisValue value, 
-            SubscriptionStats? stats, 
+            SubscriptionHandler handler,
+            RedisValue value,
+            SubscriptionStats? stats,
             CancellationToken cancellationToken)
         {
             try
@@ -543,7 +543,7 @@ namespace RedisKit.Services
                 if (handlerDict.TryGetValue(metadata.Key, out var handlers))
                 {
                     var updatedHandlers = handlers.Where(h => h.Id != handlerId).ToList();
-                    
+
                     if (updatedHandlers.Count == 0)
                     {
                         // Last handler, unsubscribe from Redis
@@ -640,8 +640,8 @@ namespace RedisKit.Services
 
                 // Clean up old statistics
                 var statsToRemove = _statistics
-                    .Where(s => s.Value.LastMessageAt < cutoffTime && 
-                               !_channelHandlers.ContainsKey(s.Key) && 
+                    .Where(s => s.Value.LastMessageAt < cutoffTime &&
+                               !_channelHandlers.ContainsKey(s.Key) &&
                                !_patternHandlers.ContainsKey(s.Key))
                     .Select(s => s.Key)
                     .ToList();
@@ -731,7 +731,7 @@ namespace RedisKit.Services
             // Return the count of local handlers for this channel
             _channelHandlers.TryGetValue(channel, out var handlers);
             var count = handlers?.Count ?? 0;
-            
+
             _logger.LogDebug("Local subscriber count for channel {Channel}: {Count}", channel, count);
             return Task.FromResult(count);
         }

@@ -129,7 +129,7 @@ namespace RedisKit.Logging
 
         [LoggerMessage(115, LogLevel.Error, "Error unsubscribing from channel pattern: {Pattern}")]
         public static partial void LogUnsubscribePatternAsyncError(this ILogger logger, string pattern, Exception ex);
-        
+
         // Stream Service Log Methods
         [LoggerMessage(201, LogLevel.Debug, "Adding message to stream: {Stream}")]
         public static partial void LogAddAsync(this ILogger logger, string stream);
@@ -175,81 +175,81 @@ namespace RedisKit.Logging
 
         [LoggerMessage(215, LogLevel.Error, "Error acknowledging message {MessageId} in stream: {Stream} for group: {GroupName}")]
         public static partial void LogAcknowledgeAsyncError(this ILogger logger, string stream, string groupName, string messageId, Exception ex);
-        
+
         // Serializer Log Methods - High Performance Source Generated Logging
         // MessagePack Serializer
         [LoggerMessage(301, LogLevel.Debug, "Serializing {Type} using MessagePack, estimated size: {Size} bytes")]
         public static partial void LogMessagePackSerialize(this ILogger logger, string type, int size);
-        
+
         [LoggerMessage(302, LogLevel.Debug, "Deserializing {ByteCount} bytes to {Type} using MessagePack")]
         public static partial void LogMessagePackDeserialize(this ILogger logger, int byteCount, string type);
-        
+
         [LoggerMessage(303, LogLevel.Warning, "Large MessagePack serialization detected: {Type} resulted in {ByteCount} bytes")]
         public static partial void LogMessagePackLargeData(this ILogger logger, string type, int byteCount);
-        
+
         [LoggerMessage(304, LogLevel.Error, "MessagePack serialization failed for {Type}")]
         public static partial void LogMessagePackSerializeError(this ILogger logger, string type, Exception ex);
-        
+
         [LoggerMessage(305, LogLevel.Error, "MessagePack deserialization failed for {Type} from {ByteCount} bytes")]
         public static partial void LogMessagePackDeserializeError(this ILogger logger, string type, int byteCount, Exception ex);
-        
+
         // System.Text.Json Serializer
         [LoggerMessage(311, LogLevel.Debug, "Serializing {Type} using System.Text.Json")]
         public static partial void LogJsonSerialize(this ILogger logger, string type);
-        
+
         [LoggerMessage(312, LogLevel.Debug, "Deserializing {ByteCount} bytes to {Type} using System.Text.Json")]
         public static partial void LogJsonDeserialize(this ILogger logger, int byteCount, string type);
-        
+
         [LoggerMessage(313, LogLevel.Warning, "Large JSON serialization detected: {Type} resulted in {ByteCount} bytes")]
         public static partial void LogJsonLargeData(this ILogger logger, string type, int byteCount);
-        
+
         [LoggerMessage(314, LogLevel.Error, "JSON serialization failed for {Type}: {ErrorMessage}")]
         public static partial void LogJsonSerializeError(this ILogger logger, string type, string errorMessage, Exception ex);
-        
+
         [LoggerMessage(315, LogLevel.Error, "JSON deserialization failed for {Type} from {ByteCount} bytes: {ErrorMessage}")]
         public static partial void LogJsonDeserializeError(this ILogger logger, string type, int byteCount, string errorMessage, Exception ex);
-        
+
         [LoggerMessage(316, LogLevel.Warning, "Invalid UTF-8 encoding detected when deserializing {Type}")]
         public static partial void LogJsonInvalidUtf8(this ILogger logger, string type);
-        
+
         [LoggerMessage(317, LogLevel.Debug, "JSON stream deserialization started for {Type}")]
         public static partial void LogJsonStreamDeserialize(this ILogger logger, string type);
-        
+
         // Generic Serializer Methods
         [LoggerMessage(320, LogLevel.Information, "Serializer {SerializerName} initialized with options")]
         public static partial void LogSerializerInitialized(this ILogger logger, string serializerName);
-        
+
         [LoggerMessage(321, LogLevel.Warning, "Large object detected for serialization: {Type} with {ElementCount} elements")]
         public static partial void LogLargeObjectWarning(this ILogger logger, string type, int elementCount);
-        
+
         [LoggerMessage(322, LogLevel.Error, "Out of memory during serialization of {Type}")]
         public static partial void LogOutOfMemoryError(this ILogger logger, string type, Exception ex);
-        
+
         [LoggerMessage(323, LogLevel.Error, "Type {Type} is not supported for serialization")]
         public static partial void LogUnsupportedTypeError(this ILogger logger, string type, Exception ex);
-        
+
         [LoggerMessage(324, LogLevel.Debug, "Serialization completed in {ElapsedMs}ms for {Type} ({ByteCount} bytes)")]
         public static partial void LogSerializationPerformance(this ILogger logger, double elapsedMs, string type, int byteCount);
-        
+
         [LoggerMessage(325, LogLevel.Debug, "Deserialization completed in {ElapsedMs}ms for {Type}")]
         public static partial void LogDeserializationPerformance(this ILogger logger, double elapsedMs, string type);
-        
+
         // Factory and Configuration
         [LoggerMessage(330, LogLevel.Information, "Creating serializer of type {SerializerType}")]
         public static partial void LogSerializerCreation(this ILogger logger, string serializerType);
-        
+
         [LoggerMessage(331, LogLevel.Debug, "Serializer cache hit for {SerializerType}, returning cached instance")]
         public static partial void LogSerializerCacheHit(this ILogger logger, string serializerType);
-        
+
         [LoggerMessage(332, LogLevel.Debug, "Serializer cache miss for {SerializerType}, creating new instance")]
         public static partial void LogSerializerCacheMiss(this ILogger logger, string serializerType);
-        
+
         [LoggerMessage(333, LogLevel.Warning, "Custom serializer registration failed for type {TypeName}")]
         public static partial void LogCustomSerializerRegistrationFailed(this ILogger logger, string typeName, Exception ex);
-        
+
         [LoggerMessage(334, LogLevel.Information, "Serializer cache cleared, {Count} instances removed")]
         public static partial void LogSerializerCacheCleared(this ILogger logger, int count);
-        
+
         [LoggerMessage(335, LogLevel.Warning, "Attempting to deserialize large data of {ByteCount} bytes for type {Type}")]
         public static partial void LogLargeDataDeserializationWarning(this ILogger logger, int byteCount, string type);
     }

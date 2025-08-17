@@ -20,24 +20,24 @@ namespace RedisKit.Serialization
         public static IRedisSerializer Create(Models.SerializerType serializerType, ILoggerFactory? loggerFactory = null)
         {
             var cacheKey = $"{serializerType}";
-            
+
             return _serializerCache.GetOrAdd(cacheKey, key =>
             {
                 return serializerType switch
                 {
-                    Models.SerializerType.MessagePack => 
+                    Models.SerializerType.MessagePack =>
                         new MessagePackRedisSerializer(
                             loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
                             null),
-                        
-                    Models.SerializerType.SystemTextJson => 
+
+                    Models.SerializerType.SystemTextJson =>
                         new SystemTextJsonRedisSerializer(
                             loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
                             null),
-                        
-                    Models.SerializerType.Custom => 
+
+                    Models.SerializerType.Custom =>
                         throw new ArgumentException("Custom serializer type requires specifying the custom serializer implementation", nameof(serializerType)),
-                        
+
                     _ => throw new ArgumentOutOfRangeException(nameof(serializerType), $"Unknown serializer type: {serializerType}")
                 };
             });
@@ -56,7 +56,7 @@ namespace RedisKit.Serialization
             ILoggerFactory? loggerFactory = null) where TOptions : class
         {
             var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-            
+
             return _serializerCache.GetOrAdd(cacheKey, key =>
             {
                 // Using modern pattern matching with switch expression
@@ -66,21 +66,21 @@ namespace RedisKit.Serialization
                         new MessagePackRedisSerializer(
                             loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
                             messagePackOptions),
-                    
+
                     (Models.SerializerType.SystemTextJson, System.Text.Json.JsonSerializerOptions jsonOptions) =>
                         new SystemTextJsonRedisSerializer(
                             loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
                             jsonOptions),
-                    
+
                     (Models.SerializerType.MessagePack, _) =>
                         throw new ArgumentException($"Invalid options type for MessagePack serializer. Expected {nameof(MessagePack.MessagePackSerializerOptions)}, got {options.GetType().Name}", nameof(options)),
-                    
+
                     (Models.SerializerType.SystemTextJson, _) =>
                         throw new ArgumentException($"Invalid options type for System.Text.Json serializer. Expected {nameof(System.Text.Json.JsonSerializerOptions)}, got {options.GetType().Name}", nameof(options)),
-                    
+
                     (Models.SerializerType.Custom, _) =>
                         throw new ArgumentException("Custom serializer type requires using CreateCustom method", nameof(serializerType)),
-                    
+
                     _ => throw new ArgumentOutOfRangeException(nameof(serializerType), $"Unknown serializer type: {serializerType}")
                 };
             });
@@ -100,7 +100,7 @@ namespace RedisKit.Serialization
             }
 
             var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-            
+
             return _serializerCache.GetOrAdd(cacheKey, key =>
             {
                 // Using if-else pattern matching as suggested
@@ -149,13 +149,13 @@ namespace RedisKit.Serialization
             }
 
             var cacheKey = $"Custom_{serializerType.FullName}";
-            
+
             return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type =>
             {
                 try
                 {
                     var instance = Activator.CreateInstance(type);
-                    
+
                     // Using pattern matching instead of cast
                     return instance switch
                     {
@@ -186,13 +186,13 @@ namespace RedisKit.Serialization
             }
 
             var cacheKey = $"Custom_{serializerType.FullName}_{options.GetHashCode()}";
-            
+
             return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type =>
             {
                 try
                 {
                     var instance = Activator.CreateInstance(type, options);
-                    
+
                     // Using pattern matching instead of cast
                     return instance switch
                     {
@@ -220,7 +220,7 @@ namespace RedisKit.Serialization
             }
 
             var instance = Activator.CreateInstance(serializerType);
-            
+
             _customSerializers[serializerType] = instance switch
             {
                 null => throw new InvalidOperationException($"Failed to create instance of type {serializerType.Name}"),
@@ -252,7 +252,7 @@ namespace RedisKit.Serialization
                 serializer = instance is TSerializer typedSerializer ? typedSerializer : default;
                 return serializer != null;
             }
-            
+
             serializer = default;
             return false;
         }

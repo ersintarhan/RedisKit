@@ -64,10 +64,10 @@ namespace RedisKit.Utilities
         {
             // Calculate base exponential delay
             var baseDelay = CalculateExponential(attempt, config);
-            
+
             // Add jitter to prevent thundering herd problem
             var jitter = GetRandomJitter(baseDelay, config.JitterFactor);
-            
+
             return baseDelay + jitter;
         }
 
@@ -75,23 +75,23 @@ namespace RedisKit.Utilities
         {
             // AWS recommended decorrelated jitter
             // sleep = min(cap, random_between(base, sleep * 3))
-            
+
             var baseMs = config.InitialDelay.TotalMilliseconds;
             var prevMs = previousDelay?.TotalMilliseconds ?? baseMs;
-            
+
             double minDelay = baseMs;
             double maxDelay = prevMs * 3;
-            
+
             // Ensure max doesn't exceed configured maximum
             if (maxDelay > config.MaxDelay.TotalMilliseconds)
                 maxDelay = config.MaxDelay.TotalMilliseconds;
-            
+
             double delay;
             lock (_randomLock)
             {
                 delay = minDelay + (_random.NextDouble() * (maxDelay - minDelay));
             }
-            
+
             return TimeSpan.FromMilliseconds(delay);
         }
 

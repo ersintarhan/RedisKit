@@ -57,7 +57,7 @@ namespace RedisKit.Extensions
                 provider.GetRequiredService<ISubscriber>(),
                 provider.GetRequiredService<ILogger<RedisPubSubService>>(),
                 provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-            
+
             // Register StreamService
             services.AddSingleton<IRedisStreamService>(provider => new RedisStreamService(
                 provider.GetRequiredService<IDatabaseAsync>(),

@@ -20,7 +20,7 @@ public class SerializerBenchmarks
     {
         _jsonSerializer = new SystemTextJsonRedisSerializer();
         _messagePackSerializer = new MessagePackRedisSerializer();
-        
+
         _smallObject = new TestData
         {
             Id = 123,

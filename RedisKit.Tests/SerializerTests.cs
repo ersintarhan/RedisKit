@@ -66,7 +66,7 @@ namespace RedisKit.Tests
             var serializer = new MessagePackRedisSerializer();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 serializer.SerializeAsync<TestModel>(null));
         }
 
@@ -144,9 +144,9 @@ namespace RedisKit.Tests
         {
             // Arrange
             var serializer = new MessagePackRedisSerializer();
-            var testData = new TestModel 
-            { 
-                Id = 42, 
+            var testData = new TestModel
+            {
+                Id = 42,
                 Name = "Round Trip Test",
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
@@ -170,9 +170,9 @@ namespace RedisKit.Tests
         {
             // Arrange
             var serializer = new MessagePackRedisSerializer();
-            var testData = new TestModel 
-            { 
-                Id = 42, 
+            var testData = new TestModel
+            {
+                Id = 42,
                 Name = "Async Round Trip",
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
@@ -199,7 +199,7 @@ namespace RedisKit.Tests
             var invalidData = new byte[] { 0xFF, 0xFE, 0xFD, 0xFC }; // Invalid MessagePack data
 
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
                 serializer.Deserialize<TestModel>(invalidData));
         }
 
@@ -265,7 +265,7 @@ namespace RedisKit.Tests
             var serializer = new SystemTextJsonRedisSerializer();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 serializer.SerializeAsync<TestModel>(null));
         }
 
@@ -306,7 +306,7 @@ namespace RedisKit.Tests
             var serializer = new SystemTextJsonRedisSerializer();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 serializer.Deserialize<TestModel>(null));
         }
 
@@ -354,9 +354,9 @@ namespace RedisKit.Tests
         {
             // Arrange
             var serializer = new SystemTextJsonRedisSerializer();
-            var testData = new TestModel 
-            { 
-                Id = 42, 
+            var testData = new TestModel
+            {
+                Id = 42,
                 Name = "Round Trip Test",
                 CreatedAt = DateTime.UtcNow.Date, // Use Date to avoid millisecond precision issues
                 IsActive = true,
@@ -381,9 +381,9 @@ namespace RedisKit.Tests
         {
             // Arrange
             var serializer = new SystemTextJsonRedisSerializer();
-            var testData = new TestModel 
-            { 
-                Id = 42, 
+            var testData = new TestModel
+            {
+                Id = 42,
                 Name = "Async Round Trip",
                 CreatedAt = DateTime.UtcNow.Date,
                 IsActive = true,
@@ -411,7 +411,7 @@ namespace RedisKit.Tests
             var invalidJson = System.Text.Encoding.UTF8.GetBytes("{ invalid json }");
 
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
                 serializer.Deserialize<TestModel>(invalidJson));
         }
 
@@ -423,7 +423,7 @@ namespace RedisKit.Tests
             var invalidJson = System.Text.Encoding.UTF8.GetBytes("{ invalid json }");
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 serializer.DeserializeAsync<TestModel>(invalidJson));
         }
 
@@ -433,13 +433,13 @@ namespace RedisKit.Tests
             // Arrange
             var mockLogger = new Mock<ILogger<SystemTextJsonRedisSerializer>>();
             mockLogger.Setup(x => x.IsEnabled(LogLevel.Warning)).Returns(true);
-            
+
             var serializer = new SystemTextJsonRedisSerializer(mockLogger.Object, null);
-            
+
             // Create a large object (>1MB when serialized)
-            var largeData = new TestModel 
-            { 
-                Id = 1, 
+            var largeData = new TestModel
+            {
+                Id = 1,
                 Name = new string('x', 2_000_000), // 2MB string
                 Tags = new string[0]
             };
@@ -541,7 +541,7 @@ namespace RedisKit.Tests
         public void SerializerFactory_Create_WithInvalidType_ThrowsArgumentOutOfRangeException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => 
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 RedisSerializerFactory.Create((Models.SerializerType)999, null));
         }
 
@@ -559,9 +559,9 @@ namespace RedisKit.Tests
 
             // Act
             var messagePackBytes = messagePackSerializer.Serialize(testData);
-            
+
             // Assert - Should throw when trying to deserialize MessagePack data as JSON
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
                 jsonSerializer.Deserialize<TestModel>(messagePackBytes));
         }
 
@@ -575,9 +575,9 @@ namespace RedisKit.Tests
 
             // Act
             var jsonBytes = jsonSerializer.Serialize(testData);
-            
+
             // Assert - Should throw when trying to deserialize JSON data as MessagePack
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
                 messagePackSerializer.Deserialize<TestModel>(jsonBytes));
         }
 

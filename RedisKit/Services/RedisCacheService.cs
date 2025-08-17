@@ -17,11 +17,11 @@ namespace RedisKit.Services
         private readonly RedisOptions _options;
         private readonly IRedisSerializer _serializer;
         private string _keyPrefix = string.Empty;
-        
+
         // Lua script support detection
         private bool? _supportsLuaScripts = null;
         private bool _useFallbackMode = false;
-        
+
         // Lua script for SET with EXPIRE
         private const string SetWithExpireScript = @"
             local count = 0
@@ -144,7 +144,8 @@ namespace RedisKit.Services
                 var redisKeys = prefixedKeys.Select(k => (RedisKey)k).ToArray();
                 var values = await _database.StringGetAsync(redisKeys);
 
-                var result = new Dictionary<string, T?>();
+                // Use StringComparer.Ordinal for better performance
+                var result = new Dictionary<string, T?>(keyArray.Length, StringComparer.Ordinal);
                 for (int i = 0; i < prefixedKeys.Length; i++)
                 {
                     // Use the original key (without prefix) as dictionary key
@@ -215,7 +216,7 @@ namespace RedisKit.Services
                     }
 
                     processedCount += chunk.Count();
-                    
+
                     // Progress logging for large datasets
                     if (values.Count > 10000 && processedCount % 5000 == 0)
                     {
@@ -225,11 +226,11 @@ namespace RedisKit.Services
 
                 stopwatch.Stop();
                 Logging.LoggingExtensions.LogSetManyAsyncSuccess(_logger, values.Count);
-                
+
                 // Performance monitoring
                 if (stopwatch.ElapsedMilliseconds > 1000)
                 {
-                    Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, values.Count, stopwatch.ElapsedMilliseconds, 
+                    Logging.LoggingExtensions.LogSlowSetManyAsync(_logger, values.Count, stopwatch.ElapsedMilliseconds,
                         _supportsLuaScripts.Value ? "Lua" : "Fallback");
                 }
             }
@@ -248,7 +249,7 @@ namespace RedisKit.Services
                 var testScript = "return redis.call('PING')";
                 var result = await _database.ScriptEvaluateAsync(testScript);
                 var supported = result.ToString() == "PONG";
-                
+
                 if (supported)
                 {
                     Logging.LoggingExtensions.LogLuaScriptSupported(_logger);
@@ -257,7 +258,7 @@ namespace RedisKit.Services
                 {
                     Logging.LoggingExtensions.LogLuaScriptTestFailed(_logger);
                 }
-                
+
                 return supported;
             }
             catch (Exception ex)
@@ -271,10 +272,10 @@ namespace RedisKit.Services
         {
             return totalCount switch
             {
-                < 100 => totalCount,        // No chunking for small sets
-                < 1000 => 500,              // Medium chunk for medium sets
-                < 10000 => 1000,            // Standard chunk for large sets
-                _ => 2000                   // Large chunk for very large sets
+                < 100 => totalCount, // No chunking for small sets
+                < 1000 => 500, // Medium chunk for medium sets
+                < 10000 => 1000, // Standard chunk for large sets
+                _ => 2000 // Large chunk for very large sets
             };
         }
 
@@ -288,7 +289,7 @@ namespace RedisKit.Services
                     .ToArray();
 
                 var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values);
-                
+
                 var successCount = (int)result;
                 if (successCount != pairs.Length)
                 {
@@ -326,10 +327,10 @@ namespace RedisKit.Services
                 var kvpArray = pairs
                     .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
                     .ToArray();
-                
+
                 // First: MSET
                 await _database.StringSetAsync(kvpArray);
-                
+
                 // Then: parallel EXPIRE to minimize round-trips
                 var expireTasks = pairs
                     .Select(p => _database.KeyExpireAsync(p.Key, expiry.Value))

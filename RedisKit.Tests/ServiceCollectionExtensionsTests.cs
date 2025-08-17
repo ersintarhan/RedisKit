@@ -32,7 +32,7 @@ namespace RedisKit.Tests
             IServiceCollection? services = null;
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 services!.AddRedisServices(options => { }));
         }
 
@@ -40,7 +40,7 @@ namespace RedisKit.Tests
         public void AddRedisServices_WithNullConfigureOptions_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 _services.AddRedisServices(null!));
         }
 
@@ -237,7 +237,7 @@ namespace RedisKit.Tests
             // Act & Assert - These should not throw
             Assert.NotNull(serviceProvider.GetRequiredService<IOptions<RedisOptions>>());
             Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
-            
+
             // Note: IDatabaseAsync and ISubscriber require actual Redis connection
             // so they would throw in unit tests. These would be tested in integration tests.
         }
@@ -282,7 +282,7 @@ namespace RedisKit.Tests
 
             var serviceProvider = _services.BuildServiceProvider();
             var options = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
-            
+
             // The empty connection string is stored
             Assert.Empty(options.Value.ConnectionString);
         }

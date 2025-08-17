@@ -44,11 +44,11 @@ namespace RedisKit.Tests
                 DefaultTtl = TimeSpan.FromHours(1),
                 CacheKeyPrefix = "test:"
             };
-            
+
             var cacheService = new RedisCacheService(mockDatabase.Object, mockLogger.Object, options);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await cacheService.GetAsync<TestModel>(null));
         }
 
@@ -64,11 +64,11 @@ namespace RedisKit.Tests
                 DefaultTtl = TimeSpan.FromHours(1),
                 CacheKeyPrefix = "test:"
             };
-            
+
             var cacheService = new RedisCacheService(mockDatabase.Object, mockLogger.Object, options);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await cacheService.SetAsync<TestModel>(null, new TestModel()));
         }
 
@@ -84,11 +84,11 @@ namespace RedisKit.Tests
                 DefaultTtl = TimeSpan.FromHours(1),
                 CacheKeyPrefix = "test:"
             };
-            
+
             var cacheService = new RedisCacheService(mockDatabase.Object, mockLogger.Object, options);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await cacheService.DeleteAsync(null));
         }
 
@@ -104,11 +104,11 @@ namespace RedisKit.Tests
                 DefaultTtl = TimeSpan.FromHours(1),
                 CacheKeyPrefix = "test:"
             };
-            
+
             var cacheService = new RedisCacheService(mockDatabase.Object, mockLogger.Object, options);
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 cacheService.SetKeyPrefix(null));
         }
 
@@ -131,8 +131,8 @@ namespace RedisKit.Tests
 
             // Setup Lua script execution for SET with EXPIRE
             mockDatabase.ScriptEvaluateAsync(
-                Arg.Is<string>(s => s.Contains("SET") && s.Contains("EX")), 
-                Arg.Any<RedisKey[]>(), 
+                Arg.Is<string>(s => s.Contains("SET") && s.Contains("EX")),
+                Arg.Any<RedisKey[]>(),
                 Arg.Any<RedisValue[]>())
                 .Returns(Task.FromResult(RedisResult.Create((RedisValue)3))); // Return count of items set
 
@@ -151,14 +151,14 @@ namespace RedisKit.Tests
             // Assert
             // Should check Lua support
             await mockDatabase.Received(1).ScriptEvaluateAsync(
-                Arg.Is<string>(s => s.Contains("PING")), 
-                Arg.Any<RedisKey[]>(), 
+                Arg.Is<string>(s => s.Contains("PING")),
+                Arg.Any<RedisKey[]>(),
                 Arg.Any<RedisValue[]>());
 
             // Should execute SET with EXPIRE script
             await mockDatabase.Received(1).ScriptEvaluateAsync(
-                Arg.Is<string>(s => s.Contains("SET") && s.Contains("EX")), 
-                Arg.Any<RedisKey[]>(), 
+                Arg.Is<string>(s => s.Contains("SET") && s.Contains("EX")),
+                Arg.Any<RedisKey[]>(),
                 Arg.Any<RedisValue[]>());
         }
 
@@ -201,7 +201,7 @@ namespace RedisKit.Tests
             // Assert
             // Should use MSET
             await mockDatabase.Received(1).StringSetAsync(Arg.Any<KeyValuePair<RedisKey, RedisValue>[]>());
-            
+
             // Should call EXPIRE for each key
             await mockDatabase.Received(2).KeyExpireAsync(Arg.Any<RedisKey>(), Arg.Any<TimeSpan?>());
         }
