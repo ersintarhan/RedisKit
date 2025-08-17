@@ -43,37 +43,29 @@ namespace RedisKit.Services
             var lockKey = GetLockKey(resource);
             var database = _connectionMultiplexer.GetDatabase();
 
-            try
+            // Try to acquire the lock using SET NX PX
+            var acquired = await database.StringSetAsync(
+                lockKey,
+                lockId,
+                expiry,
+                When.NotExists,
+                CommandFlags.DemandMaster);
+
+            if (acquired)
             {
-                // Try to acquire the lock using SET NX PX
-                var acquired = await database.StringSetAsync(
-                    lockKey,
+                _logger?.LogDebug("Acquired lock for resource: {Resource}, LockId: {LockId}", resource, lockId);
+
+                return new RedisLockHandle(
+                    database,
+                    resource,
                     lockId,
                     expiry,
-                    When.NotExists,
-                    CommandFlags.DemandMaster);
-
-                if (acquired)
-                {
-                    _logger?.LogDebug("Acquired lock for resource: {Resource}, LockId: {LockId}", resource, lockId);
-
-                    return new RedisLockHandle(
-                        database,
-                        resource,
-                        lockId,
-                        expiry,
-                        _options.EnableAutoRenewal,
-                        null); // Logger type mismatch - RedisLockHandle will work without logger
-                }
-
-                _logger?.LogDebug("Failed to acquire lock for resource: {Resource} - already locked", resource);
-                return null;
+                    _options.EnableAutoRenewal,
+                    null); // Logger type mismatch - RedisLockHandle will work without logger
             }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error acquiring lock for resource: {Resource}", resource);
-                throw;
-            }
+
+            _logger?.LogDebug("Failed to acquire lock for resource: {Resource} - already locked", resource);
+            return null;
         }
 
         public async Task<ILockHandle?> AcquireLockAsync(
@@ -124,18 +116,10 @@ namespace RedisKit.Services
             if (string.IsNullOrWhiteSpace(resource))
                 throw new ArgumentException("Resource cannot be null or empty", nameof(resource));
 
-            try
-            {
-                var database = _connectionMultiplexer.GetDatabase();
-                var lockKey = GetLockKey(resource);
+            var database = _connectionMultiplexer.GetDatabase();
+            var lockKey = GetLockKey(resource);
 
-                return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error checking lock status for resource: {Resource}", resource);
-                throw;
-            }
+            return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
         }
 
         public async Task<bool> ExtendLockAsync(
@@ -180,10 +164,9 @@ namespace RedisKit.Services
                         // Failed to acquire one lock, release all acquired locks
                         _logger?.LogDebug("Failed to acquire multi-lock. Could not lock resource: {Resource}", resource);
 
-                        foreach (var acquired in acquiredLocks)
-                        {
-                            await acquired.ReleaseAsync(cancellationToken).ConfigureAwait(false);
-                        }
+                        // Use LINQ with Task.WhenAll for parallel release
+                        await Task.WhenAll(acquiredLocks.Select(acquired => 
+                            acquired.ReleaseAsync(cancellationToken)));
 
                         return null;
                     }
@@ -192,12 +175,10 @@ namespace RedisKit.Services
                 _logger?.LogDebug("Successfully acquired multi-lock for {Count} resources", resources.Length);
                 return new MultiLockHandle(acquiredLocks);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger?.LogError(ex, "Error acquiring multi-lock for resources");
-
-                // Clean up any acquired locks
-                foreach (var acquired in acquiredLocks)
+                // Clean up any acquired locks using LINQ
+                var releaseTasks = acquiredLocks.Select(async acquired =>
                 {
                     try
                     {
@@ -207,8 +188,9 @@ namespace RedisKit.Services
                     {
                         // Best effort cleanup
                     }
-                }
+                });
 
+                await Task.WhenAll(releaseTasks);
                 throw;
             }
         }

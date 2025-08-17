@@ -121,37 +121,29 @@ namespace RedisKit.Services
             if (_disposed || !_isAcquired)
                 return;
 
-            try
-            {
-                // Lua script to ensure we only delete our own lock
-                var script = @"
+            // Lua script to ensure we only delete our own lock
+            var script = @"
                     if redis.call('get', KEYS[1]) == ARGV[1] then
                         return redis.call('del', KEYS[1])
                     else
                         return 0
                     end";
 
-                var result = await _database.ScriptEvaluateAsync(
-                    script,
-                    new RedisKey[] { GetLockKey(Resource) },
-                    new RedisValue[] { LockId },
-                    CommandFlags.DemandMaster);
+            var result = await _database.ScriptEvaluateAsync(
+                script,
+                new RedisKey[] { GetLockKey(Resource) },
+                new RedisValue[] { LockId },
+                CommandFlags.DemandMaster);
 
-                _isAcquired = false;
+            _isAcquired = false;
 
-                if ((int)result == 1)
-                {
-                    _logger?.LogDebug("Released lock for resource: {Resource}", Resource);
-                }
-                else
-                {
-                    _logger?.LogWarning("Lock was already released or expired for resource: {Resource}", Resource);
-                }
-            }
-            catch (Exception ex)
+            if ((int)result == 1)
             {
-                _logger?.LogError(ex, "Failed to release lock for resource: {Resource}", Resource);
-                throw;
+                _logger?.LogDebug("Released lock for resource: {Resource}", Resource);
+            }
+            else
+            {
+                _logger?.LogWarning("Lock was already released or expired for resource: {Resource}", Resource);
             }
         }
 

@@ -20,31 +20,11 @@ namespace RedisKit.Serialization
         public static IRedisSerializer Create(Models.SerializerType serializerType, ILoggerFactory? loggerFactory = null)
         {
             var cacheKey = $"{serializerType}";
-
-            return _serializerCache.GetOrAdd(cacheKey, key =>
-            {
-                return serializerType switch
-                {
-                    Models.SerializerType.MessagePack =>
-                        new MessagePackRedisSerializer(
-                            loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
-                            null),
-
-                    Models.SerializerType.SystemTextJson =>
-                        new SystemTextJsonRedisSerializer(
-                            loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
-                            null),
-
-                    Models.SerializerType.Custom =>
-                        throw new ArgumentException("Custom serializer type requires specifying the custom serializer implementation", nameof(serializerType)),
-
-                    _ => throw new ArgumentOutOfRangeException(nameof(serializerType), $"Unknown serializer type: {serializerType}")
-                };
-            });
+            return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, null, loggerFactory));
         }
 
         /// <summary>
-        /// Creates a serializer instance with custom options using pattern matching
+        /// Creates a serializer instance with custom options
         /// </summary>
         /// <param name="serializerType">The type of serializer to create</param>
         /// <param name="options">Serializer-specific options</param>
@@ -56,38 +36,11 @@ namespace RedisKit.Serialization
             ILoggerFactory? loggerFactory = null) where TOptions : class
         {
             var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-
-            return _serializerCache.GetOrAdd(cacheKey, key =>
-            {
-                // Using modern pattern matching with switch expression
-                return (serializerType, options) switch
-                {
-                    (Models.SerializerType.MessagePack, MessagePack.MessagePackSerializerOptions messagePackOptions) =>
-                        new MessagePackRedisSerializer(
-                            loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
-                            messagePackOptions),
-
-                    (Models.SerializerType.SystemTextJson, System.Text.Json.JsonSerializerOptions jsonOptions) =>
-                        new SystemTextJsonRedisSerializer(
-                            loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
-                            jsonOptions),
-
-                    (Models.SerializerType.MessagePack, _) =>
-                        throw new ArgumentException($"Invalid options type for MessagePack serializer. Expected {nameof(MessagePack.MessagePackSerializerOptions)}, got {options.GetType().Name}", nameof(options)),
-
-                    (Models.SerializerType.SystemTextJson, _) =>
-                        throw new ArgumentException($"Invalid options type for System.Text.Json serializer. Expected {nameof(System.Text.Json.JsonSerializerOptions)}, got {options.GetType().Name}", nameof(options)),
-
-                    (Models.SerializerType.Custom, _) =>
-                        throw new ArgumentException("Custom serializer type requires using CreateCustom method", nameof(serializerType)),
-
-                    _ => throw new ArgumentOutOfRangeException(nameof(serializerType), $"Unknown serializer type: {serializerType}")
-                };
-            });
+            return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerWithTypedOptions(serializerType, options, loggerFactory));
         }
 
         /// <summary>
-        /// Alternative method using if-else pattern matching for better readability in some cases
+        /// Creates a serializer instance with options
         /// </summary>
         public static IRedisSerializer CreateWithOptions(
             Models.SerializerType serializerType,
@@ -95,44 +48,10 @@ namespace RedisKit.Serialization
             ILoggerFactory? loggerFactory = null)
         {
             if (options == null)
-            {
                 return Create(serializerType, loggerFactory);
-            }
 
             var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-
-            return _serializerCache.GetOrAdd(cacheKey, key =>
-            {
-                // Using if-else pattern matching as suggested
-                if (serializerType == Models.SerializerType.MessagePack)
-                {
-                    if (options is MessagePack.MessagePackSerializerOptions messagePackOptions)
-                    {
-                        return new MessagePackRedisSerializer(
-                            loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
-                            messagePackOptions);
-                    }
-                    throw new ArgumentException($"Invalid options type for MessagePack serializer. Expected {nameof(MessagePack.MessagePackSerializerOptions)}, got {options.GetType().Name}", nameof(options));
-                }
-                else if (serializerType == Models.SerializerType.SystemTextJson)
-                {
-                    if (options is System.Text.Json.JsonSerializerOptions jsonOptions)
-                    {
-                        return new SystemTextJsonRedisSerializer(
-                            loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
-                            jsonOptions);
-                    }
-                    throw new ArgumentException($"Invalid options type for System.Text.Json serializer. Expected {nameof(System.Text.Json.JsonSerializerOptions)}, got {options.GetType().Name}", nameof(options));
-                }
-                else if (serializerType == Models.SerializerType.Custom)
-                {
-                    throw new ArgumentException("Custom serializer type requires using CreateCustom method", nameof(serializerType));
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(serializerType), $"Unknown serializer type: {serializerType}");
-                }
-            });
+            return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, options, loggerFactory));
         }
 
         /// <summary>
@@ -143,32 +62,8 @@ namespace RedisKit.Serialization
         /// <returns>An instance of IRedisSerializer</returns>
         public static IRedisSerializer CreateCustom(Type serializerType, ILoggerFactory? loggerFactory = null)
         {
-            if (!typeof(IRedisSerializer).IsAssignableFrom(serializerType))
-            {
-                throw new ArgumentException($"Type {serializerType.Name} must implement IRedisSerializer interface", nameof(serializerType));
-            }
-
-            var cacheKey = $"Custom_{serializerType.FullName}";
-
-            return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type =>
-            {
-                try
-                {
-                    var instance = Activator.CreateInstance(type);
-
-                    // Using pattern matching instead of cast
-                    return instance switch
-                    {
-                        null => throw new InvalidOperationException($"Failed to create instance of type {type.Name}"),
-                        IRedisSerializer serializer => serializer,
-                        _ => throw new InvalidOperationException($"Type {type.Name} must implement IRedisSerializer interface")
-                    };
-                }
-                catch (Exception ex) when (ex is not InvalidOperationException)
-                {
-                    throw new InvalidOperationException($"Failed to create custom serializer of type {serializerType.Name}", ex);
-                }
-            });
+            ValidateCustomSerializerType(serializerType);
+            return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, null));
         }
 
         /// <summary>
@@ -180,53 +75,20 @@ namespace RedisKit.Serialization
         /// <returns>An instance of IRedisSerializer</returns>
         public static IRedisSerializer CreateCustom(Type serializerType, object options, ILoggerFactory? loggerFactory = null)
         {
-            if (!typeof(IRedisSerializer).IsAssignableFrom(serializerType))
-            {
-                throw new ArgumentException($"Type {serializerType.Name} must implement IRedisSerializer interface", nameof(serializerType));
-            }
-
+            ValidateCustomSerializerType(serializerType);
             var cacheKey = $"Custom_{serializerType.FullName}_{options.GetHashCode()}";
-
-            return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type =>
-            {
-                try
-                {
-                    var instance = Activator.CreateInstance(type, options);
-
-                    // Using pattern matching instead of cast
-                    return instance switch
-                    {
-                        null => throw new InvalidOperationException($"Failed to create instance of type {type.Name} with options"),
-                        IRedisSerializer serializer => serializer,
-                        _ => throw new InvalidOperationException($"Type {type.Name} must implement IRedisSerializer interface")
-                    };
-                }
-                catch (Exception ex) when (ex is not InvalidOperationException)
-                {
-                    throw new InvalidOperationException($"Failed to create custom serializer of type {serializerType.Name} with options", ex);
-                }
-            });
+            return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, options));
         }
 
         /// <summary>
-        /// Registers a custom serializer type with improved pattern matching
+        /// Registers a custom serializer type
         /// </summary>
         /// <param name="serializerType">The type of the custom serializer</param>
         public static void RegisterCustomSerializer(Type serializerType)
         {
-            if (!typeof(IRedisSerializer).IsAssignableFrom(serializerType))
-            {
-                throw new ArgumentException($"Type {serializerType.Name} must implement IRedisSerializer interface", nameof(serializerType));
-            }
-
-            var instance = Activator.CreateInstance(serializerType);
-
-            _customSerializers[serializerType] = instance switch
-            {
-                null => throw new InvalidOperationException($"Failed to create instance of type {serializerType.Name}"),
-                IRedisSerializer serializer => serializer,
-                _ => throw new InvalidOperationException($"Type {serializerType.Name} must implement IRedisSerializer interface")
-            };
+            ValidateCustomSerializerType(serializerType);
+            var instance = CreateCustomSerializerInstance(serializerType, null);
+            _customSerializers[serializerType] = instance;
         }
 
         /// <summary>
@@ -275,5 +137,131 @@ namespace RedisKit.Serialization
         /// Gets the number of registered custom serializers
         /// </summary>
         public static int CustomSerializerCount => _customSerializers.Count;
+
+        #region Private Helper Methods
+
+        private static IRedisSerializer CreateSerializerInstance(
+            Models.SerializerType serializerType,
+            object? options,
+            ILoggerFactory? loggerFactory)
+        {
+            return serializerType switch
+            {
+                Models.SerializerType.MessagePack => CreateMessagePackSerializer(options, loggerFactory),
+                Models.SerializerType.SystemTextJson => CreateSystemTextJsonSerializer(options, loggerFactory),
+                Models.SerializerType.Custom => throw new ArgumentException(
+                    "Custom serializer type requires using CreateCustom method", nameof(serializerType)),
+                _ => throw new ArgumentOutOfRangeException(nameof(serializerType), 
+                    $"Unknown serializer type: {serializerType}")
+            };
+        }
+
+        private static IRedisSerializer CreateSerializerWithTypedOptions<TOptions>(
+            Models.SerializerType serializerType,
+            TOptions options,
+            ILoggerFactory? loggerFactory) where TOptions : class
+        {
+            return (serializerType, options) switch
+            {
+                (Models.SerializerType.MessagePack, MessagePack.MessagePackSerializerOptions msgPackOpts) =>
+                    new MessagePackRedisSerializer(
+                        loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
+                        msgPackOpts),
+
+                (Models.SerializerType.SystemTextJson, System.Text.Json.JsonSerializerOptions jsonOpts) =>
+                    new SystemTextJsonRedisSerializer(
+                        loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
+                        jsonOpts),
+
+                (Models.SerializerType.MessagePack, _) =>
+                    throw CreateInvalidOptionsException(serializerType, typeof(MessagePack.MessagePackSerializerOptions), options.GetType()),
+
+                (Models.SerializerType.SystemTextJson, _) =>
+                    throw CreateInvalidOptionsException(serializerType, typeof(System.Text.Json.JsonSerializerOptions), options.GetType()),
+
+                (Models.SerializerType.Custom, _) =>
+                    throw new ArgumentException("Custom serializer type requires using CreateCustom method", nameof(serializerType)),
+
+                _ => throw new ArgumentOutOfRangeException(nameof(serializerType), 
+                    $"Unknown serializer type: {serializerType}")
+            };
+        }
+
+        private static IRedisSerializer CreateMessagePackSerializer(object? options, ILoggerFactory? loggerFactory)
+        {
+            var messagePackOptions = options switch
+            {
+                null => null,
+                MessagePack.MessagePackSerializerOptions msgPackOpts => msgPackOpts,
+                _ => throw CreateInvalidOptionsException(Models.SerializerType.MessagePack, 
+                    typeof(MessagePack.MessagePackSerializerOptions), options.GetType())
+            };
+
+            return new MessagePackRedisSerializer(
+                loggerFactory?.CreateLogger<MessagePackRedisSerializer>(),
+                messagePackOptions);
+        }
+
+        private static IRedisSerializer CreateSystemTextJsonSerializer(object? options, ILoggerFactory? loggerFactory)
+        {
+            var jsonOptions = options switch
+            {
+                null => null,
+                System.Text.Json.JsonSerializerOptions jsonOpts => jsonOpts,
+                _ => throw CreateInvalidOptionsException(Models.SerializerType.SystemTextJson,
+                    typeof(System.Text.Json.JsonSerializerOptions), options.GetType())
+            };
+
+            return new SystemTextJsonRedisSerializer(
+                loggerFactory?.CreateLogger<SystemTextJsonRedisSerializer>(),
+                jsonOptions);
+        }
+
+        private static object CreateCustomSerializerInstance(Type serializerType, object? options)
+        {
+            try
+            {
+                var instance = options == null 
+                    ? Activator.CreateInstance(serializerType)
+                    : Activator.CreateInstance(serializerType, options);
+
+                return instance switch
+                {
+                    null => throw new InvalidOperationException(
+                        $"Failed to create instance of type {serializerType.Name}"),
+                    IRedisSerializer serializer => serializer,
+                    _ => throw new InvalidOperationException(
+                        $"Type {serializerType.Name} must implement IRedisSerializer interface")
+                };
+            }
+            catch (Exception ex) when (ex is not InvalidOperationException)
+            {
+                var withOptionsMsg = options != null ? " with options" : "";
+                throw new InvalidOperationException(
+                    $"Failed to create custom serializer of type {serializerType.Name}{withOptionsMsg}", ex);
+            }
+        }
+
+        private static void ValidateCustomSerializerType(Type serializerType)
+        {
+            if (!typeof(IRedisSerializer).IsAssignableFrom(serializerType))
+            {
+                throw new ArgumentException(
+                    $"Type {serializerType.Name} must implement IRedisSerializer interface", 
+                    nameof(serializerType));
+            }
+        }
+
+        private static ArgumentException CreateInvalidOptionsException(
+            Models.SerializerType serializerType, 
+            Type expectedType, 
+            Type actualType)
+        {
+            return new ArgumentException(
+                $"Invalid options type for {serializerType} serializer. Expected {expectedType.Name}, got {actualType.Name}", 
+                "options");
+        }
+
+        #endregion
     }
 }

@@ -108,7 +108,6 @@ namespace RedisKit.Services
     {
         private readonly ISubscriber _subscriber;
         private readonly ILogger<RedisPubSubService> _logger;
-        private readonly RedisOptions _options;
         private readonly IRedisSerializer _serializer;
 
         // Channel subscriptions: channel -> list of handlers
@@ -140,10 +139,9 @@ namespace RedisKit.Services
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
 
             // Create serializer based on configuration
-            _serializer = RedisSerializerFactory.Create(_options.Serializer);
+            _serializer = RedisSerializerFactory.Create(options.Serializer);
 
             _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
             _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
@@ -481,6 +479,14 @@ namespace RedisKit.Services
             await UnsubscribeInternalAsync(channel, SubscriptionType.Channel, cancellationToken).ConfigureAwait(false);
         }
 
+        public async Task UnsubscribeAsync(SubscriptionToken token, CancellationToken cancellationToken = default)
+        {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+
+            await token.UnsubscribeAsync().ConfigureAwait(false);
+        }
+
         public async Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)
         {
             await UnsubscribeInternalAsync(pattern, SubscriptionType.Pattern, cancellationToken).ConfigureAwait(false);
@@ -672,7 +678,7 @@ namespace RedisKit.Services
             return stats;
         }
 
-        private void UpdateAverageProcessingTime(SubscriptionStats stats, TimeSpan elapsed)
+        private static void UpdateAverageProcessingTime(SubscriptionStats stats, TimeSpan elapsed)
         {
             if (stats.AverageProcessingTime == TimeSpan.Zero)
             {
@@ -689,14 +695,6 @@ namespace RedisKit.Services
         #endregion
 
         #region Additional Interface Methods
-
-        public async Task UnsubscribeAsync(SubscriptionToken token, CancellationToken cancellationToken = default)
-        {
-            if (token == null)
-                throw new ArgumentNullException(nameof(token));
-
-            await token.UnsubscribeAsync().ConfigureAwait(false);
-        }
 
         public async Task<SubscriptionToken> SubscribePatternWithChannelAsync<T>(
             string pattern,
@@ -785,7 +783,7 @@ namespace RedisKit.Services
         /// <summary>
         /// Internal handler representation
         /// </summary>
-        private class SubscriptionHandler
+        private sealed class SubscriptionHandler
         {
             public string Id { get; }
             public Func<object, CancellationToken, Task> Handler { get; }
@@ -802,7 +800,7 @@ namespace RedisKit.Services
         /// <summary>
         /// Handler metadata for tracking and cleanup
         /// </summary>
-        private class HandlerMetadata
+        private sealed class HandlerMetadata
         {
             public required string Key { get; init; }
             public required SubscriptionType Type { get; init; }

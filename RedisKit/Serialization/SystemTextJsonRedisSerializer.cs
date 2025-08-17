@@ -149,8 +149,6 @@ namespace RedisKit.Serialization
         /// </remarks>
         public byte[] Serialize<T>(T obj)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
 
             try
             {
@@ -275,8 +273,6 @@ namespace RedisKit.Serialization
         /// </remarks>
         public Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
 
             // Validate object size to prevent memory issues (only if warning is enabled)
             if (_logger?.IsEnabled(LogLevel.Warning) == true)
@@ -359,18 +355,7 @@ namespace RedisKit.Serialization
             }
         }
 
-        /// <summary>
-        /// Creates consistent error messages for serialization/deserialization failures.
-        /// </summary>
-        /// <typeparam name="T">The type involved in the operation.</typeparam>
-        /// <param name="operation">The operation that failed (e.g., "serialize", "deserialize").</param>
-        /// <param name="ex">The exception that occurred.</param>
-        /// <returns>A formatted error message with operation and type information.</returns>
-        private string CreateErrorMessage<T>(string operation, Exception ex)
-        {
-            return $"Failed to {operation} object of type {typeof(T).Name} using System.Text.Json. " +
-                   $"Error: {ex.Message}";
-        }
+ 
 
         /// <summary>
         /// Asynchronously deserializes a UTF-8 encoded JSON byte array to an object.
