@@ -1,5 +1,9 @@
+using System.Buffers;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -147,16 +151,21 @@ namespace RedisKit.Services;
 /// </remarks>
 public class RedisStreamService : IRedisStreamService
 {
+    // ArrayPool for memory optimization
+    private static readonly ArrayPool<string> StringArrayPool = ArrayPool<string>.Shared;
+    
     private readonly IDatabaseAsync _database;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
+    private readonly ObjectPool<List<(int index, string id)>>? _resultListPool;
     private string _keyPrefix = string.Empty;
 
     public RedisStreamService(
         IDatabaseAsync database,
         ILogger<RedisStreamService> logger,
-        RedisOptions options)
+        RedisOptions options,
+        ObjectPoolProvider? poolProvider = null)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -164,6 +173,10 @@ public class RedisStreamService : IRedisStreamService
 
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
+        
+        // Initialize object pool for result lists
+        var provider = poolProvider ?? new DefaultObjectPoolProvider();
+        _resultListPool = provider.Create<List<(int index, string id)>>();
     }
 
     public async Task<string> AddAsync<T>(string stream, T message, CancellationToken cancellationToken = default) where T : class
@@ -231,13 +244,7 @@ public class RedisStreamService : IRedisStreamService
             foreach (var entry in entries)
             {
                 // Extract the data field and deserialize
-                var value = default(RedisValue);
-                foreach (var fieldValue in entry.Values)
-                    if (fieldValue.Name == "data")
-                    {
-                        value = fieldValue.Value;
-                        break;
-                    }
+                var value = GetDataFieldValue(entry);
 
                 if (!value.IsNullOrEmpty)
                     try
@@ -329,13 +336,7 @@ public class RedisStreamService : IRedisStreamService
             foreach (var entry in entries)
             {
                 // Extract the data field and deserialize
-                var value = default(RedisValue);
-                foreach (var fieldValue in entry.Values)
-                    if (fieldValue.Name == "data")
-                    {
-                        value = fieldValue.Value;
-                        break;
-                    }
+                var value = GetDataFieldValue(entry);
 
                 if (!value.IsNullOrEmpty)
                     try
@@ -988,6 +989,16 @@ public class RedisStreamService : IRedisStreamService
         if (processor == null)
             throw new ArgumentNullException(nameof(processor));
     }
+    
+    private static void ValidateStreamName(string stream, string paramName = "stream")
+    {
+        if (string.IsNullOrWhiteSpace(stream))
+            throw new ArgumentException($"Stream name cannot be null, empty or whitespace", paramName);
+        
+        // Redis key length limit check
+        if (stream.Length > 512)
+            throw new ArgumentException($"Stream name cannot exceed 512 characters (was {stream.Length})", paramName);
+    }
 
     private async Task<List<StreamPendingMessageInfo>> GetTimedOutMessagesAsync(
         string stream, string groupName, string consumerName,
@@ -1143,24 +1154,102 @@ public class RedisStreamService : IRedisStreamService
         string stream, T[] messages, int? maxLength,
         CancellationToken cancellationToken) where T : class
     {
-        var results = new ConcurrentBag<(int index, string id)>();
-
-        await Parallel.ForEachAsync(
-            messages.Select((msg, idx) => (message: msg, index: idx)),
-            CreateParallelOptions(cancellationToken),
-            async (item, ct) => await AddSingleMessageAsync(stream, item, maxLength, results, messages.Length, ct));
-
-        return results
-            .OrderBy(r => r.index)
-            .Select(r => r.id)
-            .ToArray();
+        const int optimalBatchSize = 100;
+        
+        // For small batches, use simple array pooling
+        if (messages.Length <= optimalBatchSize)
+        {
+            return await ProcessSmallBatchAsync(stream, messages, maxLength, cancellationToken);
+        }
+        
+        // For large batches, use object pool for result collection
+        return await ProcessLargeBatchAsync(stream, messages, maxLength, cancellationToken);
+    }
+    
+    private async Task<string[]> ProcessSmallBatchAsync<T>(
+        string stream, T[] messages, int? maxLength,
+        CancellationToken cancellationToken) where T : class
+    {
+        // Rent array from pool
+        var resultArray = StringArrayPool.Rent(messages.Length);
+        try
+        {
+            for (int i = 0; i < messages.Length; i++)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+                    
+                resultArray[i] = await AddAsync(stream, messages[i], maxLength, cancellationToken).ConfigureAwait(false);
+            }
+            
+            // Create exact-sized array for return
+            var results = new string[messages.Length];
+            Array.Copy(resultArray, results, messages.Length);
+            return results;
+        }
+        finally
+        {
+            StringArrayPool.Return(resultArray, clearArray: true);
+        }
+    }
+    
+    private async Task<string[]> ProcessLargeBatchAsync<T>(
+        string stream, T[] messages, int? maxLength,
+        CancellationToken cancellationToken) where T : class
+    {
+        // Use pooled list from ObjectPool if available
+        if (_resultListPool != null)
+        {
+            var results = _resultListPool.Get();
+            try
+            {
+                await Parallel.ForEachAsync(
+                    messages.Select((msg, idx) => (message: msg, index: idx)),
+                    CreateParallelOptions(cancellationToken),
+                    async (item, ct) => 
+                    {
+                        var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
+                        lock (results)
+                        {
+                            results.Add((item.index, messageId));
+                        }
+                        LogBatchProgress(stream, item.index, messages.Length);
+                    });
+                
+                // Sort and convert to array
+                results.Sort((a, b) => a.index.CompareTo(b.index));
+                return results.Select(r => r.id).ToArray();
+            }
+            finally
+            {
+                _resultListPool.Return(results);
+            }
+        }
+        else
+        {
+            // Fallback to ConcurrentBag if ObjectPool is not available
+            var results = new ConcurrentBag<(int index, string id)>();
+            
+            await Parallel.ForEachAsync(
+                messages.Select((msg, idx) => (message: msg, index: idx)),
+                CreateParallelOptions(cancellationToken),
+                async (item, ct) => await AddSingleMessageAsync(stream, item, maxLength, results, messages.Length, ct));
+            
+            return results
+                .OrderBy(r => r.index)
+                .Select(r => r.id)
+                .ToArray();
+        }
     }
 
     private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
     {
+        // Dinamik parallelism: CPU sayısına göre ayarla, max 8 ile sınırla
+        var maxDegree = Math.Min(Environment.ProcessorCount * 2, 8);
+        
         return new ParallelOptions
         {
-            MaxDegreeOfParallelism = 10,
+            MaxDegreeOfParallelism = maxDegree,
             CancellationToken = cancellationToken
         };
     }
@@ -1176,6 +1265,11 @@ public class RedisStreamService : IRedisStreamService
             results.Add((item.index, messageId));
 
             LogBatchProgress(stream, item.index, totalMessages);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogDebug("Batch add operation cancelled at index {Index} for stream {Stream}", item.index, stream);
+            throw;
         }
         catch (Exception ex)
         {
@@ -1198,5 +1292,142 @@ public class RedisStreamService : IRedisStreamService
 
         _logger.LogInformation("Successfully added {Count} messages to stream {Stream} in {ElapsedMs}ms ({Rate} msgs/sec)",
             messageCount, stream, elapsedMs, rate);
+    }
+    
+    // ============= Memory Optimization Methods =============
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static RedisValue GetDataFieldValue(StreamEntry entry)
+    {
+        // Optimized field lookup without LINQ
+        foreach (var fieldValue in entry.Values)
+        {
+            if (fieldValue.Name == "data")
+                return fieldValue.Value;
+        }
+        return RedisValue.Null;
+    }
+    
+    // ============= Streaming API Methods =============
+    
+    /// <summary>
+    /// Memory-efficient streaming reader for large datasets
+    /// </summary>
+    public async IAsyncEnumerable<(string Id, T? Data)> ReadStreamingAsync<T>(
+        string stream,
+        string? start = null,
+        int batchSize = 100,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : class
+    {
+        if (string.IsNullOrEmpty(stream))
+            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+        
+        var prefixedStream = $"{_keyPrefix}{stream}";
+        var currentStart = start ?? "0";
+        
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var entries = await _database.StreamRangeAsync(
+                prefixedStream, 
+                currentStart, 
+                "+", 
+                batchSize).ConfigureAwait(false);
+            
+            if (entries.Length == 0)
+                yield break;
+            
+            foreach (var entry in entries)
+            {
+                var value = GetDataFieldValue(entry);
+                if (!value.IsNullOrEmpty)
+                {
+                    T? data = null;
+                    try
+                    {
+                        data = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", 
+                            prefixedStream, entry.Id);
+                    }
+                    yield return (entry.Id!, data);
+                }
+                
+                currentStart = entry.Id!;
+            }
+            
+            // If we got less than batch size, we've reached the end
+            if (entries.Length < batchSize)
+                yield break;
+        }
+    }
+    
+    /// <summary>
+    /// Streaming consumer group reader with automatic acknowledgment
+    /// </summary>
+    public async IAsyncEnumerable<(string Id, T? Data, Func<Task> AckFunc)> ReadGroupStreamingAsync<T>(
+        string stream,
+        string groupName,
+        string consumerName,
+        int batchSize = 10,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : class
+    {
+        if (string.IsNullOrEmpty(stream))
+            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+        if (string.IsNullOrEmpty(groupName))
+            throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
+        if (string.IsNullOrEmpty(consumerName))
+            throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
+        
+        var prefixedStream = $"{_keyPrefix}{stream}";
+        
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var entries = await _database.StreamReadGroupAsync(
+                prefixedStream,
+                groupName,
+                consumerName,
+                ">",
+                batchSize).ConfigureAwait(false);
+            
+            if (entries.Length == 0)
+            {
+                // No new messages, wait a bit before checking again
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                continue;
+            }
+            
+            foreach (var entry in entries)
+            {
+                var value = GetDataFieldValue(entry);
+                T? data = null;
+                
+                if (!value.IsNullOrEmpty)
+                {
+                    try
+                    {
+                        data = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", 
+                            prefixedStream, entry.Id);
+                    }
+                }
+                
+                // Create acknowledgment function closure
+                var messageId = entry.Id.ToString();
+                if (!string.IsNullOrEmpty(messageId))
+                {
+                    Func<Task> ackFunc = async () => 
+                    {
+                        await AcknowledgeAsync(stream, groupName, messageId, cancellationToken);
+                    };
+                    
+                    yield return (messageId, data, ackFunc);
+                }
+            }
+        }
     }
 }
