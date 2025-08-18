@@ -208,7 +208,7 @@ public class RedisCacheService : IRedisCacheService
 
         var prefixedKeys = originalKeys.Select(k => (RedisKey)$"{_keyPrefix}{k}").ToArray();
 
-        using var pooledTasks = _taskListPool.GetPooled();
+        using var pooledTasks = _taskListPool!.GetPooled();
         var deserializationTasks = pooledTasks.Value;
         var resultsByIndex = new ConcurrentDictionary<int, T?>();
 
@@ -431,7 +431,7 @@ public class RedisCacheService : IRedisCacheService
         IEnumerable<KeyValuePair<string, T>> chunk, CancellationToken cancellationToken)
         where T : class
     {
-        using var pooledTasks = _taskListPool.GetPooled();
+        using var pooledTasks = _taskListPool!.GetPooled();
         var tasks = pooledTasks.Value;
 
         tasks.AddRange(chunk.Select(async kvp =>
@@ -588,11 +588,9 @@ public class RedisCacheService : IRedisCacheService
             var msetTask = batch.StringSetAsync(kvpArray);
 
             // Then: parallel EXPIRE to minimize round-trips
-            using var pooledTasks = _taskListPool.GetPooled();
+            using var pooledTasks = _taskListPool!.GetPooled();
             var expireTasks = pooledTasks.Value;
-
-            foreach (var pair in pairs) expireTasks.Add(batch.KeyExpireAsync(pair.Key, expiry.Value));
-
+            expireTasks.AddRange(pairs.Select(pair => batch.KeyExpireAsync(pair.Key, expiry.Value)));
             batch.Execute();
             await Task.WhenAll(expireTasks.Append(msetTask));
         }

@@ -1,5 +1,3 @@
-# Jules AI Agent Configuration
-
 ## Environment Setup
 
 This is a .NET 9 project that requires Redis for full functionality.
@@ -7,7 +5,7 @@ This is a .NET 9 project that requires Redis for full functionality.
 ### Quick Setup
 Run the following command to set up the development environment:
 ```bash
-bash jules-setup.sh
+sudo bash jules-setup.sh
 ```
 
 ### Manual Setup

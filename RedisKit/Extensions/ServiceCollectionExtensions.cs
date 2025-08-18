@@ -98,5 +98,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IRedisPubSubService, RedisPubSubService>();
         services.TryAddSingleton<IRedisStreamService, RedisStreamService>();
         services.TryAddSingleton<IDistributedLock, RedisDistributedLock>();
+
+        // Redis 7.x services (will gracefully degrade if not supported)
+        services.TryAddSingleton<IRedisFunction, RedisFunctionService>();
+        services.TryAddSingleton<IRedisShardedPubSub, RedisShardedPubSubService>();
     }
 }

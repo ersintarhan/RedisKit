@@ -100,7 +100,6 @@ namespace RedisKit.Services;
 /// }
 /// </code>
 /// </remarks>
-
 public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDisposable
 {
     private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _channelHandlers;
@@ -786,7 +785,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         foreach (var (channel, message) in messages)
         {
             var serialized = await _serializer.SerializeAsync(message, cancellationToken);
-            tasks.Add(batch.PublishAsync(channel, serialized));
+            tasks.Add(batch.PublishAsync(RedisChannel.Literal(channel), serialized));
         }
 
         batch.Execute();

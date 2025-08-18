@@ -345,7 +345,7 @@ internal class MessagePackRedisSerializer : IRedisSerializer
 
     public ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)
     {
-        if (data.IsEmpty) return new ValueTask<object?>(default);
+        if (data.IsEmpty) return new ValueTask<object?>((object?)null);
         return new ValueTask<object?>(MessagePackSerializer.Deserialize(type, data, _options, cancellationToken));
     }
 }
