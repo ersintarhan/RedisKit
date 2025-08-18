@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
+using RedisKit.Logging;
 using RedisKit.Models;
 
 namespace RedisKit.Services;
@@ -123,7 +124,7 @@ internal class RedisCircuitBreaker : IRedisCircuitBreaker
                     break;
             }
 
-            if (exception != null) _logger.LogWarning(exception, "Circuit breaker recorded failure in {State} state", State);
+            if (exception != null) _logger.LogCircuitBreakerFailure(State, exception);
         }
         finally
         {
@@ -218,7 +219,7 @@ internal class RedisCircuitBreaker : IRedisCircuitBreaker
         {
             var oldState = State;
             State = newState;
-            _logger.LogInformation("Circuit breaker transitioned from {OldState} to {NewState}", oldState, newState);
+            _logger.LogCircuitBreakerTransition(oldState, newState);
         }
     }
 

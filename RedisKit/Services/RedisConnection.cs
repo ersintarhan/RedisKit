@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using RedisKit.Exceptions;
 using RedisKit.Interfaces;
+using RedisKit.Logging;
 using RedisKit.Models;
 using RedisKit.Utilities;
 using StackExchange.Redis;
@@ -223,7 +224,7 @@ public class RedisConnection : IDisposable
                 return _connection;
             }
 
-            _logger.LogInformation("Creating Redis connection to: {ConnectionString}", _options.ConnectionString);
+            _logger.LogConnectionCreating(_options.ConnectionString);
 
             // Configure connection with advanced timeout settings
             var config = ConfigurationOptions.Parse(_options.ConnectionString);
@@ -246,7 +247,7 @@ public class RedisConnection : IDisposable
             // Setup connection event handlers
             SetupConnectionEventHandlers(_connection);
 
-            _logger.LogInformation("Successfully connected to Redis at: {ConnectionString}", _options.ConnectionString);
+            _logger.LogConnectionSuccess(_options.ConnectionString);
             return _connection;
         }
         catch (Exception ex)
@@ -269,7 +270,7 @@ public class RedisConnection : IDisposable
         for (var attempt = 0; attempt < retryConfig.MaxAttempts; attempt++)
             try
             {
-                _logger.LogDebug("Connection attempt {Attempt}/{MaxAttempts}", attempt + 1, retryConfig.MaxAttempts);
+                _logger.LogConnectionAttempt(attempt + 1, retryConfig.MaxAttempts);
 
                 var attemptStopwatch = Stopwatch.StartNew();
                 var connection = await ConnectionMultiplexer.ConnectAsync(config).ConfigureAwait(false);
@@ -277,8 +278,7 @@ public class RedisConnection : IDisposable
 
                 if (connection.IsConnected)
                 {
-                    _logger.LogInformation("Connected to Redis on attempt {Attempt} after {Duration}ms",
-                        attempt + 1, attemptStopwatch.ElapsedMilliseconds);
+                    _logger.LogConnectionSuccessWithRetry(attempt + 1, attemptStopwatch.ElapsedMilliseconds);
 
                     _healthStatus.TotalRequests++;
                     return connection;
@@ -289,8 +289,7 @@ public class RedisConnection : IDisposable
                 _healthStatus.TotalRequests++;
                 _healthStatus.FailedRequests++;
 
-                _logger.LogWarning(ex, "Failed to connect to Redis (attempt {Attempt}/{MaxAttempts})",
-                    attempt + 1, retryConfig.MaxAttempts);
+                _logger.LogConnectionAttemptFailed(attempt + 1, retryConfig.MaxAttempts, ex);
 
                 if (attempt < retryConfig.MaxAttempts - 1)
                 {
@@ -298,15 +297,13 @@ public class RedisConnection : IDisposable
                     var delay = BackoffCalculator.CalculateDelay(attempt, retryConfig, _lastRetryDelay);
                     _lastRetryDelay = delay;
 
-                    _logger.LogDebug("Waiting {DelayMs}ms before retry (strategy: {Strategy})",
-                        delay.TotalMilliseconds, retryConfig.Strategy);
+                    _logger.LogConnectionRetryDelay((int)delay.TotalMilliseconds, retryConfig.Strategy.ToString());
 
                     await Task.Delay(delay);
                 }
                 else
                 {
-                    _logger.LogError(ex, "Failed to connect to Redis after {Attempts} attempts in {Duration}ms",
-                        retryConfig.MaxAttempts, stopwatch.ElapsedMilliseconds);
+                    _logger.LogConnectionFailed(retryConfig.MaxAttempts, stopwatch.ElapsedMilliseconds, ex);
                 }
             }
 
@@ -339,16 +336,14 @@ public class RedisConnection : IDisposable
         config.ReconnectRetryPolicy = new ExponentialRetry((int)_options.RetryConfiguration.InitialDelay.TotalMilliseconds);
         config.AbortOnConnectFail = false; // Allow retry logic to handle failures
 
-        _logger.LogDebug("Redis connection timeout settings applied. Connect: {ConnectMs}ms, Sync: {SyncMs}ms, Async: {AsyncMs}ms",
-            connectTimeout, syncTimeout, asyncTimeout);
+        _logger.LogConnectionTimeoutSettings(connectTimeout, syncTimeout, asyncTimeout);
     }
 
     private void SetupConnectionEventHandlers(ConnectionMultiplexer connection)
     {
         connection.ConnectionFailed += (sender, args) =>
         {
-            _logger.LogError("Redis connection failed: {FailureType} - {Exception}",
-                args.FailureType, args.Exception?.Message);
+            _logger.LogConnectionFailure(args.FailureType.ToString(), args.Exception?.Message ?? "No exception details");
 
             _healthStatus.ConsecutiveFailures++;
             _healthStatus.LastError = args.Exception?.Message;
@@ -357,14 +352,14 @@ public class RedisConnection : IDisposable
 
         connection.ConnectionRestored += (sender, args) =>
         {
-            _logger.LogInformation("Redis connection restored: {EndPoint}", args.EndPoint);
+            _logger.LogConnectionRestored(args.EndPoint?.ToString() ?? "Unknown");
             _healthStatus.ConsecutiveFailures = 0;
             UpdateHealthStatus(true, TimeSpan.Zero);
         };
 
-        connection.ErrorMessage += (sender, args) => { _logger.LogError("Redis error: {Message} from {EndPoint}", args.Message, args.EndPoint); };
+        connection.ErrorMessage += (sender, args) => { _logger.LogRedisError(args.Message, args.EndPoint?.ToString() ?? "Unknown"); };
 
-        connection.InternalError += (sender, args) => { _logger.LogError(args.Exception, "Redis internal error: {Origin}", args.Origin); };
+        connection.InternalError += (sender, args) => { _logger.LogRedisInternalError(args.Origin?.ToString() ?? "Unknown", args.Exception); };
     }
 
     private void UpdateHealthStatus(bool isHealthy, TimeSpan responseTime, string? error = null)
@@ -401,7 +396,7 @@ public class RedisConnection : IDisposable
                 stopwatch.Stop();
 
                 UpdateHealthStatus(true, stopwatch.Elapsed);
-                _logger.LogDebug("Health check succeeded in {Duration}ms", stopwatch.ElapsedMilliseconds);
+                _logger.LogHealthCheckSuccess(stopwatch.ElapsedMilliseconds);
             }
             else
             {
@@ -412,8 +407,7 @@ public class RedisConnection : IDisposable
                 if (_options.HealthMonitoring.AutoReconnect &&
                     _healthStatus.ConsecutiveFailures >= _options.HealthMonitoring.ConsecutiveFailuresThreshold)
                 {
-                    _logger.LogWarning("Health check failed {Failures} times, attempting reconnection",
-                        _healthStatus.ConsecutiveFailures);
+                    _logger.LogHealthCheckFailureWithReconnect(_healthStatus.ConsecutiveFailures);
 
                     // Use Task.Run with proper error handling to prevent unobserved exceptions
                     _ = Task.Run(async () =>
@@ -424,7 +418,7 @@ public class RedisConnection : IDisposable
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Auto-reconnection failed");
+                            _logger.LogAutoReconnectionFailed(ex);
                         }
                     });
                 }
@@ -433,7 +427,7 @@ public class RedisConnection : IDisposable
         catch (Exception ex)
         {
             UpdateHealthStatus(false, TimeSpan.Zero, ex.Message);
-            _logger.LogWarning(ex, "Health check failed");
+            _logger.LogHealthCheckFailed(ex);
         }
     }
 
@@ -549,7 +543,7 @@ public class RedisConnection : IDisposable
     public async Task ResetCircuitBreakerAsync()
     {
         await _circuitBreaker.ResetAsync().ConfigureAwait(false);
-        _logger.LogInformation("Circuit breaker has been reset");
+        _logger.LogCircuitBreakerReset();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -565,7 +559,7 @@ public class RedisConnection : IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error disposing Redis connection");
+                _logger.LogConnectionDisposeError(ex);
             }
 
             _disposed = true;
