@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -72,7 +73,7 @@ namespace RedisKit.Services;
 /// var db = await connection.GetDatabaseAsync().ConfigureAwait(false);
 /// </code>
 /// </remarks>
-public class RedisConnection : IDisposable
+public class RedisConnection : IRedisConnection, IDisposable
 {
     private readonly IRedisCircuitBreaker _circuitBreaker;
     private readonly SemaphoreSlim _connectionLock = new(1, 1);
@@ -219,7 +220,7 @@ public class RedisConnection : IDisposable
                 return _connection;
             }
 
-            _logger.LogConnectionCreating(_options.ConnectionString);
+            _logger.LogConnectionCreating(RedactConnectionString(_options.ConnectionString));
 
             // Configure connection with advanced timeout settings
             var config = ConfigurationOptions.Parse(_options.ConnectionString);
@@ -564,5 +565,22 @@ public class RedisConnection : IDisposable
     ~RedisConnection()
     {
         Dispose(false);
+    }
+
+    private static string RedactConnectionString(string connectionString)
+    {
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            return string.Empty;
+        }
+
+        // Use regex to find and replace the password value
+        // This pattern looks for "password=" followed by any characters that are not a comma
+        return Regex.Replace(
+            connectionString,
+            @"password=[^,]+",
+            "password=*****",
+            RegexOptions.IgnoreCase,
+            TimeSpan.FromMilliseconds(100));
     }
 }

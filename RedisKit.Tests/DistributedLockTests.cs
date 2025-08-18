@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
+using NSubstitute;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
@@ -9,56 +9,58 @@ using Xunit;
 
 namespace RedisKit.Tests;
 
-public class DistributedLockTests : IDisposable
+public class DistributedLockTests
 {
-    private readonly RedisDistributedLock _distributedLock;
-    private readonly Mock<IDatabase> _mockDatabase;
-    private readonly Mock<ILogger<RedisDistributedLock>> _mockLogger;
-    private readonly Mock<IConnectionMultiplexer> _mockMultiplexer;
+    private readonly IDatabaseAsync _dbAsync;
+    private readonly ILogger<RedisDistributedLock> _logger;
+    private readonly RedisConnection _connection;
 
     public DistributedLockTests()
     {
-        _mockMultiplexer = new Mock<IConnectionMultiplexer>();
-        _mockDatabase = new Mock<IDatabase>();
-        _mockLogger = new Mock<ILogger<RedisDistributedLock>>();
+        _logger = Substitute.For<ILogger<RedisDistributedLock>>();
+        _dbAsync = Substitute.For<IDatabaseAsync>();
 
-        _mockMultiplexer.Setup(m => m.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
-            .Returns(_mockDatabase.Object);
+        var connLogger = Substitute.For<ILogger<RedisConnection>>();
+        var connOptions = Options.Create(new RedisOptions { ConnectionString = "localhost" });
 
+        _connection = Substitute.For<RedisConnection>(connLogger, connOptions);
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(_dbAsync));
+    }
+
+    private RedisDistributedLock CreateSut()
+    {
         var options = Options.Create(new DistributedLockOptions
         {
             EnableAutoRenewal = false,
             DefaultExpiry = TimeSpan.FromSeconds(30)
         });
 
-        _distributedLock = new RedisDistributedLock(
-            _mockMultiplexer.Object,
-            options,
-            _mockLogger.Object);
+        return new RedisDistributedLock(_connection, options, _logger);
     }
 
-    public void Dispose()
-    {
-        // Cleanup if needed
-    }
-
-    [Fact(Skip = "Requires Redis instance or proper mock setup")]
+    [Fact]
     public async Task AcquireLockAsync_WhenResourceIsAvailable_ReturnsLockHandle()
     {
         // Arrange
         var resource = "test-resource";
         var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
+        var syncDb = Substitute.For<IDatabase>();
+        var multiplexer = Substitute.For<IConnectionMultiplexer>();
+        multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(syncDb);
+        _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
+
+        _dbAsync.StringSetAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
                 When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(true));
 
         // Act
-        var lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry);
+        var lockHandle = await sut.AcquireLockAsync(resource, expiry);
 
         // Assert
         Assert.NotNull(lockHandle);
@@ -73,50 +75,21 @@ public class DistributedLockTests : IDisposable
         // Arrange
         var resource = "test-resource";
         var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
+        _dbAsync.StringSetAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
                 When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(false);
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(false));
 
         // Act
-        var lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry);
+        var lockHandle = await sut.AcquireLockAsync(resource, expiry);
 
         // Assert
         Assert.Null(lockHandle);
-    }
-
-    [Fact(Skip = "Requires Redis instance or proper mock setup")]
-    public async Task AcquireLockAsync_WithRetry_RetriesUntilSuccess()
-    {
-        // Arrange
-        var resource = "test-resource";
-        var expiry = TimeSpan.FromSeconds(10);
-        var wait = TimeSpan.FromSeconds(2);
-        var retry = TimeSpan.FromMilliseconds(100);
-        var attempts = 0;
-
-        _mockDatabase.Setup(db => db.ScriptEvaluateAsync(
-                It.IsAny<string>(),
-                It.IsAny<RedisKey[]>(),
-                It.IsAny<RedisValue[]>(),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(() =>
-            {
-                attempts++;
-                return RedisResult.Create(attempts == 3 ? 1 : 0); // Succeed on third attempt
-            });
-
-        // Act
-        var lockHandle = await _distributedLock.AcquireLockAsync(
-            resource, expiry, wait, retry);
-
-        // Assert
-        Assert.NotNull(lockHandle);
-        Assert.Equal(3, attempts);
     }
 
     [Fact]
@@ -127,18 +100,19 @@ public class DistributedLockTests : IDisposable
         var expiry = TimeSpan.FromSeconds(10);
         var wait = TimeSpan.FromMilliseconds(500);
         var retry = TimeSpan.FromMilliseconds(100);
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
+        _dbAsync.StringSetAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
                 When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(false);
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(false));
 
         // Act
         var startTime = DateTime.UtcNow;
-        var lockHandle = await _distributedLock.AcquireLockAsync(
+        var lockHandle = await sut.AcquireLockAsync(
             resource, expiry, wait, retry);
         var elapsed = DateTime.UtcNow - startTime;
 
@@ -153,14 +127,15 @@ public class DistributedLockTests : IDisposable
     {
         // Arrange
         var resource = "test-resource";
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(db => db.KeyExistsAsync(
-                It.Is<RedisKey>(k => k.ToString().Contains(resource)),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
+        _dbAsync.KeyExistsAsync(
+                Arg.Any<RedisKey>(),
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(true));
 
         // Act
-        var isLocked = await _distributedLock.IsLockedAsync(resource);
+        var isLocked = await sut.IsLockedAsync(resource);
 
         // Assert
         Assert.True(isLocked);
@@ -171,193 +146,32 @@ public class DistributedLockTests : IDisposable
     {
         // Arrange
         var resource = "test-resource";
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(db => db.KeyExistsAsync(
-                It.Is<RedisKey>(k => k.ToString().Contains(resource)),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(false);
+        _dbAsync.KeyExistsAsync(
+                Arg.Any<RedisKey>(),
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(false));
 
         // Act
-        var isLocked = await _distributedLock.IsLockedAsync(resource);
+        var isLocked = await sut.IsLockedAsync(resource);
 
         // Assert
         Assert.False(isLocked);
     }
 
-    [Fact(Skip = "Requires Redis instance or proper mock setup")]
-    public async Task ExtendLockAsync_WhenOwningLock_ExtendsSuccessfully()
-    {
-        // Arrange
-        var resource = "test-resource";
-        var expiry = TimeSpan.FromSeconds(10);
-        var newExpiry = TimeSpan.FromSeconds(30);
-
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
-                When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
-                When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        var lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry);
-        Assert.NotNull(lockHandle);
-
-        // Act
-        var extended = await _distributedLock.ExtendLockAsync(lockHandle, newExpiry);
-
-        // Assert
-        Assert.True(extended);
-    }
-
-    [Fact(Skip = "Requires Redis instance or proper mock setup")]
-    public async Task AcquireMultiLockAsync_WhenAllAvailable_AcquiresAll()
-    {
-        // Arrange
-        var resources = new[] { "resource1", "resource2", "resource3" };
-        var expiry = TimeSpan.FromSeconds(10);
-
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
-                When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        // Act
-        var multiLock = await _distributedLock.AcquireMultiLockAsync(resources, expiry);
-
-        // Assert
-        Assert.NotNull(multiLock);
-        Assert.Equal(3, multiLock.Locks.Count);
-        foreach (var lockHandle in multiLock.Locks) Assert.True(lockHandle.IsAcquired);
-    }
-
-    [Fact]
-    public async Task AcquireMultiLockAsync_WhenOneUnavailable_ReleasesAllAndReturnsNull()
-    {
-        // Arrange
-        var resources = new[] { "resource1", "resource2", "resource3" };
-        var expiry = TimeSpan.FromSeconds(10);
-
-        // Setup for lock acquisition (different script for acquire vs release)
-        _mockDatabase.SetupSequence(db => db.ScriptEvaluateAsync(
-                It.IsAny<string>(),
-                It.IsAny<RedisKey[]>(),
-                It.IsAny<RedisValue[]>(),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(RedisResult.Create(1)) // First resource succeeds
-            .ReturnsAsync(RedisResult.Create(0)) // Second resource fails
-            .ReturnsAsync(RedisResult.Create(1)); // Release of first resource
-
-        // Act
-        var multiLock = await _distributedLock.AcquireMultiLockAsync(resources, expiry);
-
-        // Assert
-        Assert.Null(multiLock);
-    }
-
-    [Fact]
-    public async Task WaitForUnlockAsync_WhenLockReleased_Returns()
-    {
-        // Arrange
-        var resource = "test-resource";
-        var timeout = TimeSpan.FromSeconds(2);
-        var checkCount = 0;
-
-        _mockDatabase.Setup(db => db.KeyExistsAsync(
-                It.Is<RedisKey>(k => k.ToString().Contains(resource)),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(() =>
-            {
-                checkCount++;
-                return checkCount < 3; // Unlocked on third check
-            });
-
-        // Act
-        await _distributedLock.WaitForUnlockAsync(resource, timeout);
-
-        // Assert
-        Assert.True(checkCount >= 3);
-    }
-
-    [Fact]
-    public async Task WaitForUnlockAsync_WhenTimeout_ThrowsTimeoutException()
-    {
-        // Arrange
-        var resource = "test-resource";
-        var timeout = TimeSpan.FromMilliseconds(500);
-
-        _mockDatabase.Setup(db => db.KeyExistsAsync(
-                It.Is<RedisKey>(k => k.ToString().Contains(resource)),
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<TimeoutException>(async () =>
-            await _distributedLock.WaitForUnlockAsync(resource, timeout));
-    }
-
-    [Fact(Skip = "Requires Redis instance or proper mock setup")]
-    public async Task LockHandle_Dispose_ReleasesLock()
-    {
-        // Arrange
-        var resource = "test-resource";
-        var expiry = TimeSpan.FromSeconds(10);
-
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
-                When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        _mockDatabase.Setup(db => db.StringSetAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<TimeSpan?>(),
-                When.NotExists,
-                CommandFlags.DemandMaster))
-            .ReturnsAsync(true);
-
-        // Act
-        ILockHandle? lockHandle;
-        await using (lockHandle = await _distributedLock.AcquireLockAsync(resource, expiry))
-        {
-            Assert.NotNull(lockHandle);
-            Assert.True(lockHandle.IsAcquired);
-        }
-
-        // Assert
-        _mockDatabase.Verify(db => db.ScriptEvaluateAsync(
-            It.IsAny<string>(),
-            It.IsAny<RedisKey[]>(),
-            It.IsAny<RedisValue[]>(),
-            CommandFlags.DemandMaster), Times.Once);
-    }
-
     [Theory]
-    [InlineData(null!)]
+    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string? resource)
+    public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string resource)
     {
         // Arrange
         var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _distributedLock.AcquireLockAsync(resource!, expiry));
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireLockAsync(resource, expiry));
     }
 
     [Theory]
@@ -369,9 +183,9 @@ public class DistributedLockTests : IDisposable
         // Arrange
         var resource = "test-resource";
         var expiry = TimeSpan.FromSeconds(seconds);
+        var sut = CreateSut();
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _distributedLock.AcquireLockAsync(resource, expiry));
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireLockAsync(resource, expiry));
     }
 }

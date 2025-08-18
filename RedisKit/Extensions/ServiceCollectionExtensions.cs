@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,284 +17,89 @@ namespace RedisKit.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    ///     Adds all RedisKit services to the dependency injection container with a simplified API
+    ///     Adds all RedisKit services to the dependency injection container.
     /// </summary>
-    /// <param name="services">The service collection</param>
-    /// <param name="configureOptions">Action to configure Redis options</param>
-    /// <param name="addHealthCheck">Whether to add health check (default: true)</param>
-    /// <returns>The service collection for chaining</returns>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configureOptions">Action to configure Redis options.</param>
+    /// <param name="addHealthCheck">Whether to add a health check for Redis (default: true).</param>
+    /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddRedisKit(
         this IServiceCollection services,
         Action<RedisOptions> configureOptions,
         bool addHealthCheck = true)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
-        if (configureOptions == null)
-            throw new ArgumentNullException(nameof(configureOptions));
-
-        // Register options
         services.Configure(configureOptions);
 
-        // Register Circuit Breaker settings with defaults
-        services.Configure<CircuitBreakerSettings>(settings =>
-        {
-            settings.Enabled = true;
-            settings.FailureThreshold = 5;
-            settings.SuccessThreshold = 3;
-            settings.BreakDuration = TimeSpan.FromSeconds(30);
-            settings.FailureWindow = TimeSpan.FromMinutes(1);
-        });
+        AddRedisKitCore(services);
 
-        // Register Circuit Breaker as a separate service for better testability
-        services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
-
-        // Register Redis connection with interface support
-        services.AddSingleton<RedisConnection>();
-
-        // Register all other services
-        AddRedisServicesInternal(services);
-
-        // Add health check if requested
         if (addHealthCheck)
+        {
             services.AddHealthChecks()
                 .AddTypeActivatedCheck<RedisHealthCheck>(
                     "redis",
                     HealthStatus.Unhealthy,
                     tags: new[] { "redis", "cache", "database" });
+        }
 
         return services;
     }
 
     /// <summary>
-    ///     Adds all RedisKit services with default configuration
+    ///     Adds all RedisKit services with default configuration (localhost:6379).
     /// </summary>
-    /// <param name="services">The service collection</param>
-    /// <returns>The service collection for chaining</returns>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddRedisKit(this IServiceCollection services)
     {
-        // Register Circuit Breaker settings with defaults
-        services.Configure<CircuitBreakerSettings>(settings =>
-        {
-            settings.Enabled = true;
-            settings.FailureThreshold = 5;
-            settings.SuccessThreshold = 3;
-            settings.BreakDuration = TimeSpan.FromSeconds(30);
-            settings.FailureWindow = TimeSpan.FromMinutes(1);
-        });
-
         return services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
             options.DefaultTtl = TimeSpan.FromHours(1);
-            options.CacheKeyPrefix = string.Empty;
-            options.RetryAttempts = 3;
-            options.RetryDelay = TimeSpan.FromSeconds(1);
-            options.OperationTimeout = TimeSpan.FromSeconds(5);
         });
     }
 
     /// <summary>
-    ///     Adds Redis services to the dependency injection container (legacy method for compatibility)
+    ///     Adds Redis services to the dependency injection container.
     /// </summary>
+    [Obsolete("Use AddRedisKit instead. This method will be removed in a future version.")]
     public static IServiceCollection AddRedisServices(
         this IServiceCollection services,
         Action<RedisOptions> configureOptions)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
-
-        if (configureOptions == null)
-            throw new ArgumentNullException(nameof(configureOptions));
-
-        // Register options
-        services.Configure(configureOptions);
-
-        // Register Circuit Breaker settings with defaults
-        services.Configure<CircuitBreakerSettings>(settings =>
-        {
-            settings.Enabled = true;
-            settings.FailureThreshold = 5;
-            settings.SuccessThreshold = 3;
-            settings.BreakDuration = TimeSpan.FromSeconds(30);
-            settings.FailureWindow = TimeSpan.FromMinutes(1);
-        });
-
-        // Register Circuit Breaker
-        services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
-
-        // Register Redis connection and database with factory method to ensure proper initialization
-        services.AddSingleton<RedisConnection>();
-
-        // Register database and subscriber as separate services to avoid deadlocks
-        services.AddSingleton<IDatabaseAsync>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetDatabaseAsync().GetAwaiter().GetResult();
-        });
-
-        services.AddSingleton<ISubscriber>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetSubscriberAsync().GetAwaiter().GetResult();
-        });
-
-        // Register services using the pre-initialized database/subscriber
-        services.AddSingleton<IRedisCacheService>(provider => new RedisCacheService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisCacheService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        services.AddSingleton<IRedisPubSubService>(provider => new RedisPubSubService(
-            provider.GetRequiredService<ISubscriber>(),
-            provider.GetRequiredService<ILogger<RedisPubSubService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register StreamService
-        services.AddSingleton<IRedisStreamService>(provider => new RedisStreamService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisStreamService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register Distributed Lock Service
-        services.AddSingleton<IConnectionMultiplexer>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            return connection.GetMultiplexerAsync().GetAwaiter().GetResult();
-        });
-
-        services.AddSingleton<IDistributedLock, RedisDistributedLock>();
-
-        return services;
+        return services.AddRedisKit(configureOptions);
     }
 
     /// <summary>
-    ///     Adds Redis services with default configuration (legacy method for compatibility)
+    ///     Adds Redis services with default configuration.
     /// </summary>
-    public static IServiceCollection AddRedisServices(
-        this IServiceCollection services)
+    [Obsolete("Use AddRedisKit instead. This method will be removed in a future version.")]
+    public static IServiceCollection AddRedisServices(this IServiceCollection services)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
-
-        // Register default options
-        services.Configure<RedisOptions>(options =>
-        {
-            options.ConnectionString = "localhost:6379";
-            options.DefaultTtl = TimeSpan.FromHours(1);
-            options.CacheKeyPrefix = string.Empty;
-            options.RetryAttempts = 3;
-            options.RetryDelay = TimeSpan.FromSeconds(1);
-            options.OperationTimeout = TimeSpan.FromSeconds(5);
-        });
-
-        // Register Circuit Breaker settings with defaults
-        services.Configure<CircuitBreakerSettings>(settings =>
-        {
-            settings.Enabled = true;
-            settings.FailureThreshold = 5;
-            settings.SuccessThreshold = 3;
-            settings.BreakDuration = TimeSpan.FromSeconds(30);
-            settings.FailureWindow = TimeSpan.FromMinutes(1);
-        });
-
-        // Register Circuit Breaker
-        services.AddSingleton<IRedisCircuitBreaker, RedisCircuitBreaker>();
-
-        // Register Redis connection and database
-        services.AddSingleton<RedisConnection>();
-
-        // Register database and subscriber as separate services to avoid deadlocks
-        services.AddSingleton<IDatabaseAsync>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetDatabaseAsync().GetAwaiter().GetResult();
-        });
-
-        services.AddSingleton<ISubscriber>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetSubscriberAsync().GetAwaiter().GetResult();
-        });
-
-        // Register services using the pre-initialized database/subscriber
-        services.AddSingleton<IRedisCacheService>(provider => new RedisCacheService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisCacheService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        services.AddSingleton<IRedisPubSubService>(provider => new RedisPubSubService(
-            provider.GetRequiredService<ISubscriber>(),
-            provider.GetRequiredService<ILogger<RedisPubSubService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register StreamService
-        services.AddSingleton<IRedisStreamService>(provider => new RedisStreamService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisStreamService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register Distributed Lock Service
-        services.AddSingleton<IConnectionMultiplexer>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            return connection.GetMultiplexerAsync().GetAwaiter().GetResult();
-        });
-
-        services.AddSingleton<IDistributedLock, RedisDistributedLock>();
-
-        return services;
+        return services.AddRedisKit();
     }
 
-    /// <summary>
-    ///     Internal helper method to register common Redis services
-    /// </summary>
-    private static void AddRedisServicesInternal(IServiceCollection services)
+    private static void AddRedisKitCore(IServiceCollection services)
     {
-        // Register database and subscriber as separate services to avoid deadlocks
-        services.AddSingleton<IDatabaseAsync>(provider =>
+        // Use TryAdd to prevent re-registering services if called multiple times.
+        services.TryAddSingleton<IRedisConnection, RedisConnection>();
+
+        // Register the circuit breaker using a factory to ensure it gets the correct settings
+        // from the user-configured RedisOptions.
+        services.TryAddSingleton<IRedisCircuitBreaker>(provider =>
         {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetDatabaseAsync().GetAwaiter().GetResult();
+            var logger = provider.GetRequiredService<ILogger<RedisCircuitBreaker>>();
+            var redisOptions = provider.GetRequiredService<IOptions<RedisOptions>>();
+            var circuitBreakerOptions = Options.Create(redisOptions.Value.CircuitBreaker);
+            return new RedisCircuitBreaker(logger, circuitBreakerOptions);
         });
 
-        services.AddSingleton<ISubscriber>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            // This is only called once during startup, not in request context
-            return connection.GetSubscriberAsync().GetAwaiter().GetResult();
-        });
-
-        // Register services using the pre-initialized database/subscriber
-        services.AddSingleton<IRedisCacheService>(provider => new RedisCacheService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisCacheService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        services.AddSingleton<IRedisPubSubService>(provider => new RedisPubSubService(
-            provider.GetRequiredService<ISubscriber>(),
-            provider.GetRequiredService<ILogger<RedisPubSubService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register StreamService
-        services.AddSingleton<IRedisStreamService>(provider => new RedisStreamService(
-            provider.GetRequiredService<IDatabaseAsync>(),
-            provider.GetRequiredService<ILogger<RedisStreamService>>(),
-            provider.GetRequiredService<IOptions<RedisOptions>>().Value));
-
-        // Register Distributed Lock Service
-        services.AddSingleton<IConnectionMultiplexer>(provider =>
-        {
-            var connection = provider.GetRequiredService<RedisConnection>();
-            return connection.GetMultiplexerAsync().GetAwaiter().GetResult();
-        });
-
-        services.AddSingleton<IDistributedLock, RedisDistributedLock>();
+        // Register high-level services. They depend on RedisConnection and are fully async.
+        services.TryAddSingleton<IRedisCacheService, RedisCacheService>();
+        services.TryAddSingleton<IRedisPubSubService, RedisPubSubService>();
+        services.TryAddSingleton<IRedisStreamService, RedisStreamService>();
+        services.TryAddSingleton<IDistributedLock, RedisDistributedLock>();
     }
 }

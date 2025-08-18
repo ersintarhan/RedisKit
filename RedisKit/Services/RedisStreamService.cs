@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -150,10 +151,10 @@ namespace RedisKit.Services;
 /// </remarks>
 public class RedisStreamService : IRedisStreamService
 {
-    // ArrayPool for memory optimization
+// ArrayPool for memory optimization
     private static readonly ArrayPool<string> StringArrayPool = ArrayPool<string>.Shared;
 
-    private readonly IDatabaseAsync _database;
+    private readonly IRedisConnection _connection;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly RedisOptions _options;
     private readonly ObjectPool<List<(int index, string id)>>? _resultListPool;
@@ -161,14 +162,14 @@ public class RedisStreamService : IRedisStreamService
     private string _keyPrefix = string.Empty;
 
     public RedisStreamService(
-        IDatabaseAsync database,
+        IRedisConnection connection,
         ILogger<RedisStreamService> logger,
-        RedisOptions options,
+        IOptions<RedisOptions> options,
         ObjectPoolProvider? poolProvider = null)
     {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
@@ -204,10 +205,11 @@ public class RedisStreamService : IRedisStreamService
             {
                 new("data", serializedMessage)
             };
+            var database = await GetDatabaseAsync();
 
             // Add to stream and get the message ID
             // If maxLength is specified, the stream will be trimmed to approximately that length
-            var messageId = await _database.StreamAddAsync(
+            var messageId = await database.StreamAddAsync(
                 prefixedStream,
                 entry,
                 null, // Auto-generate ID
@@ -240,9 +242,10 @@ public class RedisStreamService : IRedisStreamService
 
             // Validate stream name
             if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
+            var database = await GetDatabaseAsync();
 
             // Read from stream
-            var entries = await _database.StreamRangeAsync(prefixedStream, start ?? "0", end ?? "+", count).ConfigureAwait(false);
+            var entries = await database.StreamRangeAsync(prefixedStream, start ?? "0", end ?? "+", count).ConfigureAwait(false);
 
             var result = new Dictionary<string, T?>();
 
@@ -292,10 +295,11 @@ public class RedisStreamService : IRedisStreamService
             if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             if (groupName.Length > 512) _logger.LogWarning("Group name exceeds Redis key limit of 512 characters: {GroupName}", groupName);
+            var database = await GetDatabaseAsync();
 
             // Create consumer group starting from the beginning of the stream
             // The 'false' parameter means don't create the stream if it doesn't exist
-            await _database.StreamCreateConsumerGroupAsync(
+            await database.StreamCreateConsumerGroupAsync(
                 prefixedStream,
                 groupName,
                 StreamPosition.Beginning,
@@ -331,10 +335,11 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             _logger.LogReadGroupAsync(prefixedStream, groupName, consumerName, count);
+            var database = await GetDatabaseAsync();
 
             // Read from stream using consumer group
             // ">" means read only new messages (not yet delivered to this consumer)
-            var entries = await _database.StreamReadGroupAsync(
+            var entries = await database.StreamReadGroupAsync(
                 prefixedStream,
                 groupName,
                 consumerName,
@@ -387,9 +392,10 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             _logger.LogAcknowledgeAsync(prefixedStream, groupName, messageId);
+            var database = await GetDatabaseAsync();
 
             // Acknowledge the message
-            await _database.StreamAcknowledgeAsync(prefixedStream, groupName, messageId).ConfigureAwait(false);
+            await database.StreamAcknowledgeAsync(prefixedStream, groupName, messageId).ConfigureAwait(false);
 
             _logger.LogAcknowledgeAsyncSuccess(prefixedStream, groupName, messageId);
         }
@@ -419,9 +425,10 @@ public class RedisStreamService : IRedisStreamService
 
             // Convert string array to RedisValue array
             var redisMessageIds = Array.ConvertAll(messageIds, id => (RedisValue)id);
+            var database = await GetDatabaseAsync();
 
             // Delete messages from stream
-            var deletedCount = await _database.StreamDeleteAsync(prefixedStream, redisMessageIds).ConfigureAwait(false);
+            var deletedCount = await database.StreamDeleteAsync(prefixedStream, redisMessageIds).ConfigureAwait(false);
 
             _logger.LogInformation("Deleted {Count} messages from stream {Stream}", deletedCount, prefixedStream);
             return deletedCount;
@@ -446,9 +453,10 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             _logger.LogDebug("Trimming stream {Stream} to maximum {MaxLength} entries", prefixedStream, maxLength);
+            var database = await GetDatabaseAsync();
 
             // Trim the stream
-            var trimmedCount = await _database.StreamTrimAsync(
+            var trimmedCount = await database.StreamTrimAsync(
                 prefixedStream,
                 maxLength,
                 useApproximateMaxLength);
@@ -484,9 +492,10 @@ public class RedisStreamService : IRedisStreamService
 
         // Convert string array to RedisValue array
         var redisMessageIds = Array.ConvertAll(messageIds, id => (RedisValue)id);
+        var database = await GetDatabaseAsync();
 
         // Claim the messages
-        var entries = await _database.StreamClaimAsync(
+        var entries = await database.StreamClaimAsync(
             prefixedStream,
             groupName,
             consumerName,
@@ -527,9 +536,10 @@ public class RedisStreamService : IRedisStreamService
         var prefixedStream = $"{_keyPrefix}{stream}";
 
         _logger.LogDebug("Getting info for stream {Stream}", prefixedStream);
+        var database = await GetDatabaseAsync();
 
         // Get stream info
-        var info = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
+        var info = await database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
 
         _logger.LogDebug("Retrieved info for stream {Stream}: Length={Length}, FirstEntry={FirstEntry}, LastEntry={LastEntry}",
             prefixedStream, info.Length, info.FirstEntry.Id, info.LastEntry.Id);
@@ -551,20 +561,21 @@ public class RedisStreamService : IRedisStreamService
         {
             _logger.LogDebug("Getting pending messages for stream {Stream}, group {Group}",
                 prefixedStream, groupName);
+            var database = await GetDatabaseAsync();
 
             // Get pending messages
             StreamPendingMessageInfo[] pendingMessages;
 
             if (string.IsNullOrEmpty(consumerName))
                 // Get all pending messages for the group
-                pendingMessages = await _database.StreamPendingMessagesAsync(
+                pendingMessages = await database.StreamPendingMessagesAsync(
                     prefixedStream,
                     groupName,
                     count,
                     RedisValue.Null);
             else
                 // Get pending messages for specific consumer
-                pendingMessages = await _database.StreamPendingMessagesAsync(
+                pendingMessages = await database.StreamPendingMessagesAsync(
                     prefixedStream,
                     groupName,
                     count,
@@ -614,9 +625,10 @@ public class RedisStreamService : IRedisStreamService
 
         _logger.LogInformation("Moving message {MessageId} from {Source} to dead letter queue {DLQ}",
             messageId, prefixedSourceStream, prefixedDeadLetterStream);
+        var database = await GetDatabaseAsync();
 
         // Read the original message
-        var entries = await _database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1).ConfigureAwait(false);
+        var entries = await database.StreamRangeAsync(prefixedSourceStream, messageId, messageId, 1).ConfigureAwait(false);
 
         if (entries.Length == 0)
         {
@@ -763,16 +775,17 @@ public class RedisStreamService : IRedisStreamService
             if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             _logger.LogDebug("Checking health for stream {Stream}", prefixedStream);
+            var database = await GetDatabaseAsync();
 
             // Get stream info
-            var streamInfo = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
+            var streamInfo = await database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
             health.Length = streamInfo.Length;
 
             if (includeGroups)
                 try
                 {
                     // Get consumer groups info
-                    var groups = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
+                    var groups = await database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                     health.ConsumerGroupCount = groups.Length;
 
                     // Calculate total pending messages and oldest pending age
@@ -784,7 +797,7 @@ public class RedisStreamService : IRedisStreamService
                         totalPending += group.PendingMessageCount;
 
                         // Get detailed pending info for the group
-                        var pendingInfo = await _database.StreamPendingAsync(prefixedStream, group.Name).ConfigureAwait(false);
+                        var pendingInfo = await database.StreamPendingAsync(prefixedStream, group.Name).ConfigureAwait(false);
                         if (pendingInfo.LowestPendingMessageId != RedisValue.Null && pendingInfo.HighestPendingMessageId != RedisValue.Null)
                         {
                             // Parse the timestamp from the message ID (format: timestamp-sequence)
@@ -852,9 +865,10 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             _logger.LogDebug("Collecting metrics for stream {Stream}", prefixedStream);
+            var database = await GetDatabaseAsync();
 
             // Get stream info
-            var streamInfo = await _database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
+            var streamInfo = await database.StreamInfoAsync(prefixedStream).ConfigureAwait(false);
             metrics.TotalMessages = streamInfo.Length;
             metrics.MeasurementWindow = measurementWindow;
 
@@ -864,14 +878,14 @@ public class RedisStreamService : IRedisStreamService
             var startId = $"{new DateTimeOffset(startTime).ToUnixTimeMilliseconds()}-0";
             var endId = $"{new DateTimeOffset(endTime).ToUnixTimeMilliseconds()}-0";
 
-            var recentMessages = await _database.StreamRangeAsync(prefixedStream, startId, endId, -1).ConfigureAwait(false);
+            var recentMessages = await database.StreamRangeAsync(prefixedStream, startId, endId, -1).ConfigureAwait(false);
             metrics.MessagesPerSecond = recentMessages.Length / measurementWindow.TotalSeconds;
 
             // Get consumer group metrics if specified
             if (!string.IsNullOrEmpty(groupName))
                 try
                 {
-                    var groupInfo = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
+                    var groupInfo = await database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                     var group = groupInfo.FirstOrDefault(g => g.Name == groupName);
 
                     if (!string.IsNullOrEmpty(group.Name))
@@ -880,7 +894,7 @@ public class RedisStreamService : IRedisStreamService
                         metrics.TotalConsumers = group.ConsumerCount;
 
                         // Calculate average processing time for pending messages
-                        var pendingDetails = await _database.StreamPendingMessagesAsync(
+                        var pendingDetails = await database.StreamPendingMessagesAsync(
                             prefixedStream, groupName, 100, RedisValue.Null);
 
                         if (pendingDetails.Length > 0)
@@ -899,7 +913,7 @@ public class RedisStreamService : IRedisStreamService
                 // Get metrics for all groups
                 try
                 {
-                    var groups = await _database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
+                    var groups = await database.StreamGroupInfoAsync(prefixedStream).ConfigureAwait(false);
                     metrics.PendingMessages = groups.Sum(g => g.PendingMessageCount);
                     metrics.TotalConsumers = groups.Sum(g => g.ConsumerCount);
                 }
@@ -912,7 +926,7 @@ public class RedisStreamService : IRedisStreamService
             var dlqStream = $"{stream}:dlq";
             try
             {
-                var dlqInfo = await _database.StreamInfoAsync($"{_keyPrefix}{dlqStream}").ConfigureAwait(false);
+                var dlqInfo = await database.StreamInfoAsync($"{_keyPrefix}{dlqStream}").ConfigureAwait(false);
                 metrics.DeadLetterCount = dlqInfo.Length;
             }
             catch
@@ -1197,77 +1211,58 @@ public class RedisStreamService : IRedisStreamService
         string stream, T[] messages, int? maxLength,
         CancellationToken cancellationToken) where T : class
     {
-        // Rent array from pool
-        var resultArray = StringArrayPool.Rent(messages.Length);
-        try
-        {
-            for (var i = 0; i < messages.Length; i++)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
+        var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
+        var batch = database.CreateBatch();
+        var tasks = new List<Task<RedisValue>>(messages.Length);
 
-                resultArray[i] = await AddAsync(stream, messages[i], maxLength, cancellationToken).ConfigureAwait(false);
-            }
+        var prefixedStream = $"{_keyPrefix}{stream}";
 
-            // Create exact-sized array for return
-            var results = new string[messages.Length];
-            Array.Copy(resultArray, results, messages.Length);
-            return results;
-        }
-        finally
+        foreach (var message in messages)
         {
-            StringArrayPool.Return(resultArray, true);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // It's safe to not await here because we are adding to a batch
+            var serializedMessageTask = _serializer.SerializeAsync(message, cancellationToken);
+
+            // This is a bit tricky: we need the serialized message to create the stream add task.
+            // We can do this more efficiently by serializing first.
+            var entryTask = serializedMessageTask.ContinueWith(t =>
+                new NameValueEntry[] { new("data", t.Result) }, cancellationToken);
+
+            var streamAddTask = entryTask.ContinueWith(t =>
+                batch.StreamAddAsync(prefixedStream, t.Result, null, maxLength, true), cancellationToken).Unwrap();
+
+            tasks.Add(streamAddTask);
         }
+
+        batch.Execute();
+        await Task.WhenAll(tasks);
+
+        return tasks.Select(t => t.Result.ToString()).ToArray();
     }
 
     private async Task<string[]> ProcessLargeBatchAsync<T>(
         string stream, T[] messages, int? maxLength,
         CancellationToken cancellationToken) where T : class
     {
-        // Use pooled list from ObjectPool if available
-        if (_resultListPool != null)
-        {
-            var results = _resultListPool.Get();
-            try
+        var results = new ConcurrentBag<(int index, string id)>();
+
+        await Parallel.ForEachAsync(
+            messages.Select((msg, idx) => (message: msg, index: idx)),
+            CreateParallelOptions(cancellationToken),
+            async (item, ct) =>
             {
-                await Parallel.ForEachAsync(
-                    messages.Select((msg, idx) => (message: msg, index: idx)),
-                    CreateParallelOptions(cancellationToken),
-                    async (item, ct) =>
-                    {
-                        var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
-                        lock (results)
-                        {
-                            results.Add((item.index, messageId));
-                        }
+                // Each parallel task will call the regular AddAsync, which is efficient for a single item.
+                // The parallelism across many items provides the throughput.
+                var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
+                results.Add((item.index, messageId));
+                LogBatchProgress(stream, item.index, messages.Length);
+            });
 
-                        LogBatchProgress(stream, item.index, messages.Length);
-                    });
-
-                // Sort and convert to array
-                results.Sort((a, b) => a.index.CompareTo(b.index));
-                return results.Select(r => r.id).ToArray();
-            }
-            finally
-            {
-                _resultListPool.Return(results);
-            }
-        }
-        else
-        {
-            // Fallback to ConcurrentBag if ObjectPool is not available
-            var results = new ConcurrentBag<(int index, string id)>();
-
-            await Parallel.ForEachAsync(
-                messages.Select((msg, idx) => (message: msg, index: idx)),
-                CreateParallelOptions(cancellationToken),
-                async (item, ct) => await AddSingleMessageAsync(stream, item, maxLength, results, messages.Length, ct));
-
-            return results
-                .OrderBy(r => r.index)
-                .Select(r => r.id)
-                .ToArray();
-        }
+        return results
+            .OrderBy(r => r.index)
+            .Select(r => r.id)
+            .ToArray();
     }
 
     private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
@@ -1353,7 +1348,8 @@ public class RedisStreamService : IRedisStreamService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var entries = await _database.StreamRangeAsync(
+            var database = await GetDatabaseAsync();
+            var entries = await database.StreamRangeAsync(
                 prefixedStream,
                 currentStart,
                 "+",
@@ -1411,7 +1407,8 @@ public class RedisStreamService : IRedisStreamService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var entries = await _database.StreamReadGroupAsync(
+            var database = await GetDatabaseAsync();
+            var entries = await database.StreamReadGroupAsync(
                 prefixedStream,
                 groupName,
                 consumerName,
@@ -1452,4 +1449,5 @@ public class RedisStreamService : IRedisStreamService
             }
         }
     }
+    private Task<IDatabaseAsync> GetDatabaseAsync() => _connection.GetDatabaseAsync();
 }

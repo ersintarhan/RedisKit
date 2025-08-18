@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
@@ -7,20 +9,23 @@ using StackExchange.Redis;
 namespace RedisKit.Services;
 
 /// <summary>
-///     Redis-based distributed lock implementation using the Redlock algorithm
+///     An implementation of a distributed lock using a single Redis instance.
+///     WARNING: This implementation is not the Redlock algorithm and does not provide the same safety guarantees
+///     against scenarios like Redis master failover. It is intended for use cases where such guarantees
+///     are not strictly required.
 /// </summary>
 public class RedisDistributedLock : IDistributedLock
 {
-    private readonly IConnectionMultiplexer _connectionMultiplexer;
+    private readonly IRedisConnection _connection;
     private readonly ILogger<RedisDistributedLock>? _logger;
     private readonly DistributedLockOptions _options;
 
     public RedisDistributedLock(
-        IConnectionMultiplexer connectionMultiplexer,
+        IRedisConnection connection,
         IOptions<DistributedLockOptions>? options = null,
         ILogger<RedisDistributedLock>? logger = null)
     {
-        _connectionMultiplexer = connectionMultiplexer ?? throw new ArgumentNullException(nameof(connectionMultiplexer));
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger;
         _options = options?.Value ?? new DistributedLockOptions();
     }
@@ -42,7 +47,7 @@ public class RedisDistributedLock : IDistributedLock
 
         var lockId = GenerateLockId();
         var lockKey = GetLockKey(resource);
-        var database = _connectionMultiplexer.GetDatabase();
+        var database = await _connection.GetDatabaseAsync();
 
         // Try to acquire the lock using SET NX PX
         var acquired = await database.StringSetAsync(
@@ -56,8 +61,11 @@ public class RedisDistributedLock : IDistributedLock
         {
             _logger?.LogDebug("Acquired lock for resource: {Resource}, LockId: {LockId}", resource, lockId);
 
+            // RedisLockHandle requires the synchronous IDatabase interface.
+            var syncDatabase = (await _connection.GetMultiplexerAsync()).GetDatabase();
+
             return new RedisLockHandle(
-                database,
+                syncDatabase,
                 resource,
                 lockId,
                 expiry,
@@ -118,7 +126,7 @@ public class RedisDistributedLock : IDistributedLock
         if (resource.Length > 512)
             throw new ArgumentException("Resource name exceeds Redis key limit of 512 characters", nameof(resource));
 
-        var database = _connectionMultiplexer.GetDatabase();
+        var database = await _connection.GetDatabaseAsync();
         var lockKey = GetLockKey(resource);
 
         return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
@@ -139,7 +147,10 @@ public class RedisDistributedLock : IDistributedLock
     }
 
     /// <summary>
-    ///     Attempts to acquire locks on multiple resources atomically
+    ///     Attempts to acquire locks on multiple resources.
+    ///     WARNING: This operation is NOT atomic. It acquires locks sequentially. If it fails to acquire
+    ///     a lock on one resource, it will release all locks it has already acquired. This can lead to
+    ///     race conditions in high-concurrency scenarios. For atomic multi-lock, a Lua script is required.
     /// </summary>
     public async Task<IMultiLockHandle?> AcquireMultiLockAsync(
         string[] resources,
@@ -228,8 +239,11 @@ public class RedisDistributedLock : IDistributedLock
 
     private static string GetLockKey(string resource)
     {
-        // Ensure resource name is properly sanitized to prevent invalid Redis keys
-        var sanitizedName = resource.Replace(":", "_").Replace(" ", "_");
-        return $"lock:{sanitizedName}";
+        // Use a SHA256 hash of the resource name to create a safe and uniform key.
+        // This prevents issues with special characters and key length.
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(resource));
+        var hashString = Convert.ToHexString(hashBytes);
+        return $"lock:{hashString}";
     }
 }

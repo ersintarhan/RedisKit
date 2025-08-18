@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Options;
+using NSubstitute;
 using RedisKit.Models;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -9,62 +10,44 @@ namespace RedisKit.Tests;
 
 public class PubSubServiceTests
 {
-    private readonly Mock<ILogger<RedisPubSubService>> _mockLogger;
-    private readonly Mock<ISubscriber> _mockSubscriber;
-    private readonly RedisOptions _options;
-    private readonly RedisPubSubService _pubSubService;
+    private readonly ILogger<RedisPubSubService> _logger;
+    private readonly IOptions<RedisOptions> _options;
+    private readonly ISubscriber _subscriber;
+    private readonly RedisConnection _connection;
 
     public PubSubServiceTests()
     {
-        _mockSubscriber = new Mock<ISubscriber>();
-        _mockLogger = new Mock<ILogger<RedisPubSubService>>();
-        _options = new RedisOptions
+        _subscriber = Substitute.For<ISubscriber>();
+        _logger = Substitute.For<ILogger<RedisPubSubService>>();
+
+        var redisOptions = new RedisOptions
         {
             ConnectionString = "localhost:6379",
             DefaultTtl = TimeSpan.FromHours(1),
             Serializer = SerializerType.SystemTextJson
         };
+        _options = Options.Create(redisOptions);
 
-        _pubSubService = new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
+        var connLogger = Substitute.For<ILogger<RedisConnection>>();
+        _connection = Substitute.For<RedisConnection>(connLogger, _options);
+        _connection.GetSubscriberAsync().Returns(Task.FromResult(_subscriber));
     }
 
-    #region Channel Pattern Matching Tests
-
-    [Theory]
-    [InlineData("*", "any-channel", true)]
-    [InlineData("test-*", "test-channel", true)]
-    [InlineData("test-*", "test-", true)]
-    [InlineData("test-*", "prod-channel", false)]
-    [InlineData("*-channel", "test-channel", true)]
-    [InlineData("*-channel", "channel", false)]
-    [InlineData("exact-match", "exact-match", true)]
-    [InlineData("exact-match", "not-exact", false)]
-    public void IsChannelMatch_WithVariousPatterns_ReturnsExpectedResult(
-        string pattern,
-        string channel,
-        bool expectedMatch)
+    private RedisPubSubService CreateSut()
     {
-        // This would require making IsChannelMatch method public or internal
-        // For now, we're testing the behavior indirectly through subscription tests
-        Assert.NotNull(pattern);
-        Assert.NotNull(channel);
-        Assert.IsType<bool>(expectedMatch);
-        Assert.True(true); // Placeholder - actual implementation would test the method
+        return new RedisPubSubService(_connection, _logger, _options);
     }
-
-    #endregion
 
     #region Dispose Tests
 
     [Fact]
-    public void Dispose_DoesNotThrow()
+    public async Task Dispose_DoesNotThrow()
     {
         // Arrange
-        var service = new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, _options);
+        var service = CreateSut();
 
         // Act & Assert
-        Assert.NotNull(service);
-        service.Dispose(); // Should not throw
+        await service.DisposeAsync(); // Should not throw
     }
 
     #endregion
@@ -84,21 +67,19 @@ public class PubSubServiceTests
     [Fact]
     public void Constructor_WithValidParameters_DoesNotThrow()
     {
-        // Arrange
-        var mockSubscriber = new Mock<ISubscriber>();
-        var mockLogger = new Mock<ILogger<RedisPubSubService>>();
-        var redisOptions = new RedisOptions();
+        // Arrange & Act
+        var sut = CreateSut();
 
-        // Act & Assert
-        Assert.NotNull(new RedisPubSubService(mockSubscriber.Object, mockLogger.Object, redisOptions));
+        // Assert
+        Assert.NotNull(sut);
     }
 
     [Fact]
-    public void Constructor_WithNullSubscriber_ThrowsArgumentNullException()
+    public void Constructor_WithNullConnection_ThrowsArgumentNullException()
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisPubSubService(null!, _mockLogger.Object, _options));
+            new RedisPubSubService(null!, _logger, _options));
     }
 
     [Fact]
@@ -106,7 +87,7 @@ public class PubSubServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisPubSubService(_mockSubscriber.Object, null!, _options));
+            new RedisPubSubService(_connection, null!, _options));
     }
 
     [Fact]
@@ -114,7 +95,7 @@ public class PubSubServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisPubSubService(_mockSubscriber.Object, _mockLogger.Object, null!));
+            new RedisPubSubService(_connection, _logger, null!));
     }
 
     #endregion
@@ -124,25 +105,34 @@ public class PubSubServiceTests
     [Fact]
     public async Task PublishAsync_WithNullChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.PublishAsync(null!, new TestMessage()));
+            sut.PublishAsync(null!, new TestMessage()));
     }
 
     [Fact]
     public async Task PublishAsync_WithEmptyChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.PublishAsync("", new TestMessage()));
+            sut.PublishAsync("", new TestMessage()));
     }
 
     [Fact]
     public async Task PublishAsync_WithNullMessage_ThrowsArgumentNullException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _pubSubService.PublishAsync<TestMessage>("test-channel", null!));
+            sut.PublishAsync<TestMessage>("test-channel", null!));
     }
 
     [Fact]
@@ -151,22 +141,22 @@ public class PubSubServiceTests
         // Arrange
         var channel = "test-channel";
         var message = new TestMessage { Content = "Test Content" };
-        var tcs = new TaskCompletionSource<bool>();
+        var sut = CreateSut();
 
-        _mockSubscriber.Setup(x => x.PublishAsync(
-                It.IsAny<RedisChannel>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<CommandFlags>()))
+        _subscriber.PublishAsync(
+                Arg.Any<RedisChannel>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(1L));
 
         // Act
-        await _pubSubService.PublishAsync(channel, message);
+        await sut.PublishAsync(channel, message);
 
         // Assert
-        _mockSubscriber.Verify(x => x.PublishAsync(
-            It.Is<RedisChannel>(c => c.ToString() == channel),
-            It.IsAny<RedisValue>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _subscriber.Received(1).PublishAsync(
+            Arg.Is<RedisChannel>(c => c.ToString() == channel),
+            Arg.Any<RedisValue>(),
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
@@ -176,25 +166,34 @@ public class PubSubServiceTests
     [Fact]
     public async Task SubscribeAsync_WithNullChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.SubscribeAsync<TestMessage>(null!, (_, _) => Task.CompletedTask));
+            sut.SubscribeAsync<TestMessage>(null!, (_, _) => Task.CompletedTask));
     }
 
     [Fact]
     public async Task SubscribeAsync_WithEmptyChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.SubscribeAsync<TestMessage>("", (msg, ct) => Task.CompletedTask));
+            sut.SubscribeAsync<TestMessage>("", (msg, ct) => Task.CompletedTask));
     }
 
     [Fact]
     public async Task SubscribeAsync_WithNullHandler_ThrowsArgumentNullException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _pubSubService.SubscribeAsync<TestMessage>("test-channel", null!));
+            sut.SubscribeAsync<TestMessage>("test-channel", null!));
     }
 
     [Fact]
@@ -203,21 +202,22 @@ public class PubSubServiceTests
         // Arrange
         var channel = "test-channel";
         Func<TestMessage, CancellationToken, Task> handler = (msg, ct) => { return Task.CompletedTask; };
+        var sut = CreateSut();
 
-        _mockSubscriber.Setup(x => x.SubscribeAsync(
-                It.IsAny<RedisChannel>(),
-                It.IsAny<Action<RedisChannel, RedisValue>>(),
-                It.IsAny<CommandFlags>()))
+        _subscriber.SubscribeAsync(
+                Arg.Any<RedisChannel>(),
+                Arg.Any<Action<RedisChannel, RedisValue>>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
         // Act
-        await _pubSubService.SubscribeAsync(channel, handler);
+        await sut.SubscribeAsync(channel, handler);
 
         // Assert
-        _mockSubscriber.Verify(x => x.SubscribeAsync(
-            It.Is<RedisChannel>(c => c.ToString() == channel),
-            It.IsAny<Action<RedisChannel, RedisValue>>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _subscriber.Received(1).SubscribeAsync(
+            Arg.Is<RedisChannel>(c => c.ToString() == channel),
+            Arg.Any<Action<RedisChannel, RedisValue>>(),
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
@@ -227,17 +227,23 @@ public class PubSubServiceTests
     [Fact]
     public async Task UnsubscribeAsync_WithNullChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.UnsubscribeAsync((string)null!));
+            sut.UnsubscribeAsync((string)null!));
     }
 
     [Fact]
     public async Task UnsubscribeAsync_WithEmptyChannel_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.UnsubscribeAsync(""));
+            sut.UnsubscribeAsync(""));
     }
 
     [Fact]
@@ -245,32 +251,32 @@ public class PubSubServiceTests
     {
         // Arrange
         var channel = "test-channel";
-        //var message = new TestMessage { Content = "Test" };
+        var sut = CreateSut();
 
         // First subscribe to create a handler
-        _mockSubscriber.Setup(x => x.SubscribeAsync(
-                It.IsAny<RedisChannel>(),
-                It.IsAny<Action<RedisChannel, RedisValue>>(),
-                It.IsAny<CommandFlags>()))
+        _subscriber.SubscribeAsync(
+                Arg.Any<RedisChannel>(),
+                Arg.Any<Action<RedisChannel, RedisValue>>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
-        _mockSubscriber.Setup(x => x.UnsubscribeAsync(
-                It.IsAny<RedisChannel>(),
+        _subscriber.UnsubscribeAsync(
+                Arg.Any<RedisChannel>(),
                 null,
-                It.IsAny<CommandFlags>()))
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
         // Act - Subscribe first
-        await _pubSubService.SubscribeAsync<TestMessage>(channel, Handler);
+        await sut.SubscribeAsync<TestMessage>(channel, Handler);
 
         // Then unsubscribe
-        await _pubSubService.UnsubscribeAsync(channel);
+        await sut.UnsubscribeAsync(channel);
 
         // Assert
-        _mockSubscriber.Verify(x => x.UnsubscribeAsync(
-            It.Is<RedisChannel>(c => c.ToString() == channel),
+        await _subscriber.Received(1).UnsubscribeAsync(
+            Arg.Is<RedisChannel>(c => c.ToString() == channel),
             null,
-            It.IsAny<CommandFlags>()), Times.Once);
+            Arg.Any<CommandFlags>());
     }
 
     private async Task Handler(TestMessage msg, CancellationToken ct)
@@ -286,25 +292,34 @@ public class PubSubServiceTests
     [Fact]
     public async Task SubscribePatternAsync_WithNullPattern_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.SubscribePatternAsync<TestMessage>(null!, (msg, ct) => Task.CompletedTask));
+            sut.SubscribePatternAsync<TestMessage>(null!, (msg, ct) => Task.CompletedTask));
     }
 
     [Fact]
     public async Task SubscribePatternAsync_WithEmptyPattern_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.SubscribePatternAsync<TestMessage>("", (_, _) => Task.CompletedTask));
+            sut.SubscribePatternAsync<TestMessage>("", (_, _) => Task.CompletedTask));
     }
 
     [Fact]
     public async Task SubscribePatternAsync_WithNullHandler_ThrowsArgumentNullException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _pubSubService.SubscribePatternAsync<TestMessage>("test-*", null!));
+            sut.SubscribePatternAsync<TestMessage>("test-*", null!));
     }
 
     [Fact]
@@ -313,37 +328,44 @@ public class PubSubServiceTests
         // Arrange
         var pattern = "test-*";
         Func<TestMessage, CancellationToken, Task> handler = (msg, ct) => Task.CompletedTask;
+        var sut = CreateSut();
 
-        _mockSubscriber.Setup(x => x.SubscribeAsync(
-                It.IsAny<RedisChannel>(),
-                It.IsAny<Action<RedisChannel, RedisValue>>(),
-                It.IsAny<CommandFlags>()))
+        _subscriber.SubscribeAsync(
+                Arg.Any<RedisChannel>(),
+                Arg.Any<Action<RedisChannel, RedisValue>>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
         // Act
-        await _pubSubService.SubscribePatternAsync(pattern, handler);
+        await sut.SubscribePatternAsync(pattern, handler);
 
         // Assert
-        _mockSubscriber.Verify(x => x.SubscribeAsync(
-            It.Is<RedisChannel>(c => c.IsPattern && c.ToString() == pattern),
-            It.IsAny<Action<RedisChannel, RedisValue>>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _subscriber.Received(1).SubscribeAsync(
+            Arg.Is<RedisChannel>(c => c.IsPattern && c.ToString() == pattern),
+            Arg.Any<Action<RedisChannel, RedisValue>>(),
+            Arg.Any<CommandFlags>());
     }
 
     [Fact]
     public async Task UnsubscribePatternAsync_WithNullPattern_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.UnsubscribePatternAsync(null!));
+            sut.UnsubscribePatternAsync(null!));
     }
 
     [Fact]
     public async Task UnsubscribePatternAsync_WithEmptyPattern_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _pubSubService.UnsubscribePatternAsync(""));
+            sut.UnsubscribePatternAsync(""));
     }
 
     [Fact]
@@ -351,31 +373,32 @@ public class PubSubServiceTests
     {
         // Arrange
         var pattern = "test-*";
+        var sut = CreateSut();
 
         // First subscribe to create a handler
-        _mockSubscriber.Setup(x => x.SubscribeAsync(
-                It.IsAny<RedisChannel>(),
-                It.IsAny<Action<RedisChannel, RedisValue>>(),
-                It.IsAny<CommandFlags>()))
+        _subscriber.SubscribeAsync(
+                Arg.Any<RedisChannel>(),
+                Arg.Any<Action<RedisChannel, RedisValue>>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
-        _mockSubscriber.Setup(x => x.UnsubscribeAsync(
-                It.IsAny<RedisChannel>(),
+        _subscriber.UnsubscribeAsync(
+                Arg.Any<RedisChannel>(),
                 null,
-                It.IsAny<CommandFlags>()))
+                Arg.Any<CommandFlags>())
             .Returns(Task.CompletedTask);
 
         // Act - Subscribe first
-        var token = await _pubSubService.SubscribePatternAsync<TestMessage>(pattern, async (msg, ct) => { await Task.CompletedTask; });
+        var token = await sut.SubscribePatternAsync<TestMessage>(pattern, async (msg, ct) => { await Task.CompletedTask; });
 
         // Then unsubscribe
-        await _pubSubService.UnsubscribePatternAsync(pattern);
+        await sut.UnsubscribePatternAsync(pattern);
 
         // Assert
-        _mockSubscriber.Verify(x => x.UnsubscribeAsync(
-            It.Is<RedisChannel>(c => c.IsPattern && c.ToString() == pattern),
+        await _subscriber.Received(1).UnsubscribeAsync(
+            Arg.Is<RedisChannel>(c => c.IsPattern && c.ToString() == pattern),
             null,
-            It.IsAny<CommandFlags>()), Times.Once);
+            Arg.Any<CommandFlags>());
     }
 
     #endregion

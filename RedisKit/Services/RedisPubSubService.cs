@@ -98,13 +98,16 @@ namespace RedisKit.Services;
 /// }
 /// </code>
 /// </remarks>
-public class RedisPubSubService : IRedisPubSubService, IDisposable
+using Microsoft.Extensions.Options;
+
+public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDisposable
 {
     // Channel subscriptions: channel -> list of handlers
     private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _channelHandlers;
 
     // Cleanup timer for inactive handlers
     private readonly Timer _cleanupTimer;
+    private readonly IRedisConnection _connection;
 
     // Handler ID to subscription mapping for fast unsubscribe
     private readonly ConcurrentDictionary<string, HandlerMetadata> _handlerMap;
@@ -117,7 +120,6 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
 
     // Statistics tracking
     private readonly ConcurrentDictionary<string, SubscriptionStats> _statistics;
-    private readonly ISubscriber _subscriber;
 
     // Synchronization
     private readonly SemaphoreSlim _subscriptionLock = new(1, 1);
@@ -126,18 +128,17 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
     private bool _disposed;
 
     public RedisPubSubService(
-        ISubscriber subscriber,
+        IRedisConnection connection,
         ILogger<RedisPubSubService> logger,
-        RedisOptions options)
+        IOptions<RedisOptions> options)
     {
-        _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        if (options == null)
-            throw new ArgumentNullException(nameof(options));
+        var redisOptions = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Create serializer based on configuration
-        _serializer = RedisSerializerFactory.Create(options.Serializer);
+        _serializer = RedisSerializerFactory.Create(redisOptions.Serializer);
 
         _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
         _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
@@ -169,9 +170,10 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
         try
         {
             _logger.LogPublishAsync(channel);
+            var subscriber = await GetSubscriberAsync();
 
             var serialized = await _serializer.SerializeAsync(message, cancellationToken).ConfigureAwait(false);
-            var subscriberCount = await _subscriber.PublishAsync(RedisChannel.Literal(channel), serialized);
+            var subscriberCount = await subscriber.PublishAsync(RedisChannel.Literal(channel), serialized);
 
             _logger.LogPublishAsyncSuccess(channel);
             return subscriberCount;
@@ -338,12 +340,13 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
     /// </summary>
     private async Task SubscribeToRedisAsync(string key, SubscriptionType type, CancellationToken cancellationToken)
     {
+        var subscriber = await GetSubscriberAsync();
         if (type == SubscriptionType.Channel)
-            await _subscriber.SubscribeAsync(
+            await subscriber.SubscribeAsync(
                 RedisChannel.Literal(key),
                 async (ch, val) => await ProcessMessage(ch.ToString(), val, type, cancellationToken));
         else
-            await _subscriber.SubscribeAsync(
+            await subscriber.SubscribeAsync(
                 RedisChannel.Pattern(key),
                 async (ch, val) => await ProcessMessage(ch.ToString(), val, type, cancellationToken));
     }
@@ -521,6 +524,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
         try
         {
             _logger.LogDebug("Unsubscribing from {Type}: {Key}", type, key);
+            var subscriber = await GetSubscriberAsync();
 
             var handlerDict = type == SubscriptionType.Channel ? _channelHandlers : _patternHandlers;
 
@@ -531,9 +535,9 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
 
                 // Unsubscribe from Redis
                 if (type == SubscriptionType.Channel)
-                    await _subscriber.UnsubscribeAsync(RedisChannel.Literal(key));
+                    await subscriber.UnsubscribeAsync(RedisChannel.Literal(key));
                 else
-                    await _subscriber.UnsubscribeAsync(RedisChannel.Pattern(key));
+                    await subscriber.UnsubscribeAsync(RedisChannel.Pattern(key));
 
                 // Remove statistics
                 _statistics.TryRemove(key, out _);
@@ -584,12 +588,13 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
         try
         {
             _logger.LogDebug("Unsubscribing from all channels and patterns");
+            var subscriber = await GetSubscriberAsync();
 
             // Unsubscribe all channels
-            foreach (var channel in _channelHandlers.Keys.ToList()) await _subscriber.UnsubscribeAsync(RedisChannel.Literal(channel));
+            foreach (var channel in _channelHandlers.Keys.ToList()) await subscriber.UnsubscribeAsync(RedisChannel.Literal(channel));
 
             // Unsubscribe all patterns
-            foreach (var pattern in _patternHandlers.Keys.ToList()) await _subscriber.UnsubscribeAsync(RedisChannel.Pattern(pattern));
+            foreach (var pattern in _patternHandlers.Keys.ToList()) await subscriber.UnsubscribeAsync(RedisChannel.Pattern(pattern));
 
             // Clear all collections
             _channelHandlers.Clear();
@@ -688,32 +693,57 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed && disposing)
+        if (_disposed) return;
+
+        if (disposing)
         {
+            // Stop cleanup timer
+            _cleanupTimer?.Dispose();
+
+            // Synchronously block for unsubscribe, as Dispose must be synchronous.
+            // IAsyncDisposable is preferred.
             try
             {
-                // Stop cleanup timer
-                _cleanupTimer?.Dispose();
-
-                // Unsubscribe all
                 UnsubscribeAllAsync(CancellationToken.None).GetAwaiter().GetResult();
-
-                // Dispose semaphore
-                _subscriptionLock?.Dispose();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                _logger.LogError(ex, "Error during PubSubService disposal");
+                _logger.LogError(ex, "Error during synchronous PubSubService disposal");
             }
 
-            _disposed = true;
+            _subscriptionLock?.Dispose();
         }
+
+        _disposed = true;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+
+        await _cleanupTimer.DisposeAsync();
+
+        try
+        {
+            await UnsubscribeAllAsync(CancellationToken.None);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Error during asynchronous PubSubService disposal");
+        }
+
+        _subscriptionLock?.Dispose();
+
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
     private void ThrowIfDisposed()
     {
         if (_disposed) throw new ObjectDisposedException(nameof(RedisPubSubService));
     }
+
+    private Task<ISubscriber> GetSubscriberAsync() => _connection.GetSubscriberAsync();
 
     #endregion
 

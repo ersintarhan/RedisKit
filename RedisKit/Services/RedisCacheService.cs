@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -27,7 +29,7 @@ public class RedisCacheService : IRedisCacheService
             return count
         ";
 
-    private readonly IDatabaseAsync _database;
+    private readonly IRedisConnection _connection;
     private readonly ILogger<RedisCacheService> _logger;
     private readonly SemaphoreSlim _luaScriptDetectionLock = new(1, 1);
     private readonly RedisOptions _options;
@@ -40,14 +42,16 @@ public class RedisCacheService : IRedisCacheService
     private bool _useFallbackMode;
 
     public RedisCacheService(
-        IDatabaseAsync database,
+        IRedisConnection connection,
         ILogger<RedisCacheService> logger,
-        RedisOptions options)
+        IOptions<RedisOptions> options)
     {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+
         // Create the serializer based on configuration
+        // In a future refactor, IRedisSerializer should be injected directly.
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
     }
 
@@ -62,8 +66,9 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             _logger.LogGetAsync(prefixedKey);
+            var database = await GetDatabaseAsync();
 
-            var value = await _database.StringGetAsync(prefixedKey).ConfigureAwait(false);
+            var value = await database.StringGetAsync(prefixedKey).ConfigureAwait(false);
             if (value.IsNullOrEmpty)
                 return null;
 
@@ -104,11 +109,12 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             _logger.LogSetAsync(prefixedKey);
+            var database = await GetDatabaseAsync();
 
             var serializedValue = await _serializer.SerializeAsync(value, cancellationToken).ConfigureAwait(false);
             var expiry = ttl ?? _options.DefaultTtl;
 
-            await _database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
+            await database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
 
             _logger.LogSetAsyncSuccess(prefixedKey);
         }
@@ -144,8 +150,9 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             _logger.LogDeleteAsync(prefixedKey);
+            var database = await GetDatabaseAsync();
 
-            await _database.KeyDeleteAsync(prefixedKey).ConfigureAwait(false);
+            await database.KeyDeleteAsync(prefixedKey).ConfigureAwait(false);
 
             _logger.LogDeleteAsyncSuccess(prefixedKey);
         }
@@ -175,27 +182,47 @@ public class RedisCacheService : IRedisCacheService
     {
         ArgumentNullException.ThrowIfNull(keys);
 
-        // Materialize the keys once to avoid multiple enumeration
-        var keyArray = keys.ToArray();
-        var prefixedKeys = keyArray.Select(k => $"{_keyPrefix}{k}").ToArray();
+        var originalKeys = keys.ToList();
+        if (originalKeys.Count == 0)
+        {
+            return new Dictionary<string, T?>();
+        }
+
+        var prefixedKeys = originalKeys.Select(k => (RedisKey)$"{_keyPrefix}{k}").ToArray();
 
         try
         {
-            _logger.LogGetManyAsync(string.Join(", ", prefixedKeys));
+            _logger.LogGetManyAsync(string.Join(", ", originalKeys));
+            var database = await GetDatabaseAsync();
 
-            var redisKeys = prefixedKeys.Select(k => (RedisKey)k).ToArray();
-            var values = await _database.StringGetAsync(redisKeys).ConfigureAwait(false);
+            var values = await database.StringGetAsync(prefixedKeys).ConfigureAwait(false);
 
-            // Use StringComparer.Ordinal for better performance
-            var result = new Dictionary<string, T?>(keyArray.Length, StringComparer.Ordinal);
-            for (var i = 0; i < prefixedKeys.Length; i++)
+            var result = new Dictionary<string, T?>(originalKeys.Count, StringComparer.Ordinal);
+            var deserializationTasks = new List<Task>(originalKeys.Count);
+            var resultsByIndex = new ConcurrentDictionary<int, T?>();
+
+            for (var i = 0; i < originalKeys.Count; i++)
             {
-                // Use the original key (without prefix) as dictionary key
-                var originalKey = keyArray[i];
-                if (values[i].IsNullOrEmpty)
-                    result[originalKey] = null;
+                var index = i;
+                if (values[index].IsNullOrEmpty)
+                {
+                    resultsByIndex[index] = null;
+                }
                 else
-                    result[originalKey] = await _serializer.DeserializeAsync<T>(values[i]!, cancellationToken);
+                {
+                    deserializationTasks.Add(Task.Run(async () =>
+                    {
+                        var deserialized = await _serializer.DeserializeAsync<T>(values[index]!, cancellationToken);
+                        resultsByIndex[index] = deserialized;
+                    }, cancellationToken));
+                }
+            }
+
+            await Task.WhenAll(deserializationTasks);
+
+            for (var i = 0; i < originalKeys.Count; i++)
+            {
+                result[originalKeys[i]] = resultsByIndex[i];
             }
 
             _logger.LogGetManyAsyncSuccess(result.Count);
@@ -279,8 +306,9 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             _logger.LogExistsAsync(prefixedKey);
+            var database = await GetDatabaseAsync();
 
-            var result = await _database.KeyExistsAsync(prefixedKey).ConfigureAwait(false);
+            var result = await database.KeyExistsAsync(prefixedKey).ConfigureAwait(false);
 
             _logger.LogExistsAsyncSuccess(prefixedKey, result);
             return result;
@@ -376,8 +404,6 @@ public class RedisCacheService : IRedisCacheService
 
         if (string.IsNullOrEmpty(kvp.Key))
             throw new ArgumentException("Key cannot be null or empty");
-        if (kvp.Value is not null)
-            throw new ArgumentNullException(nameof(kvp), ValueCannotBeNullOrEmpty);
     }
 
     private async Task SetChunkAsync((RedisKey Key, RedisValue Value)[] serializedPairs, TimeSpan expiry)
@@ -406,9 +432,10 @@ public class RedisCacheService : IRedisCacheService
     {
         try
         {
+            var database = await GetDatabaseAsync();
             // Test with a simple Lua script
             var testScript = "return redis.call('PING')";
-            var result = await _database.ScriptEvaluateAsync(testScript).ConfigureAwait(false);
+            var result = await database.ScriptEvaluateAsync(testScript).ConfigureAwait(false);
             var supported = result.ToString() == "PONG";
 
             if (supported)
@@ -455,10 +482,11 @@ public class RedisCacheService : IRedisCacheService
     {
         try
         {
+            var database = await GetDatabaseAsync();
             var keys = pairs.Select(p => p.Key).ToArray();
-            var values = pairs.Select(p => p.Value).Concat([expiry.TotalSeconds]).ToArray();
-            var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
-            var successCount = Convert.ToInt32(result);
+            var values = pairs.Select(p => p.Value).Concat(new RedisValue[] { expiry.TotalSeconds }).ToArray();
+            var result = await database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
+            var successCount = (int?)result ?? 0;
             if (successCount != pairs.Length)
                 _logger.LogSetManyPartialSuccess(pairs.Length, successCount);
         }
@@ -486,29 +514,40 @@ public class RedisCacheService : IRedisCacheService
 
     private async Task SetManyWithFallback((RedisKey Key, RedisValue Value)[] pairs, TimeSpan? expiry)
     {
+        // Get the synchronous IDatabase interface to create a batch
+        var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
+
         if (expiry == TimeSpan.Zero || expiry == null)
         {
             // No TTL: use MSET for single round-trip
             var kvpArray = pairs
                 .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
                 .ToArray();
-            await _database.StringSetAsync(kvpArray).ConfigureAwait(false);
+            await database.StringSetAsync(kvpArray).ConfigureAwait(false);
         }
         else
         {
-            // With TTL: MSET followed by parallel EXPIRE
+            // With TTL: use a batch to pipeline MSET and EXPIRE commands
+            var batch = database.CreateBatch();
+
             var kvpArray = pairs
                 .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
                 .ToArray();
 
             // First: MSET
-            await _database.StringSetAsync(kvpArray).ConfigureAwait(false);
+            var msetTask = batch.StringSetAsync(kvpArray);
 
             // Then: parallel EXPIRE to minimize round-trips
-            var expireTasks = pairs
-                .Select(p => _database.KeyExpireAsync(p.Key, expiry.Value))
-                .ToArray();
-            await Task.WhenAll(expireTasks);
+            var expireTasks = new List<Task>();
+            foreach (var pair in pairs)
+            {
+                expireTasks.Add(batch.KeyExpireAsync(pair.Key, expiry.Value));
+            }
+
+            batch.Execute();
+            await Task.WhenAll(expireTasks.Append(msetTask));
         }
     }
+
+    private Task<IDatabaseAsync> GetDatabaseAsync() => _connection.GetDatabaseAsync();
 }

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
+using NSubstitute;
 using RedisKit.Models;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -11,26 +11,32 @@ namespace RedisKit.Tests;
 
 public class StreamServiceTests
 {
-    private readonly Mock<IDatabaseAsync> _mockDatabase;
-    private readonly Mock<ILogger<RedisStreamService>> _mockLogger;
-    private readonly RedisOptions _options;
-    private readonly RedisStreamService _streamService;
+    private readonly IDatabaseAsync _db;
+    private readonly ILogger<RedisStreamService> _logger;
+    private readonly IOptions<RedisOptions> _options;
+    private readonly RedisConnection _connection;
 
     public StreamServiceTests()
     {
-        _mockDatabase = new Mock<IDatabaseAsync>();
-        _mockLogger = new Mock<ILogger<RedisStreamService>>();
-        _options = new RedisOptions
+        _db = Substitute.For<IDatabaseAsync>();
+        _logger = Substitute.For<ILogger<RedisStreamService>>();
+
+        var redisOptions = new RedisOptions
         {
             ConnectionString = "localhost:6379",
             DefaultTtl = TimeSpan.FromHours(1),
             Serializer = SerializerType.SystemTextJson
         };
+        _options = Options.Create(redisOptions);
 
-        var optionsMock = new Mock<IOptions<RedisOptions>>();
-        optionsMock.Setup(x => x.Value).Returns(_options);
+        var connLogger = Substitute.For<ILogger<RedisConnection>>();
+        _connection = Substitute.For<RedisConnection>(connLogger, _options);
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(_db));
+    }
 
-        _streamService = new RedisStreamService(_mockDatabase.Object, _mockLogger.Object, _options);
+    private RedisStreamService CreateSut()
+    {
+        return new RedisStreamService(_connection, _logger, _options);
     }
 
     #region Test Models
@@ -46,11 +52,11 @@ public class StreamServiceTests
     #region Constructor Tests
 
     [Fact]
-    public void Constructor_WithNullDatabase_ThrowsArgumentNullException()
+    public void Constructor_WithNullConnection_ThrowsArgumentNullException()
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisStreamService(null!, _mockLogger.Object, _options));
+            new RedisStreamService(null!, _logger, _options));
     }
 
     [Fact]
@@ -58,7 +64,7 @@ public class StreamServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisStreamService(_mockDatabase.Object, null!, _options));
+            new RedisStreamService(_connection, null!, _options));
     }
 
     [Fact]
@@ -66,14 +72,14 @@ public class StreamServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new RedisStreamService(_mockDatabase.Object, _mockLogger.Object, null!));
+            new RedisStreamService(_connection, _logger, null!));
     }
 
     [Fact]
     public void Constructor_WithValidParameters_DoesNotThrow()
     {
         // Act & Assert
-        var service = new RedisStreamService(_mockDatabase.Object, _mockLogger.Object, _options);
+        var service = CreateSut();
         Assert.NotNull(service);
     }
 
@@ -84,25 +90,34 @@ public class StreamServiceTests
     [Fact]
     public async Task AddAsync_WithNullStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.AddAsync(null!, new TestMessage { Content = "Test" }));
+            sut.AddAsync(null!, new TestMessage { Content = "Test" }));
     }
 
     [Fact]
     public async Task AddAsync_WithEmptyStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.AddAsync("", new TestMessage { Content = "Test" }));
+            sut.AddAsync("", new TestMessage { Content = "Test" }));
     }
 
     [Fact]
     public async Task AddAsync_WithNullMessage_ThrowsArgumentNullException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _streamService.AddAsync<TestMessage>("test-stream", null!));
+            sut.AddAsync<TestMessage>("test-stream", null!));
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -112,35 +127,21 @@ public class StreamServiceTests
         var streamName = "test-stream";
         var message = new TestMessage { Content = "Test Message" };
         var expectedId = "123456789-0";
+        var sut = CreateSut();
 
-        // Setup mock with callback to debug what's happening
-        _mockDatabase.Setup(x => x.StreamAddAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<NameValueEntry[]>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<int?>(),
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .Returns<RedisKey, NameValueEntry[], RedisValue?, int?, bool, CommandFlags>((key, entries, msgId, maxLen, approx, flags) =>
-            {
-                // Return a RedisValue that will properly convert to string
-                return Task.FromResult(RedisValue.Unbox(expectedId));
-            });
+        _db.StreamAddAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<NameValueEntry[]>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<int?>(),
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult((RedisValue)expectedId));
 
         // Act  
-        Exception? caughtException = null;
-        string? result = null;
-        try
-        {
-            result = await _streamService.AddAsync(streamName, message);
-        }
-        catch (Exception ex)
-        {
-            caughtException = ex;
-        }
+        var result = await sut.AddAsync(streamName, message);
 
         // Assert
-        Assert.Null(caughtException);
         Assert.NotNull(result);
         Assert.Equal(expectedId, result);
     }
@@ -152,27 +153,28 @@ public class StreamServiceTests
         var streamName = "test-stream";
         var message = new TestMessage { Content = "Test" };
         var maxLength = 1000;
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamAddAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<NameValueEntry[]>(),
-                It.IsAny<RedisValue?>(),
+        _db.StreamAddAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<NameValueEntry[]>(),
+                Arg.Any<RedisValue?>(),
                 maxLength,
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(new RedisValue("123456789-0"));
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult((RedisValue)"123456789-0"));
 
         // Act
-        await _streamService.AddAsync(streamName, message, maxLength);
+        await sut.AddAsync(streamName, message, maxLength);
 
         // Assert
-        _mockDatabase.Verify(x => x.StreamAddAsync(
-            It.IsAny<RedisKey>(), // Key prefix is added internally
-            It.IsAny<NameValueEntry[]>(),
-            It.IsAny<RedisValue?>(),
+        await _db.Received(1).StreamAddAsync(
+            Arg.Any<RedisKey>(), // Key prefix is added internally
+            Arg.Any<NameValueEntry[]>(),
+            Arg.Any<RedisValue?>(),
             maxLength,
             true, // useApproximateMaxLength
-            It.IsAny<CommandFlags>()), Times.Once);
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
@@ -182,17 +184,23 @@ public class StreamServiceTests
     [Fact]
     public async Task ReadAsync_WithNullStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.ReadAsync<TestMessage>(null!));
+            sut.ReadAsync<TestMessage>(null!));
     }
 
     [Fact]
     public async Task ReadAsync_WithEmptyStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.ReadAsync<TestMessage>(""));
+            sut.ReadAsync<TestMessage>(""));
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -202,24 +210,24 @@ public class StreamServiceTests
         var streamName = "test-stream";
         var messageId = "123456789-0";
         var testMessage = new TestMessage { Content = "Test" };
-        // Use the same serializer as StreamService uses (SystemTextJson)
         var messageData = JsonSerializer.SerializeToUtf8Bytes(testMessage);
+        var sut = CreateSut();
 
         var streamEntry = new StreamEntry(
             messageId,
             new[] { new NameValueEntry("data", messageData) });
 
-        _mockDatabase.Setup(x => x.StreamRangeAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<int?>(),
-                It.IsAny<Order>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(new[] { streamEntry });
+        _db.StreamRangeAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<int?>(),
+                Arg.Any<Order>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(new[] { streamEntry }));
 
         // Act
-        var result = await _streamService.ReadAsync<TestMessage>(streamName);
+        var result = await sut.ReadAsync<TestMessage>(streamName);
 
         // Assert
         Assert.NotNull(result);
@@ -235,27 +243,28 @@ public class StreamServiceTests
         // Arrange
         var streamName = "test-stream";
         var count = 5;
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamRangeAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<RedisValue?>(),
+        _db.StreamRangeAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<RedisValue?>(),
                 count,
-                It.IsAny<Order>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(Array.Empty<StreamEntry>());
+                Arg.Any<Order>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(Array.Empty<StreamEntry>()));
 
         // Act
-        await _streamService.ReadAsync<TestMessage>(streamName, count: count);
+        await sut.ReadAsync<TestMessage>(streamName, count: count);
 
         // Assert
-        _mockDatabase.Verify(x => x.StreamRangeAsync(
-            It.IsAny<RedisKey>(), // Key prefix is added internally
-            It.IsAny<RedisValue?>(),
-            It.IsAny<RedisValue?>(),
+        await _db.Received(1).StreamRangeAsync(
+            Arg.Any<RedisKey>(), // Key prefix is added internally
+            Arg.Any<RedisValue?>(),
+            Arg.Any<RedisValue?>(),
             count,
-            It.IsAny<Order>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+            Arg.Any<Order>(),
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
@@ -265,17 +274,23 @@ public class StreamServiceTests
     [Fact]
     public async Task CreateConsumerGroupAsync_WithNullStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.CreateConsumerGroupAsync(null!, "group"));
+            sut.CreateConsumerGroupAsync(null!, "group"));
     }
 
     [Fact]
     public async Task CreateConsumerGroupAsync_WithNullGroupName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.CreateConsumerGroupAsync("stream", null!));
+            sut.CreateConsumerGroupAsync("stream", null!));
     }
 
     [Fact]
@@ -284,26 +299,27 @@ public class StreamServiceTests
         // Arrange
         var streamName = "test-stream";
         var groupName = "test-group";
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamCreateConsumerGroupAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(true);
+        _db.StreamCreateConsumerGroupAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(true));
 
         // Act
-        await _streamService.CreateConsumerGroupAsync(streamName, groupName);
+        await sut.CreateConsumerGroupAsync(streamName, groupName);
 
         // Assert
         // CreateConsumerGroupAsync returns void, no result to assert
-        _mockDatabase.Verify(x => x.StreamCreateConsumerGroupAsync(
-            It.IsAny<RedisKey>(), // Key prefix is added internally
+        await _db.Received(1).StreamCreateConsumerGroupAsync(
+            Arg.Any<RedisKey>(), // Key prefix is added internally
             groupName,
             StreamPosition.Beginning,
             false,
-            It.IsAny<CommandFlags>()), Times.Once);
+            Arg.Any<CommandFlags>());
     }
 
     [Fact]
@@ -312,41 +328,45 @@ public class StreamServiceTests
         // Arrange
         var streamName = "test-stream";
         var groupName = "existing-group";
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamCreateConsumerGroupAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .ThrowsAsync(new RedisServerException("BUSYGROUP Consumer Group name already exists"));
+        _db.StreamCreateConsumerGroupAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromException<bool>(new RedisServerException("BUSYGROUP Consumer Group name already exists")));
 
         // Act
-        await _streamService.CreateConsumerGroupAsync(streamName, groupName);
+        await sut.CreateConsumerGroupAsync(streamName, groupName);
 
         // Assert
         // Exception is thrown, but CreateConsumerGroupAsync returns void
         // Verify the mock was called to ensure the method executed
-        _mockDatabase.Verify(x => x.StreamCreateConsumerGroupAsync(
-            It.IsAny<RedisKey>(),
-            It.IsAny<RedisValue>(),
-            It.IsAny<RedisValue?>(),
-            It.IsAny<bool>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _db.Received(1).StreamCreateConsumerGroupAsync(
+            Arg.Any<RedisKey>(),
+            Arg.Any<RedisValue>(),
+            Arg.Any<RedisValue?>(),
+            Arg.Any<bool>(),
+            Arg.Any<CommandFlags>());
     }
 
     [Fact]
     public async Task ReadGroupAsync_WithNullParameters_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.ReadGroupAsync<TestMessage>(null!, "group", "consumer"));
+            sut.ReadGroupAsync<TestMessage>(null!, "group", "consumer"));
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.ReadGroupAsync<TestMessage>("stream", null!, "consumer"));
+            sut.ReadGroupAsync<TestMessage>("stream", null!, "consumer"));
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.ReadGroupAsync<TestMessage>("stream", "group", null!));
+            sut.ReadGroupAsync<TestMessage>("stream", "group", null!));
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -358,25 +378,25 @@ public class StreamServiceTests
         var consumerName = "test-consumer";
         var messageId = "123456789-0";
         var testMessage = new TestMessage { Content = "Group Message" };
-        // Use the same serializer as StreamService uses (SystemTextJson)
         var messageData = JsonSerializer.SerializeToUtf8Bytes(testMessage);
+        var sut = CreateSut();
 
         var streamEntry = new StreamEntry(
             messageId,
             new[] { new NameValueEntry("data", messageData) });
 
-        _mockDatabase.Setup(x => x.StreamReadGroupAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue?>(),
-                It.IsAny<int?>(),
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(new[] { streamEntry });
+        _db.StreamReadGroupAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue?>(),
+                Arg.Any<int?>(),
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(new[] { streamEntry }));
 
         // Act
-        var result = await _streamService.ReadGroupAsync<TestMessage>(streamName, groupName, consumerName);
+        var result = await sut.ReadGroupAsync<TestMessage>(streamName, groupName, consumerName);
 
         // Assert
         Assert.NotNull(result);
@@ -389,15 +409,18 @@ public class StreamServiceTests
     [Fact]
     public async Task AcknowledgeAsync_WithNullParameters_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.AcknowledgeAsync(null!, "group", "123"));
+            sut.AcknowledgeAsync(null!, "group", "123"));
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.AcknowledgeAsync("stream", null!, "123"));
+            sut.AcknowledgeAsync("stream", null!, "123"));
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.AcknowledgeAsync("stream", "group", null!));
+            sut.AcknowledgeAsync("stream", "group", null!));
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -407,23 +430,24 @@ public class StreamServiceTests
         var streamName = "test-stream";
         var groupName = "test-group";
         var messageId = "123456789-0";
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamAcknowledgeAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue[]>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(1);
+        _db.StreamAcknowledgeAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(1L));
 
         // Act
-        await _streamService.AcknowledgeAsync(streamName, groupName, messageId);
+        await sut.AcknowledgeAsync(streamName, groupName, messageId);
 
         // Assert - AcknowledgeAsync returns void, verify it was called
-        _mockDatabase.Verify(x => x.StreamAcknowledgeAsync(
-            It.IsAny<RedisKey>(),
-            It.IsAny<RedisValue>(),
-            It.IsAny<RedisValue[]>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _db.Received(1).StreamAcknowledgeAsync(
+            Arg.Any<RedisKey>(),
+            Arg.Any<RedisValue>(),
+            Arg.Any<RedisValue[]>(),
+            Arg.Any<CommandFlags>());
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -435,24 +459,24 @@ public class StreamServiceTests
         var consumerName = "test-consumer";
         var messageIds = new[] { "123456789-0", "123456789-1" };
         var testMessage = new TestMessage { Content = "Claimed Message" };
-        // Use the same serializer as StreamService uses (SystemTextJson)
         var messageData = JsonSerializer.SerializeToUtf8Bytes(testMessage);
+        var sut = CreateSut();
 
         var streamEntry = new StreamEntry(
             messageIds[0],
             new[] { new NameValueEntry("data", messageData) });
 
-        _mockDatabase.Setup(x => x.StreamClaimAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<RedisValue>(),
-                It.IsAny<long>(),
-                It.IsAny<RedisValue[]>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(new[] { streamEntry });
+        _db.StreamClaimAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<long>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(new[] { streamEntry }));
 
         // Act
-        var result = await _streamService.ClaimAsync<TestMessage>(
+        var result = await sut.ClaimAsync<TestMessage>(
             streamName, groupName, consumerName, 1000, messageIds);
 
         // Assert
@@ -470,25 +494,34 @@ public class StreamServiceTests
     [Fact]
     public async Task DeleteAsync_WithNullStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.DeleteAsync(null!, ["123"]));
+            sut.DeleteAsync(null!, ["123"]));
     }
 
     [Fact]
     public async Task DeleteAsync_WithNullMessageIds_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.DeleteAsync("stream", null!));
+            sut.DeleteAsync("stream", null!));
     }
 
     [Fact]
     public async Task DeleteAsync_WithEmptyMessageIds_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.DeleteAsync("stream", []));
+            sut.DeleteAsync("stream", []));
     }
 
     [Fact]
@@ -497,22 +530,23 @@ public class StreamServiceTests
         // Arrange
         var streamName = "test-stream";
         var messageIds = new[] { "123456789-0", "123456789-1" };
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamDeleteAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<RedisValue[]>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(2);
+        _db.StreamDeleteAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(2L));
 
         // Act
-        var result = await _streamService.DeleteAsync(streamName, messageIds);
+        var result = await sut.DeleteAsync(streamName, messageIds);
 
         // Assert
         Assert.Equal(2, result);
-        _mockDatabase.Verify(x => x.StreamDeleteAsync(
-            It.IsAny<RedisKey>(), // Key prefix is added internally
-            It.Is<RedisValue[]>(v => v.Length == 2),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _db.Received(1).StreamDeleteAsync(
+            Arg.Any<RedisKey>(), // Key prefix is added internally
+            Arg.Is<RedisValue[]>(v => v.Length == 2),
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
@@ -522,20 +556,26 @@ public class StreamServiceTests
     [Fact]
     public async Task TrimByLengthAsync_WithNullStreamName_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.TrimByLengthAsync(null!, 100));
+            sut.TrimByLengthAsync(null!, 100));
     }
 
     [Fact]
     public async Task TrimByLengthAsync_WithInvalidMaxLength_ThrowsArgumentException()
     {
+        // Arrange
+        var sut = CreateSut();
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.TrimByLengthAsync("stream", 0));
+            sut.TrimByLengthAsync("stream", 0));
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _streamService.TrimByLengthAsync("stream", -1));
+            sut.TrimByLengthAsync("stream", -1));
     }
 
     [Fact(Skip = "Requires integration testing with real Redis due to RedisValue struct mock limitations")]
@@ -545,24 +585,25 @@ public class StreamServiceTests
         var streamName = "test-stream";
         var maxLength = 100;
         var expectedTrimmedCount = 5L;
+        var sut = CreateSut();
 
-        _mockDatabase.Setup(x => x.StreamTrimAsync(
-                It.IsAny<RedisKey>(),
-                It.IsAny<int>(),
-                It.IsAny<bool>(),
-                It.IsAny<CommandFlags>()))
-            .ReturnsAsync(expectedTrimmedCount);
+        _db.StreamTrimAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<int>(),
+                Arg.Any<bool>(),
+                Arg.Any<CommandFlags>())
+            .Returns(Task.FromResult(expectedTrimmedCount));
 
         // Act
-        var result = await _streamService.TrimByLengthAsync(streamName, maxLength);
+        var result = await sut.TrimByLengthAsync(streamName, maxLength);
 
         // Assert
         Assert.Equal(expectedTrimmedCount, result);
-        _mockDatabase.Verify(x => x.StreamTrimAsync(
-            It.IsAny<RedisKey>(),
-            It.IsAny<int>(),
-            It.IsAny<bool>(),
-            It.IsAny<CommandFlags>()), Times.Once);
+        await _db.Received(1).StreamTrimAsync(
+            Arg.Any<RedisKey>(),
+            Arg.Any<int>(),
+            Arg.Any<bool>(),
+            Arg.Any<CommandFlags>());
     }
 
     #endregion
