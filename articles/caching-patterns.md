@@ -1,8 +1,8 @@
 # Caching Patterns with RedisKit
 
-## Cache-Aside Pattern
+## Cache-Aside Pattern with ValueTask
 
-The most common caching pattern where the application manages the cache:
+The most common caching pattern where the application manages the cache, optimized with ValueTask:
 
 ```csharp
 public class ProductService
@@ -10,11 +10,12 @@ public class ProductService
     private readonly IRedisCacheService _cache;
     private readonly IProductRepository _repository;
     
-    public async Task<Product> GetProductAsync(int productId)
+    // ValueTask for hot path optimization
+    public async ValueTask<Product> GetProductAsync(int productId)
     {
         var key = $"product:{productId}";
         
-        // 1. Check cache
+        // 1. Check cache - ValueTask reduces allocations
         var cached = await _cache.GetAsync<Product>(key);
         if (cached != null)
             return cached;
@@ -23,7 +24,7 @@ public class ProductService
         var product = await _repository.GetByIdAsync(productId);
         if (product != null)
         {
-            // 3. Store in cache
+            // 3. Store in cache - ValueTask for performance
             await _cache.SetAsync(key, product, TimeSpan.FromHours(1));
         }
         
@@ -38,6 +39,56 @@ public class ProductService
         // Invalidate cache
         var key = $"product:{product.Id}";
         await _cache.DeleteAsync(key);
+    }
+}
+```
+
+## High-Performance Batch Caching
+
+Use ExecuteBatchAsync for multiple cache operations in a single round-trip:
+
+```csharp
+public class BatchCacheService
+{
+    private readonly IRedisCacheService _cache;
+    private readonly IProductRepository _repository;
+    
+    // Fetch multiple related items in one round-trip
+    public async Task<ProductDetails> GetProductDetailsAsync(int productId)
+    {
+        var result = await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.GetAsync<Product>($"product:{productId}");
+            batch.GetAsync<List<Review>>($"reviews:{productId}");
+            batch.GetAsync<Inventory>($"inventory:{productId}");
+            batch.GetAsync<PriceHistory>($"price:history:{productId}");
+            batch.ExistsAsync($"featured:{productId}");
+        });
+        
+        return new ProductDetails
+        {
+            Product = result.GetResult<Product>(0),
+            Reviews = result.GetResult<List<Review>>(1) ?? new(),
+            Inventory = result.GetResult<Inventory>(2),
+            PriceHistory = result.GetResult<PriceHistory>(3),
+            IsFeatured = result.GetResult<bool>(4)
+        };
+    }
+    
+    // Update multiple cache entries atomically
+    public async Task RefreshProductCacheAsync(int productId)
+    {
+        var product = await _repository.GetProductAsync(productId);
+        var reviews = await _repository.GetReviewsAsync(productId);
+        var inventory = await _repository.GetInventoryAsync(productId);
+        
+        await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.SetAsync($"product:{productId}", product, TimeSpan.FromHours(1));
+            batch.SetAsync($"reviews:{productId}", reviews, TimeSpan.FromMinutes(30));
+            batch.SetAsync($"inventory:{productId}", inventory, TimeSpan.FromMinutes(5));
+            batch.DeleteAsync($"temp:product:{productId}");
+        });
     }
 }
 ```

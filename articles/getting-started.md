@@ -38,7 +38,7 @@ var app = builder.Build();
 
 ## Basic Usage
 
-### Cache Service
+### Cache Service with ValueTask (Performance Optimized)
 
 ```csharp
 using RedisKit.Interfaces;
@@ -52,11 +52,12 @@ public class WeatherService
         _cache = cache;
     }
     
-    public async Task<WeatherData> GetWeatherAsync(string city)
+    // Using ValueTask for hot path optimization
+    public async ValueTask<WeatherData> GetWeatherAsync(string city)
     {
         var key = $"weather:{city}";
         
-        // Try to get from cache
+        // Try to get from cache - ValueTask reduces allocations
         var cached = await _cache.GetAsync<WeatherData>(key);
         if (cached != null)
             return cached;
@@ -64,10 +65,66 @@ public class WeatherService
         // Fetch from API
         var weather = await FetchWeatherFromApi(city);
         
-        // Store in cache for 5 minutes
+        // Store in cache for 5 minutes - ValueTask for performance
         await _cache.SetAsync(key, weather, TimeSpan.FromMinutes(5));
         
         return weather;
+    }
+    
+    // Check if data exists without fetching
+    public async ValueTask<bool> HasWeatherDataAsync(string city)
+    {
+        return await _cache.ExistsAsync($"weather:{city}");
+    }
+}
+```
+
+### High-Performance Batch Operations
+
+```csharp
+using RedisKit.Interfaces;
+
+public class DashboardService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public DashboardService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    // ExecuteBatchAsync - Multiple operations in single round-trip
+    public async Task<DashboardData> GetDashboardDataAsync(string userId)
+    {
+        var result = await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.GetAsync<UserProfile>($"profile:{userId}");
+            batch.GetAsync<List<Activity>>($"activities:{userId}");
+            batch.GetAsync<UserStats>($"stats:{userId}");
+            batch.ExistsAsync($"premium:{userId}");
+            batch.GetAsync<int>($"notifications:count:{userId}");
+        });
+        
+        return new DashboardData
+        {
+            Profile = result.GetResult<UserProfile>(0),
+            RecentActivities = result.GetResult<List<Activity>>(1) ?? new(),
+            Statistics = result.GetResult<UserStats>(2),
+            IsPremiumUser = result.GetResult<bool>(3),
+            NotificationCount = result.GetResult<int>(4) ?? 0
+        };
+    }
+    
+    // Batch update multiple values
+    public async Task UpdateUserDataAsync(string userId, UserUpdate update)
+    {
+        await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.SetAsync($"profile:{userId}", update.Profile, TimeSpan.FromHours(1));
+            batch.SetAsync($"stats:{userId}", update.Stats, TimeSpan.FromHours(1));
+            batch.DeleteAsync($"cache:old:{userId}");
+            batch.ExpireAsync($"session:{userId}", TimeSpan.FromMinutes(30));
+        });
     }
 }
 ```

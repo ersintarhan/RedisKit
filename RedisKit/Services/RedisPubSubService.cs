@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -99,17 +100,18 @@ namespace RedisKit.Services;
 /// }
 /// </code>
 /// </remarks>
-using Microsoft.Extensions.Options;
 
 public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDisposable
 {
-    // Channel subscriptions: channel -> list of handlers
-    private readonly ObjectPool<ConcurrentDictionary<string, List<SubscriptionHandler>>>? _dictionaryPool;
     private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _channelHandlers;
 
     // Cleanup timer for inactive handlers
     private readonly Timer _cleanupTimer;
+
     private readonly IRedisConnection _connection;
+
+    // Channel subscriptions: channel -> list of handlers
+    private readonly ObjectPool<ConcurrentDictionary<string, List<SubscriptionHandler>>>? _dictionaryPool;
 
     // Handler ID to subscription mapping for fast unsubscribe
     private readonly ConcurrentDictionary<string, HandlerMetadata> _handlerMap;
@@ -146,10 +148,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         if (redisOptions.Pooling.Enabled)
         {
             var provider = poolProvider ?? new DefaultObjectPoolProvider();
-            if (provider is DefaultObjectPoolProvider defaultProvider)
-            {
-                defaultProvider.MaximumRetained = redisOptions.Pooling.MaxPoolSize;
-            }
+            if (provider is DefaultObjectPoolProvider defaultProvider) defaultProvider.MaximumRetained = redisOptions.Pooling.MaxPoolSize;
             _dictionaryPool = provider.Create<ConcurrentDictionary<string, List<SubscriptionHandler>>>();
             _channelHandlers = _dictionaryPool.Get();
             _patternHandlers = _dictionaryPool.Get();
@@ -724,7 +723,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
             {
                 UnsubscribeAllAsync(CancellationToken.None).GetAwaiter().GetResult();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during synchronous PubSubService disposal");
             }
@@ -751,7 +750,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         {
             await UnsubscribeAllAsync(CancellationToken.None);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Error during asynchronous PubSubService disposal");
         }
@@ -773,7 +772,10 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         if (_disposed) throw new ObjectDisposedException(nameof(RedisPubSubService));
     }
 
-    private Task<ISubscriber> GetSubscriberAsync() => _connection.GetSubscriberAsync();
+    private Task<ISubscriber> GetSubscriberAsync()
+    {
+        return _connection.GetSubscriberAsync();
+    }
 
     public async Task PublishManyAsync<T>(IEnumerable<(string channel, T message)> messages, CancellationToken cancellationToken = default) where T : class
     {

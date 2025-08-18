@@ -37,8 +37,8 @@ public class RedisCacheService : IRedisCacheService
     private readonly SemaphoreSlim _luaScriptDetectionLock = new(1, 1);
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
-    private string _keyPrefix = string.Empty;
     private readonly ObjectPool<List<Task>>? _taskListPool;
+    private string _keyPrefix = string.Empty;
 
 
     // Lua script support detection
@@ -63,10 +63,7 @@ public class RedisCacheService : IRedisCacheService
         if (_options.Pooling.Enabled)
         {
             var provider = poolProvider ?? new DefaultObjectPoolProvider();
-            if (provider is DefaultObjectPoolProvider defaultProvider)
-            {
-                defaultProvider.MaximumRetained = _options.Pooling.MaxPoolSize;
-            }
+            if (provider is DefaultObjectPoolProvider defaultProvider) defaultProvider.MaximumRetained = _options.Pooling.MaxPoolSize;
             _taskListPool = provider.Create<List<Task>>();
         }
     }
@@ -160,10 +157,7 @@ public class RedisCacheService : IRedisCacheService
         }
         finally
         {
-            if (buffer != null)
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            if (buffer != null) ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 
@@ -210,10 +204,7 @@ public class RedisCacheService : IRedisCacheService
         ArgumentNullException.ThrowIfNull(keys);
 
         var originalKeys = keys.ToList();
-        if (originalKeys.Count == 0)
-        {
-            return new Dictionary<string, T?>();
-        }
+        if (originalKeys.Count == 0) return new Dictionary<string, T?>();
 
         var prefixedKeys = originalKeys.Select(k => (RedisKey)$"{_keyPrefix}{k}").ToArray();
 
@@ -234,25 +225,18 @@ public class RedisCacheService : IRedisCacheService
             {
                 var index = i;
                 if (values[index].IsNullOrEmpty)
-                {
                     resultsByIndex[index] = null;
-                }
                 else
-                {
                     deserializationTasks.Add(Task.Run(async () =>
                     {
                         var deserialized = await _serializer.DeserializeAsync<T>(values[index]!, cancellationToken);
                         resultsByIndex[index] = deserialized;
                     }, cancellationToken));
-                }
             }
 
             await Task.WhenAll(deserializationTasks);
 
-            for (var i = 0; i < originalKeys.Count; i++)
-            {
-                result[originalKeys[i]] = resultsByIndex[i];
-            }
+            for (var i = 0; i < originalKeys.Count; i++) result[originalKeys[i]] = resultsByIndex[i];
 
             _logger.LogGetManyAsyncSuccess(result.Count);
             return result;
@@ -388,6 +372,20 @@ public class RedisCacheService : IRedisCacheService
     {
         ValidateRedisKey(prefix);
         _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+    }
+
+    public async Task<BatchResult> ExecuteBatchAsync(Action<IBatchOperations> configureBatch)
+    {
+        var multiplexer = await _connection.GetMultiplexerAsync();
+        var database = multiplexer.GetDatabase();
+        var batch = database.CreateBatch();
+        var operations = new BatchOperations(batch, _serializer);
+
+        configureBatch(operations);
+
+        batch.Execute();
+
+        return await operations.GetResultsAsync();
     }
 
     // Add validation to protect against too-large keys
@@ -593,29 +591,15 @@ public class RedisCacheService : IRedisCacheService
             using var pooledTasks = _taskListPool.GetPooled();
             var expireTasks = pooledTasks.Value;
 
-            foreach (var pair in pairs)
-            {
-                expireTasks.Add(batch.KeyExpireAsync(pair.Key, expiry.Value));
-            }
+            foreach (var pair in pairs) expireTasks.Add(batch.KeyExpireAsync(pair.Key, expiry.Value));
 
             batch.Execute();
             await Task.WhenAll(expireTasks.Append(msetTask));
         }
     }
 
-    private Task<IDatabaseAsync> GetDatabaseAsync() => _connection.GetDatabaseAsync();
-
-    public async Task<BatchResult> ExecuteBatchAsync(Action<IBatchOperations> configureBatch)
+    private Task<IDatabaseAsync> GetDatabaseAsync()
     {
-        var multiplexer = await _connection.GetMultiplexerAsync();
-        var database = multiplexer.GetDatabase();
-        var batch = database.CreateBatch();
-        var operations = new BatchOperations(batch, _serializer);
-
-        configureBatch(operations);
-
-        batch.Execute();
-
-        return await operations.GetResultsAsync();
+        return _connection.GetDatabaseAsync();
     }
 }

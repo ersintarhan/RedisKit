@@ -237,7 +237,7 @@ public interface IRedisSerializer
     Task<object?> DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Asynchronously serializes an object to a buffer.
+    ///     Asynchronously serializes an object to a buffer.
     /// </summary>
     /// <typeparam name="T">The type of object to serialize.</typeparam>
     /// <param name="value">The object to serialize.</param>
@@ -247,7 +247,7 @@ public interface IRedisSerializer
     ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Asynchronously deserializes a memory region to an object.
+    ///     Asynchronously deserializes a memory region to an object.
     /// </summary>
     /// <typeparam name="T">The type of object to deserialize to.</typeparam>
     /// <param name="data">The memory region containing serialized data.</param>
@@ -256,7 +256,7 @@ public interface IRedisSerializer
     ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Asynchronously deserializes a memory region to an object using runtime type information.
+    ///     Asynchronously deserializes a memory region to an object using runtime type information.
     /// </summary>
     /// <param name="data">The memory region containing serialized data.</param>
     /// <param name="type">The target type for deserialization.</param>

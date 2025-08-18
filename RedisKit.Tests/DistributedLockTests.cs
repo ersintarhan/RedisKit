@@ -11,9 +11,9 @@ namespace RedisKit.Tests;
 
 public class DistributedLockTests
 {
+    private readonly IRedisConnection _connection;
     private readonly IDatabaseAsync _dbAsync;
     private readonly ILogger<RedisDistributedLock> _logger;
-    private readonly IRedisConnection _connection;
 
     public DistributedLockTests()
     {

@@ -1449,5 +1449,9 @@ public class RedisStreamService : IRedisStreamService
             }
         }
     }
-    private Task<IDatabaseAsync> GetDatabaseAsync() => _connection.GetDatabaseAsync();
+
+    private Task<IDatabaseAsync> GetDatabaseAsync()
+    {
+        return _connection.GetDatabaseAsync();
+    }
 }

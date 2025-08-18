@@ -38,6 +38,9 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **📦 Smart Batching**: Size-based strategy selection for optimal performance
 - **⚡ Inline Optimizations**: AggressiveInlining for hot paths
 - **🔄 Zero-Copy Operations**: Minimal allocations in critical paths
+- **🚀 ValueTask Support**: Reduced heap allocations in hot paths with ValueTask
+- **📊 Memory<T> & Span<T>**: Zero-allocation serialization with Memory<byte> buffers
+- **🔗 Pipeline Batching**: ExecuteBatchAsync for multiple operations in single round-trip
 
 ## 📦 Installation
 
@@ -253,7 +256,7 @@ services.AddRedisServices(options =>
 
 ## 📚 Basic Usage Examples
 
-### Simple Caching
+### Simple Caching with ValueTask (Performance Optimized)
 
 ```csharp
 public class ProductService
@@ -265,11 +268,11 @@ public class ProductService
         _cache = cache;
     }
     
-    public async Task<Product?> GetProductAsync(int productId)
+    public async ValueTask<Product?> GetProductAsync(int productId)
     {
         var cacheKey = $"product:{productId}";
         
-        // Try to get from cache
+        // Try to get from cache - ValueTask for hot path optimization
         var cached = await _cache.GetAsync<Product>(cacheKey);
         if (cached != null)
             return cached;
@@ -277,7 +280,7 @@ public class ProductService
         // Load from database
         var product = await LoadFromDatabaseAsync(productId);
         
-        // Cache for 1 hour
+        // Cache for 1 hour - ValueTask for reduced allocations
         if (product != null)
         {
             await _cache.SetAsync(cacheKey, product, TimeSpan.FromHours(1));
@@ -289,6 +292,40 @@ public class ProductService
     public async Task InvalidateProductAsync(int productId)
     {
         await _cache.DeleteAsync($"product:{productId}");
+    }
+}
+```
+
+### High-Performance Batch Operations
+
+```csharp
+public class CartService
+{
+    private readonly IRedisCacheService _cache;
+    
+    public CartService(IRedisCacheService cache)
+    {
+        _cache = cache;
+    }
+    
+    // ExecuteBatchAsync - Multiple operations in single round-trip
+    public async Task<CartSummary> GetCartSummaryAsync(string userId)
+    {
+        var result = await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.GetAsync<Cart>($"cart:{userId}");
+            batch.GetAsync<UserPreferences>($"prefs:{userId}");
+            batch.GetAsync<decimal>($"discount:{userId}");
+            batch.ExistsAsync($"premium:{userId}");
+        });
+        
+        return new CartSummary
+        {
+            Cart = result.GetResult<Cart>(0),
+            Preferences = result.GetResult<UserPreferences>(1),
+            DiscountRate = result.GetResult<decimal>(2) ?? 0,
+            IsPremium = result.GetResult<bool>(3)
+        };
     }
 }
 ```

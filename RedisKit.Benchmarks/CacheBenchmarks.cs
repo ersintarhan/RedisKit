@@ -1,3 +1,4 @@
+using System.Text;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -136,7 +137,7 @@ public class CacheBenchmarks : IDisposable
     [Benchmark]
     public async Task SetBytes_And_GetBytes()
     {
-        var data = System.Text.Encoding.UTF8.GetBytes("hello world");
+        var data = Encoding.UTF8.GetBytes("hello world");
         await _cacheService.SetBytesAsync("benchmark:bytes", data);
         await _cacheService.GetBytesAsync("benchmark:bytes");
     }

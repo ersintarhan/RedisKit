@@ -11,10 +11,10 @@ namespace RedisKit.Tests;
 
 public class PubSubServiceTests
 {
+    private readonly IRedisConnection _connection;
     private readonly ILogger<RedisPubSubService> _logger;
     private readonly IOptions<RedisOptions> _options;
     private readonly ISubscriber _subscriber;
-    private readonly IRedisConnection _connection;
 
     public PubSubServiceTests()
     {
@@ -109,7 +109,7 @@ public class PubSubServiceTests
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
         var batch = Substitute.For<IBatch>();
         var db = Substitute.For<IDatabase>();
-        db.CreateBatch(null).Returns(batch);
+        db.CreateBatch().Returns(batch);
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         _subscriber.Multiplexer.Returns(multiplexer);
 

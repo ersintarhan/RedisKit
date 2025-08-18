@@ -12,10 +12,10 @@ namespace RedisKit.Tests;
 
 public class StreamServiceTests
 {
+    private readonly IRedisConnection _connection;
     private readonly IDatabaseAsync _db;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly IOptions<RedisOptions> _options;
-    private readonly IRedisConnection _connection;
 
     public StreamServiceTests()
     {

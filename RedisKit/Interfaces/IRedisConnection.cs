@@ -1,10 +1,9 @@
 using StackExchange.Redis;
-using System.Threading.Tasks;
 
 namespace RedisKit.Interfaces;
 
 /// <summary>
-/// Defines the contract for a managed Redis connection provider.
+///     Defines the contract for a managed Redis connection provider.
 /// </summary>
 public interface IRedisConnection
 {

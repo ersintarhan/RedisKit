@@ -12,10 +12,10 @@ namespace RedisKit.Tests;
 
 public class CacheServiceTests
 {
+    private readonly IRedisConnection _connection;
+    private readonly IDatabaseAsync _db;
     private readonly ILogger<RedisCacheService> _logger;
     private readonly IOptions<RedisOptions> _options;
-    private readonly IDatabaseAsync _db;
-    private readonly IRedisConnection _connection;
 
     public CacheServiceTests()
     {
@@ -205,7 +205,7 @@ public class CacheServiceTests
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
         var db = Substitute.For<IDatabase>();
         var batch = Substitute.For<IBatch>();
-        db.CreateBatch(null).Returns(batch);
+        db.CreateBatch().Returns(batch);
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         _connection.GetMultiplexerAsync().Returns(multiplexer);
 

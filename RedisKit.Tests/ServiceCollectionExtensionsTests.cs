@@ -4,8 +4,6 @@ using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
-using RedisKit.Tests.Helpers;
-using StackExchange.Redis;
 using Xunit;
 
 namespace RedisKit.Tests;
@@ -18,6 +16,34 @@ public class ServiceCollectionExtensionsTests
     {
         _services = new ServiceCollection();
     }
+
+    #region Service Resolution Tests
+
+    [Fact]
+    public void AddRedisServices_MultipleRegistrations_ThrowsOrOverwrites()
+    {
+        // Act - Register twice with different configurations
+        _services.AddRedisServices(options =>
+        {
+            options.ConnectionString = "first:6379";
+            options.CacheKeyPrefix = "first:";
+        });
+
+        _services.AddRedisServices(options =>
+        {
+            options.ConnectionString = "second:6379";
+            options.CacheKeyPrefix = "second:";
+        });
+
+        var serviceProvider = _services.BuildServiceProvider();
+        var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
+
+        // Assert - The second registration should be active (last wins in Configure)
+        Assert.Equal("second:6379", redisOptions.Value.ConnectionString);
+        Assert.Equal("second:", redisOptions.Value.CacheKeyPrefix);
+    }
+
+    #endregion
 
     #region AddRedisServices Tests
 
@@ -171,35 +197,6 @@ public class ServiceCollectionExtensionsTests
         Assert.Equal(expectedSerializer, redisOptions.Value.Serializer);
         Assert.Equal(expectedRetryAttempts, redisOptions.Value.RetryAttempts);
         Assert.Equal(expectedRetryDelay, redisOptions.Value.RetryDelay);
-    }
-
-    #endregion
-
-    #region Service Resolution Tests
-
-
-    [Fact]
-    public void AddRedisServices_MultipleRegistrations_ThrowsOrOverwrites()
-    {
-        // Act - Register twice with different configurations
-        _services.AddRedisServices(options =>
-        {
-            options.ConnectionString = "first:6379";
-            options.CacheKeyPrefix = "first:";
-        });
-
-        _services.AddRedisServices(options =>
-        {
-            options.ConnectionString = "second:6379";
-            options.CacheKeyPrefix = "second:";
-        });
-
-        var serviceProvider = _services.BuildServiceProvider();
-        var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
-
-        // Assert - The second registration should be active (last wins in Configure)
-        Assert.Equal("second:6379", redisOptions.Value.ConnectionString);
-        Assert.Equal("second:", redisOptions.Value.CacheKeyPrefix);
     }
 
     #endregion

@@ -106,16 +106,27 @@ public class OptimizedSerializer : IRedisSerializer
 
 ### Object Pooling
 
-RedisKit uses ArrayPool and ObjectPool to minimize allocations:
+RedisKit extensively uses ArrayPool and ObjectPool to minimize allocations:
 
 ```csharp
+// Configuration for object pooling
+builder.Services.AddRedisKit(options =>
+{
+    options.Pooling = new PoolingOptions
+    {
+        Enabled = true,
+        MaxPoolSize = 100,  // Maximum objects in pool
+        InitialPoolSize = 10 // Initial pool size
+    };
+});
+
 // RedisKit internally uses memory pooling for batch operations
 public class OptimizedStreamService
 {
     // Automatic memory optimization features:
-    // - ArrayPool<string> for temporary string arrays
-    // - ObjectPool<List<T>> for result collections
-    // - Optimized batch processing with size-based strategies
+    // - ArrayPool<byte> for serialization buffers
+    // - ObjectPool<List<Task>> for parallel operations
+    // - Memory<byte> for zero-allocation serialization
     
     public async Task ProcessLargeBatchAsync()
     {
@@ -129,6 +140,67 @@ public class OptimizedStreamService
             "events:stream",
             messages,
             maxLength: 100000);
+    }
+}
+```
+
+### ValueTask for Hot Paths
+
+RedisKit uses ValueTask to reduce heap allocations in frequently accessed code paths:
+
+```csharp
+public class HighFrequencyService
+{
+    private readonly IRedisCacheService _cache;
+    
+    // ValueTask reduces allocations when data is often in cache
+    public async ValueTask<Product?> GetProductAsync(int id)
+    {
+        // GetAsync returns ValueTask<T?> for hot path optimization
+        return await _cache.GetAsync<Product>($"product:{id}");
+    }
+    
+    // SetAsync also uses ValueTask
+    public async ValueTask UpdateProductAsync(Product product)
+    {
+        await _cache.SetAsync($"product:{product.Id}", product, TimeSpan.FromHours(1));
+    }
+    
+    // ExistsAsync returns ValueTask<bool>
+    public async ValueTask<bool> IsProductCachedAsync(int id)
+    {
+        return await _cache.ExistsAsync($"product:{id}");
+    }
+}
+```
+
+### Memory<T> and Span<T> Support
+
+RedisKit supports zero-allocation operations with Memory<byte> and Span<byte>:
+
+```csharp
+public class ZeroAllocationService
+{
+    private readonly IRedisCacheService _cache;
+    
+    // Direct byte operations - no intermediate allocations
+    public async ValueTask<byte[]?> GetRawBytesAsync(string key)
+    {
+        return await _cache.GetBytesAsync(key);
+    }
+    
+    // Set raw bytes directly
+    public async ValueTask SetRawBytesAsync(string key, byte[] data)
+    {
+        await _cache.SetBytesAsync(key, data, TimeSpan.FromHours(1));
+    }
+    
+    // Memory<byte> serialization for large objects
+    public async ValueTask ProcessLargeObjectAsync(LargeObject obj)
+    {
+        // RedisKit uses Memory<byte> internally for serialization
+        // This avoids copying large byte arrays
+        await _cache.SetAsync("large:object", obj, TimeSpan.FromHours(1));
     }
 }
 ```
@@ -198,25 +270,48 @@ public class BatchOperations
 }
 ```
 
-### Pipeline Commands
+### Pipeline Commands with ExecuteBatchAsync
 
-Use pipelining for multiple operations:
+Use ExecuteBatchAsync for high-performance pipelining:
 
 ```csharp
 public class PipelineExample
 {
-    private readonly IDatabase _database;
+    private readonly IRedisCacheService _cache;
     
-    public async Task<(string value1, string value2, long length)> PipelinedOperationsAsync()
+    // NEW: ExecuteBatchAsync - All operations in single round-trip
+    public async Task<UserDashboard> GetDashboardDataAsync(string userId)
     {
-        var key1Task = _database.StringGetAsync("key1");
-        var key2Task = _database.StringGetAsync("key2");
-        var lengthTask = _database.ListLengthAsync("mylist");
+        var result = await _cache.ExecuteBatchAsync(batch =>
+        {
+            // All operations are queued and sent together
+            batch.GetAsync<UserProfile>($"profile:{userId}");
+            batch.GetAsync<List<Notification>>($"notifications:{userId}");
+            batch.GetAsync<UserSettings>($"settings:{userId}");
+            batch.ExistsAsync($"premium:{userId}");
+            batch.GetAsync<int>($"points:{userId}");
+        });
         
-        // All commands sent together, results awaited together
-        await Task.WhenAll(key1Task, key2Task, lengthTask);
-        
-        return (key1Task.Result, key2Task.Result, lengthTask.Result);
+        return new UserDashboard
+        {
+            Profile = result.GetResult<UserProfile>(0),
+            Notifications = result.GetResult<List<Notification>>(1) ?? new(),
+            Settings = result.GetResult<UserSettings>(2) ?? new(),
+            IsPremium = result.GetResult<bool>(3),
+            Points = result.GetResult<int>(4) ?? 0
+        };
+    }
+    
+    // Batch write operations
+    public async Task UpdateUserDataAsync(string userId, UserData data)
+    {
+        await _cache.ExecuteBatchAsync(batch =>
+        {
+            batch.SetAsync($"profile:{userId}", data.Profile, TimeSpan.FromHours(1));
+            batch.SetAsync($"settings:{userId}", data.Settings, TimeSpan.FromDays(30));
+            batch.DeleteAsync($"temp:{userId}");
+            batch.ExpireAsync($"session:{userId}", TimeSpan.FromMinutes(20));
+        });
     }
 }
 ```

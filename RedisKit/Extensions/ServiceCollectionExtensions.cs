@@ -7,7 +7,6 @@ using RedisKit.HealthChecks;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
-using StackExchange.Redis;
 
 namespace RedisKit.Extensions;
 
@@ -36,13 +35,11 @@ public static class ServiceCollectionExtensions
         AddRedisKitCore(services);
 
         if (addHealthCheck)
-        {
             services.AddHealthChecks()
                 .AddTypeActivatedCheck<RedisHealthCheck>(
                     "redis",
                     HealthStatus.Unhealthy,
                     tags: new[] { "redis", "cache", "database" });
-        }
 
         return services;
     }

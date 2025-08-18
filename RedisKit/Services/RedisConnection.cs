@@ -150,6 +150,60 @@ public class RedisConnection : IRedisConnection, IDisposable
     }
 
     /// <summary>
+    ///     Gets the Redis database instance asynchronously.
+    /// </summary>
+    /// <returns>
+    ///     An IDatabaseAsync instance for executing Redis commands.
+    /// </returns>
+    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+    /// <remarks>
+    ///     This method ensures a healthy connection before returning the database instance.
+    ///     The returned database uses the default database index (0) unless configured otherwise.
+    /// </remarks>
+    public async Task<IDatabaseAsync> GetDatabaseAsync()
+    {
+        var connection = await GetConnection();
+        return connection.GetDatabase();
+    }
+
+    /// <summary>
+    ///     Gets the Redis subscriber for pub/sub operations.
+    /// </summary>
+    /// <returns>
+    ///     An ISubscriber instance for pub/sub operations.
+    /// </returns>
+    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+    /// <remarks>
+    ///     The subscriber is used for pub/sub messaging patterns.
+    ///     Multiple calls return the same subscriber instance from the underlying connection.
+    /// </remarks>
+    public async Task<ISubscriber> GetSubscriberAsync()
+    {
+        var connection = await GetConnection();
+        return connection.GetSubscriber();
+    }
+
+    /// <summary>
+    ///     Gets the underlying ConnectionMultiplexer instance.
+    /// </summary>
+    /// <returns>
+    ///     The IConnectionMultiplexer instance for advanced operations.
+    /// </returns>
+    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
+    /// <remarks>
+    ///     Use this method when you need direct access to ConnectionMultiplexer features
+    ///     not exposed through the higher-level abstractions.
+    ///     The returned instance should not be disposed by the caller.
+    /// </remarks>
+    public async Task<IConnectionMultiplexer> GetMultiplexerAsync()
+    {
+        return await GetConnection();
+    }
+
+    /// <summary>
     ///     Gets the current connection health status.
     /// </summary>
     /// <returns>
@@ -428,60 +482,6 @@ public class RedisConnection : IRedisConnection, IDisposable
     }
 
     /// <summary>
-    ///     Gets the Redis database instance asynchronously.
-    /// </summary>
-    /// <returns>
-    ///     An IDatabaseAsync instance for executing Redis commands.
-    /// </returns>
-    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
-    /// <remarks>
-    ///     This method ensures a healthy connection before returning the database instance.
-    ///     The returned database uses the default database index (0) unless configured otherwise.
-    /// </remarks>
-    public async Task<IDatabaseAsync> GetDatabaseAsync()
-    {
-        var connection = await GetConnection();
-        return connection.GetDatabase();
-    }
-
-    /// <summary>
-    ///     Gets the Redis subscriber for pub/sub operations.
-    /// </summary>
-    /// <returns>
-    ///     An ISubscriber instance for pub/sub operations.
-    /// </returns>
-    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
-    /// <remarks>
-    ///     The subscriber is used for pub/sub messaging patterns.
-    ///     Multiple calls return the same subscriber instance from the underlying connection.
-    /// </remarks>
-    public async Task<ISubscriber> GetSubscriberAsync()
-    {
-        var connection = await GetConnection();
-        return connection.GetSubscriber();
-    }
-
-    /// <summary>
-    ///     Gets the underlying ConnectionMultiplexer instance.
-    /// </summary>
-    /// <returns>
-    ///     The IConnectionMultiplexer instance for advanced operations.
-    /// </returns>
-    /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is preventing connections.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established.</exception>
-    /// <remarks>
-    ///     Use this method when you need direct access to ConnectionMultiplexer features
-    ///     not exposed through the higher-level abstractions.
-    ///     The returned instance should not be disposed by the caller.
-    /// </remarks>
-    public async Task<IConnectionMultiplexer> GetMultiplexerAsync()
-    {
-        return await GetConnection();
-    }
-
-    /// <summary>
     ///     Manually triggers a health check and returns the updated status.
     /// </summary>
     /// <returns>
@@ -569,10 +569,7 @@ public class RedisConnection : IRedisConnection, IDisposable
 
     private static string RedactConnectionString(string connectionString)
     {
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            return string.Empty;
-        }
+        if (string.IsNullOrWhiteSpace(connectionString)) return string.Empty;
 
         // Use regex to find and replace the password value
         // This pattern looks for "password=" followed by any characters that are not a comma
