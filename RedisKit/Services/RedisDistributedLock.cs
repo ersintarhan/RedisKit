@@ -36,6 +36,10 @@ public class RedisDistributedLock : IDistributedLock
         if (expiry <= TimeSpan.Zero)
             throw new ArgumentException("Expiry must be positive", nameof(expiry));
 
+        // Validate resource length to prevent Redis key size issues
+        if (resource.Length > 512)
+            throw new ArgumentException("Resource name exceeds Redis key limit of 512 characters", nameof(resource));
+
         var lockId = GenerateLockId();
         var lockKey = GetLockKey(resource);
         var database = _connectionMultiplexer.GetDatabase();
@@ -57,7 +61,8 @@ public class RedisDistributedLock : IDistributedLock
                 resource,
                 lockId,
                 expiry,
-                _options.EnableAutoRenewal); // Logger type mismatch - RedisLockHandle will work without logger
+                _options.EnableAutoRenewal,
+                _logger); // Pass logger to RedisLockHandle for better logging
         }
 
         _logger?.LogDebug("Failed to acquire lock for resource: {Resource} - already locked", resource);
@@ -108,6 +113,10 @@ public class RedisDistributedLock : IDistributedLock
     {
         if (string.IsNullOrWhiteSpace(resource))
             throw new ArgumentException("Resource cannot be null or empty", nameof(resource));
+
+        // Validate resource length to prevent Redis key size issues
+        if (resource.Length > 512)
+            throw new ArgumentException("Resource name exceeds Redis key limit of 512 characters", nameof(resource));
 
         var database = _connectionMultiplexer.GetDatabase();
         var lockKey = GetLockKey(resource);
@@ -219,6 +228,8 @@ public class RedisDistributedLock : IDistributedLock
 
     private static string GetLockKey(string resource)
     {
-        return $"lock:{resource}";
+        // Ensure resource name is properly sanitized to prevent invalid Redis keys
+        var sanitizedName = resource.Replace(":", "_").Replace(" ", "_");
+        return $"lock:{sanitizedName}";
     }
 }

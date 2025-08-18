@@ -13,7 +13,7 @@ namespace RedisKit.Services;
 /// </summary>
 public class RedisCacheService : IRedisCacheService
 {
-    private const string VALUE_CANNOT_BE_NULL_OR_EMPTY = "Value cannot be null or empty";
+    private const string ValueCannotBeNullOrEmpty = "Value cannot be null or empty";
 
     // Lua script for SET with EXPIRE
     private const string SetWithExpireScript = @"
@@ -35,6 +35,8 @@ public class RedisCacheService : IRedisCacheService
 
     // Lua script support detection
     private bool? _supportsLuaScripts;
+    private readonly SemaphoreSlim _luaScriptDetectionLock = new SemaphoreSlim(1, 1);
+
     private bool _useFallbackMode;
 
     public RedisCacheService(
@@ -45,21 +47,16 @@ public class RedisCacheService : IRedisCacheService
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options ?? throw new ArgumentNullException(nameof(options));
-
         // Create the serializer based on configuration
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
     }
 
-    public void SetKeyPrefix(string prefix)
-    {
-        _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
-    }
 
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException(VALUE_CANNOT_BE_NULL_OR_EMPTY, nameof(key));
+        ArgumentNullException.ThrowIfNull(key);
 
+        ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
         try
@@ -74,6 +71,21 @@ public class RedisCacheService : IRedisCacheService
             _logger.LogGetAsyncSuccess(prefixedKey);
             return result;
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogGetAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogGetAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogGetAsyncError(prefixedKey, ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogGetAsyncError(prefixedKey, ex);
@@ -83,12 +95,10 @@ public class RedisCacheService : IRedisCacheService
 
     public async Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException(VALUE_CANNOT_BE_NULL_OR_EMPTY, nameof(key));
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(value);
 
-        if (value == null)
-            throw new ArgumentNullException(nameof(value));
-
+        ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
         try
@@ -102,6 +112,21 @@ public class RedisCacheService : IRedisCacheService
 
             _logger.LogSetAsyncSuccess(prefixedKey);
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogSetAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogSetAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogSetAsyncError(prefixedKey, ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogSetAsyncError(prefixedKey, ex);
@@ -111,9 +136,9 @@ public class RedisCacheService : IRedisCacheService
 
     public async Task DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException("Key cannot be null or empty", nameof(key));
+        ArgumentNullException.ThrowIfNull(key);
 
+        ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
         try
@@ -124,6 +149,21 @@ public class RedisCacheService : IRedisCacheService
 
             _logger.LogDeleteAsyncSuccess(prefixedKey);
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogDeleteAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogDeleteAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogDeleteAsyncError(prefixedKey, ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogDeleteAsyncError(prefixedKey, ex);
@@ -133,8 +173,7 @@ public class RedisCacheService : IRedisCacheService
 
     public async Task<Dictionary<string, T?>> GetManyAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken = default) where T : class
     {
-        if (keys == null)
-            throw new ArgumentNullException(nameof(keys));
+        ArgumentNullException.ThrowIfNull(keys);
 
         // Materialize the keys once to avoid multiple enumeration
         var keyArray = keys.ToArray();
@@ -162,6 +201,21 @@ public class RedisCacheService : IRedisCacheService
             _logger.LogGetManyAsyncSuccess(result.Count);
             return result;
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogGetManyAsyncError(ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogGetManyAsyncError(ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogGetManyAsyncError(ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogGetManyAsyncError(ex);
@@ -171,13 +225,19 @@ public class RedisCacheService : IRedisCacheService
 
     public async Task SetManyAsync<T>(IDictionary<string, T> values, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
     {
-        if (values == null)
-            throw new ArgumentNullException(nameof(values));
+        ArgumentNullException.ThrowIfNull(values);
 
         var expiry = ttl ?? _options.DefaultTtl;
 
         try
         {
+            // Validate input to prevent potential DoS attacks
+            if (values.Count > RedisConstants.DefaultBatchSizeThreshold) // Limit batch size to prevent memory issues
+            {
+                _logger.LogWarning("SetManyAsync called with {Count} values, which exceeds recommended limit of {Threshold}",
+                    values.Count, RedisConstants.DefaultBatchSizeThreshold);
+            }
+
             _logger.LogSetManyAsync(values.Count);
             var stopwatch = Stopwatch.StartNew();
 
@@ -190,6 +250,21 @@ public class RedisCacheService : IRedisCacheService
 
             LogPerformanceIfSlow(stopwatch, values.Count);
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogSetManyAsyncError(ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogSetManyAsyncError(ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogSetManyAsyncError(ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogSetManyAsyncError(ex);
@@ -199,9 +274,9 @@ public class RedisCacheService : IRedisCacheService
 
     public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException("Key cannot be null or empty", nameof(key));
+        ArgumentNullException.ThrowIfNull(key);
 
+        ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
         try
@@ -213,6 +288,21 @@ public class RedisCacheService : IRedisCacheService
             _logger.LogExistsAsyncSuccess(prefixedKey, result);
             return result;
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogExistsAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogExistsAsyncError(prefixedKey, ex);
+            throw;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogExistsAsyncError(prefixedKey, ex);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogExistsAsyncError(prefixedKey, ex);
@@ -220,12 +310,45 @@ public class RedisCacheService : IRedisCacheService
         }
     }
 
-    private async Task EnsureLuaScriptSupportChecked()
+    // Add validation to protect against too-large keys
+    private static void ValidateRedisKey(string key)
     {
-        if (_supportsLuaScripts == null) _supportsLuaScripts = await CheckLuaScriptSupport();
+        // Redis keys can't be longer than 512 MB (but practically less)
+        if (!string.IsNullOrEmpty(key) && key.Length > RedisConstants.MaxRedisKeyLength)
+        {
+            throw new ArgumentException($"Redis key exceeds maximum allowed length of {RedisConstants.MaxRedisKeyLength}", nameof(key));
+        }
     }
 
-    private async Task ProcessBatchesAsync<T>(IDictionary<string, T> values, TimeSpan expiry, CancellationToken cancellationToken) where T : class
+    // Override SetKeyPrefix to validate prefix
+    public void SetKeyPrefix(string prefix)
+    {
+        ValidateRedisKey(prefix);
+        _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+    }
+
+
+    private async Task EnsureLuaScriptSupportChecked()
+    {
+        if (_supportsLuaScripts == null)
+        {
+            await _luaScriptDetectionLock.WaitAsync();
+            try
+            {
+                if (_supportsLuaScripts == null)
+                {
+                    _supportsLuaScripts = await CheckLuaScriptSupport();
+                }
+            }
+            finally
+            {
+                _luaScriptDetectionLock.Release();
+            }
+        }
+    }
+
+    private async Task ProcessBatchesAsync<T>(IDictionary<string, T> values, TimeSpan expiry, CancellationToken cancellationToken)
+        where T : class
     {
         var chunkSize = CalculateOptimalChunkSize(values.Count);
         var processedCount = 0;
@@ -234,33 +357,36 @@ public class RedisCacheService : IRedisCacheService
         {
             var serializedPairs = await SerializeChunkAsync(chunk, cancellationToken);
             await SetChunkAsync(serializedPairs, expiry);
-
-            processedCount += chunk.Count();
+            processedCount += chunk.Length;
             LogProgressIfNeeded(values.Count, processedCount);
         }
     }
 
-    private async Task<(RedisKey Key, RedisValue Value)[]> SerializeChunkAsync<T>(IEnumerable<KeyValuePair<string, T>> chunk, CancellationToken cancellationToken) where T : class
+    private async Task<(RedisKey Key, RedisValue Value)[]> SerializeChunkAsync<T>(
+        IEnumerable<KeyValuePair<string, T>> chunk, CancellationToken cancellationToken)
+        where T : class
     {
-        var serializeTasks = chunk.Select(kvp => SerializeKeyValuePairAsync(kvp, cancellationToken)).ToArray();
-        return await Task.WhenAll(serializeTasks);
-    }
+        var tasks = chunk.Select(async kvp =>
+        {
+            ValidateKeyValuePair(kvp);
 
-    private async Task<(RedisKey Key, RedisValue Value)> SerializeKeyValuePairAsync<T>(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) where T : class
-    {
-        ValidateKeyValuePair(kvp);
+            var prefixedKey = $"{_keyPrefix}{kvp.Key}";
+            var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken);
+            return ((RedisKey)prefixedKey, (RedisValue)serialized);
+        });
 
-        var prefixedKey = $"{_keyPrefix}{kvp.Key}";
-        var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken).ConfigureAwait(false);
-        return ((RedisKey)prefixedKey, (RedisValue)serialized);
+        return await Task.WhenAll(tasks);
     }
 
     private static void ValidateKeyValuePair<T>(KeyValuePair<string, T> kvp) where T : class
     {
+        ArgumentNullException.ThrowIfNull(kvp.Key);
+        ArgumentNullException.ThrowIfNull(kvp.Value);
+
         if (string.IsNullOrEmpty(kvp.Key))
             throw new ArgumentException("Key cannot be null or empty");
-        if (kvp.Value == null)
-            throw new ArgumentNullException(nameof(kvp), VALUE_CANNOT_BE_NULL_OR_EMPTY);
+        if (kvp.Value is not null)
+            throw new ArgumentNullException(nameof(kvp), ValueCannotBeNullOrEmpty);
     }
 
     private async Task SetChunkAsync((RedisKey Key, RedisValue Value)[] serializedPairs, TimeSpan expiry)
@@ -273,12 +399,16 @@ public class RedisCacheService : IRedisCacheService
 
     private void LogProgressIfNeeded(int totalCount, int processedCount)
     {
-        if (totalCount > 10000 && processedCount % 5000 == 0) _logger.LogSetManyAsyncProgress(processedCount, totalCount);
+        if (totalCount > RedisConstants.DefaultBatchSizeThreshold
+            && processedCount % (RedisConstants.DefaultBatchSizeThreshold / 2) == 0)
+        {
+            _logger.LogSetManyAsyncProgress(processedCount, totalCount);
+        }
     }
 
     private void LogPerformanceIfSlow(Stopwatch stopwatch, int count)
     {
-        if (stopwatch.ElapsedMilliseconds > 1000)
+        if (stopwatch.ElapsedMilliseconds > RedisConstants.SlowOperationThreshold)
             _logger.LogSlowSetManyAsync(count, stopwatch.ElapsedMilliseconds,
                 _supportsLuaScripts.GetValueOrDefault() ? "Lua" : "Fallback");
     }
@@ -299,6 +429,21 @@ public class RedisCacheService : IRedisCacheService
 
             return supported;
         }
+        catch (RedisConnectionException ex)
+        {
+            _logger.LogLuaScriptNotSupported(ex);
+            return false;
+        }
+        catch (RedisTimeoutException ex)
+        {
+            _logger.LogLuaScriptNotSupported(ex);
+            return false;
+        }
+        catch (RedisServerException ex)
+        {
+            _logger.LogLuaScriptNotSupported(ex);
+            return false;
+        }
         catch (Exception ex)
         {
             _logger.LogLuaScriptNotSupported(ex);
@@ -310,10 +455,10 @@ public class RedisCacheService : IRedisCacheService
     {
         return totalCount switch
         {
-            < 100 => totalCount, // No chunking for small sets
-            < 1000 => 500, // Medium chunk for medium sets
-            < 10000 => 1000, // Standard chunk for large sets
-            _ => 2000 // Large chunk for very large sets
+            < RedisConstants.SmallBatchThreshold => totalCount, // No chunking for small sets
+            < RedisConstants.MediumBatchThreshold => RedisConstants.SmallBatchThreshold, // Medium chunk for medium sets
+            < RedisConstants.DefaultBatchSizeThreshold => RedisConstants.MediumBatchThreshold, // Standard chunk for large sets
+            _ => RedisConstants.DefaultBatchSizeThreshold // Large chunk for very large sets
         };
     }
 
@@ -323,18 +468,26 @@ public class RedisCacheService : IRedisCacheService
         {
             var keys = pairs.Select(p => p.Key).ToArray();
             var values = pairs.Select(p => p.Value)
-                .Concat(new[] { (RedisValue)expiry.TotalSeconds })
+                .Concat([(RedisValue)expiry.TotalSeconds])
                 .ToArray();
 
             var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
 
-            var successCount = (int)result;
-            if (successCount != pairs.Length) _logger.LogSetManyPartialSuccess(pairs.Length, successCount);
+            var successCount = Convert.ToInt32(result);
+            if (successCount != pairs.Length)
+                _logger.LogSetManyPartialSuccess(pairs.Length, successCount);
         }
         catch (RedisServerException ex) when (ex.Message.Contains("NOSCRIPT"))
         {
-            // Script not in cache, switch to fallback
             _logger.LogLuaScriptNotInCache();
+            _useFallbackMode = true;
+            await SetManyWithFallback(pairs, expiry);
+        }
+        catch (Exception ex) when (ex is RedisConnectionException ||
+                                   ex is RedisTimeoutException ||
+                                   ex is RedisServerException)
+        {
+            _logger.LogLuaScriptExecutionFailed(ex);
             _useFallbackMode = true;
             await SetManyWithFallback(pairs, expiry);
         }
@@ -342,7 +495,7 @@ public class RedisCacheService : IRedisCacheService
         {
             _logger.LogLuaScriptExecutionFailed(ex);
             _useFallbackMode = true;
-            await SetManyWithFallback(pairs, expiry);
+            throw;
         }
     }
 

@@ -66,7 +66,7 @@ namespace RedisKit.Services;
 ///         AutoReconnect = true
 ///     }
 /// };
-/// 
+///
 /// var connection = new RedisConnection(logger, Options.Create(options));
 /// var db = await connection.GetDatabaseAsync().ConfigureAwait(false);
 /// </code>
@@ -96,6 +96,22 @@ public class RedisConnection : IDisposable
         IOptions<RedisOptions> options,
         IRedisCircuitBreaker? circuitBreaker)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+
+        // Validate connection string
+        if (string.IsNullOrWhiteSpace(_options.ConnectionString))
+        {
+            throw new ArgumentException("Redis connection string cannot be null or empty", nameof(options));
+        }
+
+        // Validate timeout settings
+        if (_options.TimeoutSettings.ConnectTimeout.TotalMilliseconds < 0 ||
+            _options.TimeoutSettings.SyncTimeout.TotalMilliseconds < 0 ||
+            _options.TimeoutSettings.AsyncTimeout.TotalMilliseconds < 0)
+        {
+            throw new ArgumentException("Redis timeout settings must be non-negative", nameof(options));
+        }
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
@@ -301,18 +317,30 @@ public class RedisConnection : IDisposable
     {
         var timeouts = _options.TimeoutSettings;
 
-        config.ConnectTimeout = (int)timeouts.ConnectTimeout.TotalMilliseconds;
-        config.SyncTimeout = (int)timeouts.SyncTimeout.TotalMilliseconds;
-        config.AsyncTimeout = (int)timeouts.AsyncTimeout.TotalMilliseconds;
-        config.KeepAlive = (int)timeouts.KeepAlive.TotalSeconds;
-        // ResponseTimeout is obsolete in StackExchange.Redis 2.7+ and will be removed in 3.0
-        // Removed: config.ResponseTimeout = (int)timeouts.ResponseTimeout.TotalMilliseconds;
-        config.ConfigCheckSeconds = (int)timeouts.ConfigCheckSeconds.TotalSeconds;
+        // Ensure reasonable timeout values (prevent extremely small or large settings)
+        var connectTimeout = Math.Max(100, Math.Min(60000, (int)timeouts.ConnectTimeout.TotalMilliseconds));
+        var syncTimeout = Math.Max(100, Math.Min(60000, (int)timeouts.SyncTimeout.TotalMilliseconds));
+        var asyncTimeout = Math.Max(100, Math.Min(60000, (int)timeouts.AsyncTimeout.TotalMilliseconds));
+
+        config.ConnectTimeout = connectTimeout;
+        config.SyncTimeout = syncTimeout;
+        config.AsyncTimeout = asyncTimeout;
+
+        // KeepAlive should be reasonable (5-30 minutes)
+        var keepAlive = Math.Max(30, Math.Min(1800, (int)timeouts.KeepAlive.TotalSeconds));
+        config.KeepAlive = keepAlive;
+
+        // ConfigCheckSeconds (should be 30-60 seconds)
+        var configCheck = Math.Max(30, Math.Min(120, (int)timeouts.ConfigCheckSeconds.TotalSeconds));
+        config.ConfigCheckSeconds = configCheck;
 
         // Additional configuration
-        config.ConnectRetry = _options.RetryConfiguration.MaxAttempts;
+        config.ConnectRetry = Math.Min(10, _options.RetryConfiguration.MaxAttempts);
         config.ReconnectRetryPolicy = new ExponentialRetry((int)_options.RetryConfiguration.InitialDelay.TotalMilliseconds);
         config.AbortOnConnectFail = false; // Allow retry logic to handle failures
+
+        _logger.LogDebug("Redis connection timeout settings applied. Connect: {ConnectMs}ms, Sync: {SyncMs}ms, Async: {AsyncMs}ms",
+            connectTimeout, syncTimeout, asyncTimeout);
     }
 
     private void SetupConnectionEventHandlers(ConnectionMultiplexer connection)
@@ -387,6 +415,7 @@ public class RedisConnection : IDisposable
                     _logger.LogWarning("Health check failed {Failures} times, attempting reconnection",
                         _healthStatus.ConsecutiveFailures);
 
+                    // Use Task.Run with proper error handling to prevent unobserved exceptions
                     _ = Task.Run(async () =>
                     {
                         try

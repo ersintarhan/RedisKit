@@ -11,7 +11,7 @@ internal sealed class RedisLockHandle : ILockHandle
 {
     private readonly IDatabase _database;
     private readonly TimeSpan _defaultExpiry;
-    private readonly ILogger<RedisLockHandle>? _logger;
+    private readonly ILogger? _logger;
     private readonly Timer? _renewalTimer;
     private bool _disposed;
     private bool _isAcquired;
@@ -22,7 +22,7 @@ internal sealed class RedisLockHandle : ILockHandle
         string lockId,
         TimeSpan expiry,
         bool enableAutoRenewal = false,
-        ILogger<RedisLockHandle>? logger = null)
+        ILogger? logger = null)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         Resource = resource ?? throw new ArgumentNullException(nameof(resource));
