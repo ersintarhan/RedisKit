@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -103,6 +104,7 @@ using Microsoft.Extensions.Options;
 public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDisposable
 {
     // Channel subscriptions: channel -> list of handlers
+    private readonly ObjectPool<ConcurrentDictionary<string, List<SubscriptionHandler>>>? _dictionaryPool;
     private readonly ConcurrentDictionary<string, List<SubscriptionHandler>> _channelHandlers;
 
     // Cleanup timer for inactive handlers
@@ -130,7 +132,8 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
     public RedisPubSubService(
         IRedisConnection connection,
         ILogger<RedisPubSubService> logger,
-        IOptions<RedisOptions> options)
+        IOptions<RedisOptions> options,
+        ObjectPoolProvider? poolProvider = null)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -140,8 +143,23 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(redisOptions.Serializer);
 
-        _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
-        _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
+        if (redisOptions.Pooling.Enabled)
+        {
+            var provider = poolProvider ?? new DefaultObjectPoolProvider();
+            if (provider is DefaultObjectPoolProvider defaultProvider)
+            {
+                defaultProvider.MaximumRetained = redisOptions.Pooling.MaxPoolSize;
+            }
+            _dictionaryPool = provider.Create<ConcurrentDictionary<string, List<SubscriptionHandler>>>();
+            _channelHandlers = _dictionaryPool.Get();
+            _patternHandlers = _dictionaryPool.Get();
+        }
+        else
+        {
+            _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
+            _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
+        }
+
         _handlerMap = new ConcurrentDictionary<string, HandlerMetadata>();
         _statistics = new ConcurrentDictionary<string, SubscriptionStats>();
 
@@ -712,6 +730,12 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
             }
 
             _subscriptionLock?.Dispose();
+
+            if (_dictionaryPool != null)
+            {
+                _dictionaryPool.Return(_channelHandlers);
+                _dictionaryPool.Return(_patternHandlers);
+            }
         }
 
         _disposed = true;
@@ -734,6 +758,12 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
         _subscriptionLock?.Dispose();
 
+        if (_dictionaryPool != null)
+        {
+            _dictionaryPool.Return(_channelHandlers);
+            _dictionaryPool.Return(_patternHandlers);
+        }
+
         _disposed = true;
         GC.SuppressFinalize(this);
     }
@@ -744,6 +774,22 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
     }
 
     private Task<ISubscriber> GetSubscriberAsync() => _connection.GetSubscriberAsync();
+
+    public async Task PublishManyAsync<T>(IEnumerable<(string channel, T message)> messages, CancellationToken cancellationToken = default) where T : class
+    {
+        var subscriber = await GetSubscriberAsync();
+        var batch = subscriber.Multiplexer.GetDatabase().CreateBatch();
+        var tasks = new List<Task>();
+
+        foreach (var (channel, message) in messages)
+        {
+            var serialized = await _serializer.SerializeAsync(message, cancellationToken);
+            tasks.Add(batch.PublishAsync(channel, serialized));
+        }
+
+        batch.Execute();
+        await Task.WhenAll(tasks);
+    }
 
     #endregion
 

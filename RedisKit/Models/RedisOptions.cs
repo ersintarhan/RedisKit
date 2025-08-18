@@ -72,4 +72,9 @@ public class RedisOptions
     ///     Health monitoring settings
     /// </summary>
     public HealthMonitoringSettings HealthMonitoring { get; set; } = new();
+
+    /// <summary>
+    ///     Object pooling settings
+    /// </summary>
+    public PoolingOptions Pooling { get; set; } = new();
 }

@@ -1,6 +1,8 @@
+using System.Buffers;
 using System.Collections;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.IO;
 using RedisKit.Logging;
 
 namespace RedisKit.Serialization;
@@ -52,6 +54,7 @@ namespace RedisKit.Serialization;
 /// </remarks>
 internal class SystemTextJsonRedisSerializer : IRedisSerializer
 {
+    private static readonly RecyclableMemoryStreamManager StreamManager = new();
     private readonly ILogger<SystemTextJsonRedisSerializer>? _logger;
 
     /// <summary>
@@ -406,6 +409,28 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
             _logger?.LogError(ex, "Failed to deserialize data to type {Type} using System.Text.Json (async)", type.Name);
             throw new InvalidOperationException($"Failed to deserialize data to type {type.Name} using System.Text.Json (async)", ex);
         }
+    }
+
+    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await using var stream = StreamManager.GetStream();
+        await JsonSerializer.SerializeAsync(stream, value, Options, cancellationToken);
+        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
+        return (int)stream.Length;
+    }
+
+    public async ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    {
+        if (data.IsEmpty) return default;
+        await using var stream = StreamManager.GetStream("RedisKit", data.ToArray(), 0, data.Length);
+        return await JsonSerializer.DeserializeAsync<T>(stream, Options, cancellationToken);
+    }
+
+    public async ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)
+    {
+        if (data.IsEmpty) return default;
+        await using var stream = StreamManager.GetStream("RedisKit", data.ToArray(), 0, data.Length);
+        return await JsonSerializer.DeserializeAsync(stream, type, Options, cancellationToken);
     }
 
     /// <summary>

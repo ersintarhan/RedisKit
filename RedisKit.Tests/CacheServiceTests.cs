@@ -198,6 +198,34 @@ public class CacheServiceTests
         await syncDb.Received(2).StringSetAsync(Arg.Any<KeyValuePair<RedisKey, RedisValue>[]>());
     }
 
+    [Fact]
+    public async Task ExecuteBatchAsync_WithValidOperations_ExecutesBatch()
+    {
+        // Arrange
+        var multiplexer = Substitute.For<IConnectionMultiplexer>();
+        var db = Substitute.For<IDatabase>();
+        var batch = Substitute.For<IBatch>();
+        db.CreateBatch(null).Returns(batch);
+        multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
+        _connection.GetMultiplexerAsync().Returns(multiplexer);
+
+        var cacheService = CreateSut();
+        var testModel = new TestModel { Id = 1, Name = "Test" };
+
+        // Act
+        var result = await cacheService.ExecuteBatchAsync(b =>
+        {
+            _ = b.SetAsync("key1", testModel);
+            _ = b.GetAsync<TestModel>("key1");
+        });
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        batch.Received(1).Execute();
+        await batch.Received(1).StringSetAsync(Arg.Any<RedisKey>(), Arg.Any<RedisValue>(), Arg.Any<TimeSpan?>());
+        await batch.Received(1).StringGetAsync(Arg.Any<RedisKey>());
+    }
+
     [MessagePackObject]
     public class TestModel
     {

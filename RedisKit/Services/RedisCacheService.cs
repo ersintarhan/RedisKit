@@ -1,7 +1,10 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using RedisKit.Extensions;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -35,6 +38,8 @@ public class RedisCacheService : IRedisCacheService
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
     private string _keyPrefix = string.Empty;
+    private readonly ObjectPool<List<Task>>? _taskListPool;
+
 
     // Lua script support detection
     private bool? _supportsLuaScripts;
@@ -44,7 +49,8 @@ public class RedisCacheService : IRedisCacheService
     public RedisCacheService(
         IRedisConnection connection,
         ILogger<RedisCacheService> logger,
-        IOptions<RedisOptions> options)
+        IOptions<RedisOptions> options,
+        ObjectPoolProvider? poolProvider = null)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -53,10 +59,20 @@ public class RedisCacheService : IRedisCacheService
         // Create the serializer based on configuration
         // In a future refactor, IRedisSerializer should be injected directly.
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
+
+        if (_options.Pooling.Enabled)
+        {
+            var provider = poolProvider ?? new DefaultObjectPoolProvider();
+            if (provider is DefaultObjectPoolProvider defaultProvider)
+            {
+                defaultProvider.MaximumRetained = _options.Pooling.MaxPoolSize;
+            }
+            _taskListPool = provider.Create<List<Task>>();
+        }
     }
 
 
-    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
+    public async ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -72,7 +88,7 @@ public class RedisCacheService : IRedisCacheService
             if (value.IsNullOrEmpty)
                 return null;
 
-            var result = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+            var result = await _serializer.DeserializeAsync<T>((ReadOnlyMemory<byte>)value, cancellationToken);
             _logger.LogGetAsyncSuccess(prefixedKey);
             return result;
         }
@@ -98,7 +114,7 @@ public class RedisCacheService : IRedisCacheService
         }
     }
 
-    public async Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
+    public async ValueTask SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
@@ -106,12 +122,16 @@ public class RedisCacheService : IRedisCacheService
         ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
+        byte[]? buffer = null;
         try
         {
             _logger.LogSetAsync(prefixedKey);
             var database = await GetDatabaseAsync();
 
-            var serializedValue = await _serializer.SerializeAsync(value, cancellationToken).ConfigureAwait(false);
+            buffer = ArrayPool<byte>.Shared.Rent(1024);
+            var length = await _serializer.SerializeAsync(value, buffer, cancellationToken).ConfigureAwait(false);
+            var serializedValue = new ReadOnlyMemory<byte>(buffer, 0, length);
+
             var expiry = ttl ?? _options.DefaultTtl;
 
             await database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
@@ -137,6 +157,13 @@ public class RedisCacheService : IRedisCacheService
         {
             _logger.LogSetAsyncError(prefixedKey, ex);
             throw;
+        }
+        finally
+        {
+            if (buffer != null)
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
     }
 
@@ -190,6 +217,10 @@ public class RedisCacheService : IRedisCacheService
 
         var prefixedKeys = originalKeys.Select(k => (RedisKey)$"{_keyPrefix}{k}").ToArray();
 
+        using var pooledTasks = _taskListPool.GetPooled();
+        var deserializationTasks = pooledTasks.Value;
+        var resultsByIndex = new ConcurrentDictionary<int, T?>();
+
         try
         {
             _logger.LogGetManyAsync(string.Join(", ", originalKeys));
@@ -198,8 +229,6 @@ public class RedisCacheService : IRedisCacheService
             var values = await database.StringGetAsync(prefixedKeys).ConfigureAwait(false);
 
             var result = new Dictionary<string, T?>(originalKeys.Count, StringComparer.Ordinal);
-            var deserializationTasks = new List<Task>(originalKeys.Count);
-            var resultsByIndex = new ConcurrentDictionary<int, T?>();
 
             for (var i = 0; i < originalKeys.Count; i++)
             {
@@ -296,7 +325,7 @@ public class RedisCacheService : IRedisCacheService
         }
     }
 
-    public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -333,6 +362,25 @@ public class RedisCacheService : IRedisCacheService
             _logger.LogExistsAsyncError(prefixedKey, ex);
             throw;
         }
+    }
+
+    public async ValueTask<byte[]?> GetBytesAsync(string key, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        ValidateRedisKey(key);
+        var prefixedKey = $"{_keyPrefix}{key}";
+        var db = await GetDatabaseAsync();
+        return await db.StringGetAsync(prefixedKey);
+    }
+
+    public async ValueTask SetBytesAsync(string key, byte[] value, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(value);
+        ValidateRedisKey(key);
+        var prefixedKey = $"{_keyPrefix}{key}";
+        var db = await GetDatabaseAsync();
+        await db.StringSetAsync(prefixedKey, value, ttl ?? _options.DefaultTtl);
     }
 
     // Override SetKeyPrefix to validate prefix
@@ -385,16 +433,20 @@ public class RedisCacheService : IRedisCacheService
         IEnumerable<KeyValuePair<string, T>> chunk, CancellationToken cancellationToken)
         where T : class
     {
-        var tasks = chunk.Select(async kvp =>
+        using var pooledTasks = _taskListPool.GetPooled();
+        var tasks = pooledTasks.Value;
+
+        tasks.AddRange(chunk.Select(async kvp =>
         {
             ValidateKeyValuePair(kvp);
 
             var prefixedKey = $"{_keyPrefix}{kvp.Key}";
             var serialized = await _serializer.SerializeAsync(kvp.Value, cancellationToken);
             return ((RedisKey)prefixedKey, (RedisValue)serialized);
-        });
+        }));
 
-        return await Task.WhenAll(tasks);
+        var results = await Task.WhenAll(tasks.Cast<Task<(RedisKey Key, RedisValue Value)>>());
+        return results;
     }
 
     private static void ValidateKeyValuePair<T>(KeyValuePair<string, T> kvp) where T : class
@@ -538,7 +590,9 @@ public class RedisCacheService : IRedisCacheService
             var msetTask = batch.StringSetAsync(kvpArray);
 
             // Then: parallel EXPIRE to minimize round-trips
-            var expireTasks = new List<Task>();
+            using var pooledTasks = _taskListPool.GetPooled();
+            var expireTasks = pooledTasks.Value;
+
             foreach (var pair in pairs)
             {
                 expireTasks.Add(batch.KeyExpireAsync(pair.Key, expiry.Value));
@@ -550,4 +604,18 @@ public class RedisCacheService : IRedisCacheService
     }
 
     private Task<IDatabaseAsync> GetDatabaseAsync() => _connection.GetDatabaseAsync();
+
+    public async Task<BatchResult> ExecuteBatchAsync(Action<IBatchOperations> configureBatch)
+    {
+        var multiplexer = await _connection.GetMultiplexerAsync();
+        var database = multiplexer.GetDatabase();
+        var batch = database.CreateBatch();
+        var operations = new BatchOperations(batch, _serializer);
+
+        configureBatch(operations);
+
+        batch.Execute();
+
+        return await operations.GetResultsAsync();
+    }
 }

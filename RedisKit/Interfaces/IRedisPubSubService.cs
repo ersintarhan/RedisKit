@@ -65,4 +65,12 @@ public interface IRedisPubSubService
     ///     Gets the number of subscribers for a channel
     /// </summary>
     Task<int> GetSubscriberCountAsync(string channel, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Publishes multiple messages in a single batch.
+    /// </summary>
+    /// <typeparam name="T">The type of the message.</typeparam>
+    /// <param name="messages">The messages to publish, as a collection of channel-message pairs.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    Task PublishManyAsync<T>(IEnumerable<(string channel, T message)> messages, CancellationToken cancellationToken = default) where T : class;
 }

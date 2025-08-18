@@ -1,5 +1,7 @@
+using System.Buffers;
 using MessagePack;
 using Microsoft.Extensions.Logging;
+using Microsoft.IO;
 using RedisKit.Logging;
 
 namespace RedisKit.Serialization;
@@ -66,6 +68,7 @@ namespace RedisKit.Serialization;
 /// </remarks>
 internal class MessagePackRedisSerializer : IRedisSerializer
 {
+    private static readonly RecyclableMemoryStreamManager StreamManager = new();
     private readonly ILogger<MessagePackRedisSerializer>? _logger;
     private readonly MessagePackSerializerOptions? _options;
 
@@ -307,7 +310,7 @@ internal class MessagePackRedisSerializer : IRedisSerializer
     public Task<object?> DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default)
     {
         if (data == null || data.Length == 0)
-            return Task.FromResult<object?>(null);
+            return Task.FromResult<object?>(default);
 
         if (type == null)
             throw new ArgumentNullException(nameof(type));
@@ -325,5 +328,25 @@ internal class MessagePackRedisSerializer : IRedisSerializer
             _logger?.LogMessagePackDeserializeError(type.Name, data.Length, ex);
             throw new InvalidOperationException($"Failed to deserialize data to type {type.Name} using MessagePack", ex);
         }
+    }
+
+    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await using var stream = StreamManager.GetStream();
+        await MessagePackSerializer.SerializeAsync(stream, value, _options, cancellationToken);
+        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
+        return (int)stream.Length;
+    }
+
+    public ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    {
+        if (data.IsEmpty) return new ValueTask<T?>(default(T));
+        return new ValueTask<T?>((T?)MessagePackSerializer.Deserialize<T>(data, _options, cancellationToken));
+    }
+
+    public ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)
+    {
+        if (data.IsEmpty) return new ValueTask<object?>(default);
+        return new ValueTask<object?>(MessagePackSerializer.Deserialize(type, data, _options, cancellationToken));
     }
 }

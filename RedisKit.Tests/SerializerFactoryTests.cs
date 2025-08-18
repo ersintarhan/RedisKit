@@ -336,6 +336,21 @@ public class SerializerFactoryTests
         {
             return Task.FromResult<object?>(null);
         }
+
+        public ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private class TestCustomSerializerWithOptions : IRedisSerializer
@@ -373,6 +388,21 @@ public class SerializerFactoryTests
         public Task<object?> DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<object?>(null);
+        }
+
+        public ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

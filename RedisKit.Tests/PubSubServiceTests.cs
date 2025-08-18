@@ -103,6 +103,32 @@ public class PubSubServiceTests
     #region PublishAsync Tests
 
     [Fact]
+    public async Task PublishManyAsync_WithValidMessages_PublishesInBatch()
+    {
+        // Arrange
+        var multiplexer = Substitute.For<IConnectionMultiplexer>();
+        var batch = Substitute.For<IBatch>();
+        var db = Substitute.For<IDatabase>();
+        db.CreateBatch(null).Returns(batch);
+        multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
+        _subscriber.Multiplexer.Returns(multiplexer);
+
+        var sut = CreateSut();
+        var messages = new[]
+        {
+            ("channel1", new TestMessage { Content = "Message 1" }),
+            ("channel2", new TestMessage { Content = "Message 2" })
+        };
+
+        // Act
+        await sut.PublishManyAsync(messages);
+
+        // Assert
+        batch.Received(1).Execute();
+        await batch.Received(2).PublishAsync(Arg.Any<RedisChannel>(), Arg.Any<RedisValue>());
+    }
+
+    [Fact]
     public async Task PublishAsync_WithNullChannel_ThrowsArgumentException()
     {
         // Arrange

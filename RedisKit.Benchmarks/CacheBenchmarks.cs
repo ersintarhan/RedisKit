@@ -123,6 +123,24 @@ public class CacheBenchmarks : IDisposable
         await _cacheService.GetAsync<TestData>("benchmark:pipeline");
     }
 
+    [Benchmark]
+    public async Task ExecuteBatch_Get_And_Set()
+    {
+        await _cacheService.ExecuteBatchAsync(batch =>
+        {
+            _ = batch.GetAsync<TestData>("benchmark:read:test");
+            _ = batch.SetAsync("benchmark:batch:set", _testObject);
+        });
+    }
+
+    [Benchmark]
+    public async Task SetBytes_And_GetBytes()
+    {
+        var data = System.Text.Encoding.UTF8.GetBytes("hello world");
+        await _cacheService.SetBytesAsync("benchmark:bytes", data);
+        await _cacheService.GetBytesAsync("benchmark:bytes");
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
