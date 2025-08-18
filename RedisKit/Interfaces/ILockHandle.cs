@@ -39,5 +39,4 @@ public interface ILockHandle : IAsyncDisposable, IDisposable
     ///     Extends the lock expiry
     /// </summary>
     Task<bool> ExtendAsync(TimeSpan expiry, CancellationToken cancellationToken = default);
-
 }

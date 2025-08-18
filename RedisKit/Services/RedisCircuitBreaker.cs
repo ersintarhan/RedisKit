@@ -202,7 +202,7 @@ internal class RedisCircuitBreaker : IRedisCircuitBreaker
         // Check if circuit was never opened (defensive check)
         if (_openedAt == DateTime.MinValue)
             return Task.FromResult(false);
-            
+
         if (DateTime.UtcNow - _openedAt >= _settings.BreakDuration)
         {
             TransitionTo(CircuitState.HalfOpen);

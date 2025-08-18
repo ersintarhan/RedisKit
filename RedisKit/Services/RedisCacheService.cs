@@ -29,13 +29,13 @@ public class RedisCacheService : IRedisCacheService
 
     private readonly IDatabaseAsync _database;
     private readonly ILogger<RedisCacheService> _logger;
+    private readonly SemaphoreSlim _luaScriptDetectionLock = new(1, 1);
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
     private string _keyPrefix = string.Empty;
 
     // Lua script support detection
     private bool? _supportsLuaScripts;
-    private readonly SemaphoreSlim _luaScriptDetectionLock = new SemaphoreSlim(1, 1);
 
     private bool _useFallbackMode;
 
@@ -233,9 +233,7 @@ public class RedisCacheService : IRedisCacheService
         {
             // Validate input to prevent potential DoS attacks
             if (values.Count > RedisConstants.DefaultBatchSizeThreshold) // Limit batch size to prevent memory issues
-            {
                 _logger.LogSetManyBatchSizeWarning(values.Count, RedisConstants.DefaultBatchSizeThreshold);
-            }
 
             _logger.LogSetManyAsync(values.Count);
             var stopwatch = Stopwatch.StartNew();
@@ -309,21 +307,18 @@ public class RedisCacheService : IRedisCacheService
         }
     }
 
-    // Add validation to protect against too-large keys
-    private static void ValidateRedisKey(string key)
-    {
-        // Redis keys can't be longer than 512 MB (but practically less)
-        if (!string.IsNullOrEmpty(key) && key.Length > RedisConstants.MaxRedisKeyLength)
-        {
-            throw new ArgumentException($"Redis key exceeds maximum allowed length of {RedisConstants.MaxRedisKeyLength}", nameof(key));
-        }
-    }
-
     // Override SetKeyPrefix to validate prefix
     public void SetKeyPrefix(string prefix)
     {
         ValidateRedisKey(prefix);
         _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+    }
+
+    // Add validation to protect against too-large keys
+    private static void ValidateRedisKey(string key)
+    {
+        // Redis keys can't be longer than 512 MB (but practically less)
+        if (!string.IsNullOrEmpty(key) && key.Length > RedisConstants.MaxRedisKeyLength) throw new ArgumentException($"Redis key exceeds maximum allowed length of {RedisConstants.MaxRedisKeyLength}", nameof(key));
     }
 
 
@@ -397,9 +392,7 @@ public class RedisCacheService : IRedisCacheService
     {
         if (totalCount > RedisConstants.DefaultBatchSizeThreshold
             && processedCount % (RedisConstants.DefaultBatchSizeThreshold / 2) == 0)
-        {
             _logger.LogSetManyAsyncProgress(processedCount, totalCount);
-        }
     }
 
     private void LogPerformanceIfSlow(Stopwatch stopwatch, int count)
@@ -463,7 +456,7 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             var keys = pairs.Select(p => p.Key).ToArray();
-            var values = pairs.Select(p => p.Value).Concat([(RedisValue)expiry.TotalSeconds]).ToArray();
+            var values = pairs.Select(p => p.Value).Concat([expiry.TotalSeconds]).ToArray();
             var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
             var successCount = Convert.ToInt32(result);
             if (successCount != pairs.Length)

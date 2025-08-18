@@ -67,7 +67,7 @@ namespace RedisKit.Services;
 ///         AutoReconnect = true
 ///     }
 /// };
-///
+/// 
 /// var connection = new RedisConnection(logger, Options.Create(options));
 /// var db = await connection.GetDatabaseAsync().ConfigureAwait(false);
 /// </code>
@@ -101,18 +101,13 @@ public class RedisConnection : IDisposable
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Validate connection string
-        if (string.IsNullOrWhiteSpace(_options.ConnectionString))
-        {
-            throw new ArgumentException("Redis connection string cannot be null or empty", nameof(options));
-        }
+        if (string.IsNullOrWhiteSpace(_options.ConnectionString)) throw new ArgumentException("Redis connection string cannot be null or empty", nameof(options));
 
         // Validate timeout settings
         if (_options.TimeoutSettings.ConnectTimeout.TotalMilliseconds < 0 ||
             _options.TimeoutSettings.SyncTimeout.TotalMilliseconds < 0 ||
             _options.TimeoutSettings.AsyncTimeout.TotalMilliseconds < 0)
-        {
             throw new ArgumentException("Redis timeout settings must be non-negative", nameof(options));
-        }
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 

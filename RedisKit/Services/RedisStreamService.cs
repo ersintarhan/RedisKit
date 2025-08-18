@@ -65,7 +65,7 @@ namespace RedisKit.Services;
 /// public class OrderEventProcessor
 /// {
 ///     private readonly IRedisStreamService _streamService;
-///
+/// 
 ///     // Publishing events
 ///     public async Task PublishOrderEvent(OrderEvent orderEvent)
 ///     {
@@ -73,10 +73,10 @@ namespace RedisKit.Services;
 ///             "orders:events",
 ///             orderEvent,
 ///             maxLength: 100000); // Keep last 100k events
-///
+/// 
 ///         Console.WriteLine($"Published event: {messageId}");
 ///     }
-///
+/// 
 ///     // Processing events with consumer group
 ///     public async Task ProcessOrderEvents()
 ///     {
@@ -84,7 +84,7 @@ namespace RedisKit.Services;
 ///         await _streamService.CreateConsumerGroupAsync(
 ///             "orders:events",
 ///             "order-processors");
-///
+/// 
 ///         while (!cancellationToken.IsCancellationRequested)
 ///         {
 ///             // Read pending messages
@@ -93,13 +93,13 @@ namespace RedisKit.Services;
 ///                 "order-processors",
 ///                 "worker-1",
 ///                 count: 10);
-///
+/// 
 ///             foreach (var (messageId, orderEvent) in messages)
 ///             {
 ///                 try
 ///                 {
 ///                     await ProcessOrder(orderEvent);
-///
+/// 
 ///                     // Acknowledge successful processing
 ///                     await _streamService.AcknowledgeAsync(
 ///                         "orders:events",
@@ -116,23 +116,23 @@ namespace RedisKit.Services;
 ///                         ex.Message);
 ///                 }
 ///             }
-///
+/// 
 ///             await Task.Delay(1000); // Polling interval
 ///         }
 ///     }
-///
+/// 
 ///     // Claim abandoned messages
 ///     public async Task RecoverAbandonedMessages()
 ///     {
 ///         var pending = await _streamService.GetPendingAsync(
 ///             "orders:events",
 ///             "order-processors");
-///
+/// 
 ///         var stuckMessages = pending
 ///             .Where(p => p.IdleTime > TimeSpan.FromMinutes(5))
 ///             .Select(p => p.MessageId)
 ///             .ToArray();
-///
+/// 
 ///         if (stuckMessages.Any())
 ///         {
 ///             var claimed = await _streamService.ClaimAsync&lt;OrderEvent&gt;(
@@ -141,7 +141,7 @@ namespace RedisKit.Services;
 ///                 "recovery-worker",
 ///                 300000, // 5 minutes idle time
 ///                 stuckMessages);
-///
+/// 
 ///             // Process claimed messages...
 ///         }
 ///     }
@@ -215,10 +215,7 @@ public class RedisStreamService : IRedisStreamService
                 true); // Use ~ for approximate trimming (more efficient)
 
             // Validate stream name
-            if (stream.Length > 512)
-            {
-                _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-            }
+            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             _logger.LogAddAsyncSuccess(prefixedStream, messageId.ToString());
             return messageId.ToString();
@@ -242,10 +239,7 @@ public class RedisStreamService : IRedisStreamService
             _logger.LogReadAsync(prefixedStream, start ?? "0", end ?? "+", count);
 
             // Validate stream name
-            if (stream.Length > 512)
-            {
-                _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-            }
+            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             // Read from stream
             var entries = await _database.StreamRangeAsync(prefixedStream, start ?? "0", end ?? "+", count).ConfigureAwait(false);
@@ -295,15 +289,9 @@ public class RedisStreamService : IRedisStreamService
             _logger.LogCreateConsumerGroupAsync(prefixedStream, groupName);
 
             // Validate stream and group name lengths
-            if (stream.Length > 512)
-            {
-                _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-            }
+            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
-            if (groupName.Length > 512)
-            {
-                _logger.LogWarning("Group name exceeds Redis key limit of 512 characters: {GroupName}", groupName);
-            }
+            if (groupName.Length > 512) _logger.LogWarning("Group name exceeds Redis key limit of 512 characters: {GroupName}", groupName);
 
             // Create consumer group starting from the beginning of the stream
             // The 'false' parameter means don't create the stream if it doesn't exist
@@ -423,10 +411,7 @@ public class RedisStreamService : IRedisStreamService
         var prefixedStream = $"{_keyPrefix}{stream}";
 
         // Validate stream name
-        if (stream.Length > 512)
-        {
-            _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-        }
+        if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
         try
         {
@@ -620,15 +605,9 @@ public class RedisStreamService : IRedisStreamService
             throw new ArgumentException("Message ID cannot be null or empty", nameof(messageId));
 
         // Validate stream names
-        if (sourceStream.Length > 512)
-        {
-            _logger.LogWarning("Source stream name exceeds Redis key limit of 512 characters: {Stream}", sourceStream);
-        }
+        if (sourceStream.Length > 512) _logger.LogWarning("Source stream name exceeds Redis key limit of 512 characters: {Stream}", sourceStream);
 
-        if (deadLetterStream.Length > 512)
-        {
-            _logger.LogWarning("Dead letter stream name exceeds Redis key limit of 512 characters: {Stream}", deadLetterStream);
-        }
+        if (deadLetterStream.Length > 512) _logger.LogWarning("Dead letter stream name exceeds Redis key limit of 512 characters: {Stream}", deadLetterStream);
 
         var prefixedSourceStream = $"{_keyPrefix}{sourceStream}";
         var prefixedDeadLetterStream = $"{_keyPrefix}{deadLetterStream}";
@@ -747,10 +726,7 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             // Validate stream name
-            if (stream.Length > 512)
-            {
-                _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-            }
+            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             var startTime = DateTime.UtcNow;
             _logger.LogDebug("Adding {Count} messages to stream {Stream} in batch", messages.Length, stream);
@@ -776,10 +752,7 @@ public class RedisStreamService : IRedisStreamService
             throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
 
         // Validate stream name
-        if (stream.Length > 512)
-        {
-            _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-        }
+        if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
         var prefixedStream = $"{_keyPrefix}{stream}";
         var health = new StreamHealthInfo();
@@ -787,10 +760,7 @@ public class RedisStreamService : IRedisStreamService
         try
         {
             // Validate stream name
-            if (stream.Length > 512)
-            {
-                _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-            }
+            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             _logger.LogDebug("Checking health for stream {Stream}", prefixedStream);
 
@@ -873,10 +843,7 @@ public class RedisStreamService : IRedisStreamService
             throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
 
         // Validate stream name
-        if (stream.Length > 512)
-        {
-            _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-        }
+        if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
         var prefixedStream = $"{_keyPrefix}{stream}";
         var metrics = new StreamMetrics();
