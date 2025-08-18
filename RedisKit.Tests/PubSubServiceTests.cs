@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -13,7 +14,7 @@ public class PubSubServiceTests
     private readonly ILogger<RedisPubSubService> _logger;
     private readonly IOptions<RedisOptions> _options;
     private readonly ISubscriber _subscriber;
-    private readonly RedisConnection _connection;
+    private readonly IRedisConnection _connection;
 
     public PubSubServiceTests()
     {
@@ -28,9 +29,8 @@ public class PubSubServiceTests
         };
         _options = Options.Create(redisOptions);
 
-        var connLogger = Substitute.For<ILogger<RedisConnection>>();
-        _connection = Substitute.For<RedisConnection>(connLogger, _options);
-        _connection.GetSubscriberAsync().Returns(Task.FromResult(_subscriber));
+        _connection = Substitute.For<IRedisConnection>();
+        _connection.GetSubscriberAsync().Returns(_subscriber);
     }
 
     private RedisPubSubService CreateSut()

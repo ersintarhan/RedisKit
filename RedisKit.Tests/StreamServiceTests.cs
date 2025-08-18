@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -14,7 +15,7 @@ public class StreamServiceTests
     private readonly IDatabaseAsync _db;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly IOptions<RedisOptions> _options;
-    private readonly RedisConnection _connection;
+    private readonly IRedisConnection _connection;
 
     public StreamServiceTests()
     {
@@ -29,9 +30,8 @@ public class StreamServiceTests
         };
         _options = Options.Create(redisOptions);
 
-        var connLogger = Substitute.For<ILogger<RedisConnection>>();
-        _connection = Substitute.For<RedisConnection>(connLogger, _options);
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(_db));
+        _connection = Substitute.For<IRedisConnection>();
+        _connection.GetDatabaseAsync().Returns(_db);
     }
 
     private RedisStreamService CreateSut()

@@ -13,18 +13,15 @@ public class DistributedLockTests
 {
     private readonly IDatabaseAsync _dbAsync;
     private readonly ILogger<RedisDistributedLock> _logger;
-    private readonly RedisConnection _connection;
+    private readonly IRedisConnection _connection;
 
     public DistributedLockTests()
     {
         _logger = Substitute.For<ILogger<RedisDistributedLock>>();
         _dbAsync = Substitute.For<IDatabaseAsync>();
 
-        var connLogger = Substitute.For<ILogger<RedisConnection>>();
-        var connOptions = Options.Create(new RedisOptions { ConnectionString = "localhost" });
-
-        _connection = Substitute.For<RedisConnection>(connLogger, connOptions);
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(_dbAsync));
+        _connection = Substitute.For<IRedisConnection>();
+        _connection.GetDatabaseAsync().Returns(_dbAsync);
     }
 
     private RedisDistributedLock CreateSut()

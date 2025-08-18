@@ -64,43 +64,22 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_RegistersRedisConnection_AsSingleton()
+    public void AddRedisKit_RegistersIRedisConnection_AsSingleton()
     {
         // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        _services.AddRedisKit(options => { options.ConnectionString = "localhost:6379"; });
 
         // Assert
-        var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(RedisConnection));
+        var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(IRedisConnection));
         Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
+        Assert.Equal(typeof(RedisConnection), descriptor.ImplementationType);
     }
 
     [Fact]
-    public void AddRedisServices_RegistersIDatabaseAsync_AsSingleton()
+    public void AddRedisKit_RegistersCacheService_AsSingleton()
     {
         // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
-
-        // Assert
-        var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(IDatabaseAsync));
-        Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
-    }
-
-    [Fact]
-    public void AddRedisServices_RegistersISubscriber_AsSingleton()
-    {
-        // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
-
-        // Assert
-        var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(ISubscriber));
-        Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
-    }
-
-    [Fact]
-    public void AddRedisServices_RegistersCacheService_AsSingleton()
-    {
-        // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        _services.AddRedisKit(options => { options.ConnectionString = "localhost:6379"; });
 
         // Assert
         var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(IRedisCacheService));
@@ -108,10 +87,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_RegistersPubSubService_AsSingleton()
+    public void AddRedisKit_RegistersPubSubService_AsSingleton()
     {
         // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        _services.AddRedisKit(options => { options.ConnectionString = "localhost:6379"; });
 
         // Assert
         var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(IRedisPubSubService));
@@ -119,10 +98,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_RegistersStreamService_AsSingleton()
+    public void AddRedisKit_RegistersStreamService_AsSingleton()
     {
         // Act
-        _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        _services.AddRedisKit(options => { options.ConnectionString = "localhost:6379"; });
 
         // Assert
         var descriptor = Assert.Single(_services, d => d.ServiceType == typeof(IRedisStreamService));
@@ -198,28 +177,6 @@ public class ServiceCollectionExtensionsTests
 
     #region Service Resolution Tests
 
-    [Fact]
-    public void AddRedisServices_ServicesCanBeResolved_WithoutErrors()
-    {
-        // Arrange - Use test helper to create services with all required dependencies
-        var services = RedisTestHelper.CreateTestServices(options => { options.ConnectionString = "localhost:6379"; });
-
-        // Add mock Redis services to avoid actual connection
-        services.AddMockRedisServices();
-
-        // Add the Redis services
-        services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Act & Assert - These should not throw
-        Assert.NotNull(serviceProvider.GetRequiredService<IOptions<RedisOptions>>());
-        Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
-        Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
-
-        // Note: IDatabaseAsync and ISubscriber require actual Redis connection
-        // so they would throw in unit tests. These would be tested in integration tests.
-    }
 
     [Fact]
     public void AddRedisServices_MultipleRegistrations_ThrowsOrOverwrites()
@@ -253,8 +210,8 @@ public class ServiceCollectionExtensionsTests
     public void AddRedisKit_RegistersAllServices_Correctly()
     {
         // Arrange
-        var services = RedisTestHelper.CreateTestServices();
-        services.AddMockRedisServices();
+        var services = new ServiceCollection();
+        services.AddLogging();
 
         // Act
         services.AddRedisKit(options =>
@@ -267,7 +224,7 @@ public class ServiceCollectionExtensionsTests
 
         // Assert - All services should be registered
         Assert.NotNull(serviceProvider.GetRequiredService<IOptions<RedisOptions>>());
-        Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IRedisConnection>());
         Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
 
         var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
@@ -279,8 +236,8 @@ public class ServiceCollectionExtensionsTests
     public void AddRedisKit_WithDefaultConfiguration_RegistersServices()
     {
         // Arrange
-        var services = RedisTestHelper.CreateTestServices();
-        services.AddMockRedisServices();
+        var services = new ServiceCollection();
+        services.AddLogging();
 
         // Act
         services.AddRedisKit(); // Use default configuration
@@ -291,7 +248,7 @@ public class ServiceCollectionExtensionsTests
         var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
         Assert.Equal("localhost:6379", redisOptions.Value.ConnectionString);
         Assert.Equal(TimeSpan.FromHours(1), redisOptions.Value.DefaultTtl);
-        Assert.NotNull(serviceProvider.GetRequiredService<RedisConnection>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IRedisConnection>());
         Assert.NotNull(serviceProvider.GetRequiredService<IRedisCircuitBreaker>());
     }
 

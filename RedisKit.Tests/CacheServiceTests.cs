@@ -2,6 +2,7 @@ using MessagePack;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -14,7 +15,7 @@ public class CacheServiceTests
     private readonly ILogger<RedisCacheService> _logger;
     private readonly IOptions<RedisOptions> _options;
     private readonly IDatabaseAsync _db;
-    private readonly RedisConnection _connection;
+    private readonly IRedisConnection _connection;
 
     public CacheServiceTests()
     {
@@ -30,7 +31,7 @@ public class CacheServiceTests
         _options = Options.Create(redisOptions);
 
         _connection = Substitute.For<IRedisConnection>();
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(_db));
+        _connection.GetDatabaseAsync().Returns(_db);
     }
 
     private RedisCacheService CreateSut()
@@ -140,8 +141,8 @@ public class CacheServiceTests
         var syncDb = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(syncDb);
-        _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(syncDb));
+        _connection.GetMultiplexerAsync().Returns(multiplexer);
+        _connection.GetDatabaseAsync().Returns(Task.FromResult<IDatabaseAsync>(syncDb));
 
         // Setup Lua script support check to fail
         _db.ScriptEvaluateAsync(Arg.Any<string>(), Arg.Any<RedisKey[]>(), Arg.Any<RedisValue[]>())
@@ -173,8 +174,8 @@ public class CacheServiceTests
         var syncDb = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(syncDb);
-        _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(syncDb));
+        _connection.GetMultiplexerAsync().Returns(multiplexer);
+        _connection.GetDatabaseAsync().Returns(Task.FromResult<IDatabaseAsync>(syncDb));
 
         // Setup for no TTL (MSET only)
         syncDb.StringSetAsync(Arg.Any<KeyValuePair<RedisKey, RedisValue>[]>())
