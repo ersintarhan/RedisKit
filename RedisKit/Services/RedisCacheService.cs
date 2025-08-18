@@ -234,8 +234,7 @@ public class RedisCacheService : IRedisCacheService
             // Validate input to prevent potential DoS attacks
             if (values.Count > RedisConstants.DefaultBatchSizeThreshold) // Limit batch size to prevent memory issues
             {
-                _logger.LogWarning("SetManyAsync called with {Count} values, which exceeds recommended limit of {Threshold}",
-                    values.Count, RedisConstants.DefaultBatchSizeThreshold);
+                _logger.LogSetManyBatchSizeWarning(values.Count, RedisConstants.DefaultBatchSizeThreshold);
             }
 
             _logger.LogSetManyAsync(values.Count);
@@ -335,10 +334,7 @@ public class RedisCacheService : IRedisCacheService
             await _luaScriptDetectionLock.WaitAsync();
             try
             {
-                if (_supportsLuaScripts == null)
-                {
-                    _supportsLuaScripts = await CheckLuaScriptSupport();
-                }
+                _supportsLuaScripts ??= await CheckLuaScriptSupport();
             }
             finally
             {
@@ -467,12 +463,8 @@ public class RedisCacheService : IRedisCacheService
         try
         {
             var keys = pairs.Select(p => p.Key).ToArray();
-            var values = pairs.Select(p => p.Value)
-                .Concat([(RedisValue)expiry.TotalSeconds])
-                .ToArray();
-
+            var values = pairs.Select(p => p.Value).Concat([(RedisValue)expiry.TotalSeconds]).ToArray();
             var result = await _database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
-
             var successCount = Convert.ToInt32(result);
             if (successCount != pairs.Length)
                 _logger.LogSetManyPartialSuccess(pairs.Length, successCount);

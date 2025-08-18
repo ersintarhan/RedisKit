@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using RedisKit.Models;
 
 namespace RedisKit.Logging;
 
@@ -83,6 +84,9 @@ internal static partial class LoggingExtensions
 
     [LoggerMessage(26, LogLevel.Error, "Lua script execution failed, switching to fallback mode")]
     public static partial void LogLuaScriptExecutionFailed(this ILogger logger, Exception ex);
+
+    [LoggerMessage(27, LogLevel.Warning, "SetManyAsync called with {Count} values, which exceeds recommended limit of {Threshold}")]
+    public static partial void LogSetManyBatchSizeWarning(this ILogger logger, int count, int threshold);
 
     // PubSub Service Log Methods
     [LoggerMessage(101, LogLevel.Debug, "Publishing message to channel: {Channel}")]
@@ -252,4 +256,66 @@ internal static partial class LoggingExtensions
 
     [LoggerMessage(335, LogLevel.Warning, "Attempting to deserialize large data of {ByteCount} bytes for type {Type}")]
     public static partial void LogLargeDataDeserializationWarning(this ILogger logger, int byteCount, string type);
+
+    // Connection Service Log Methods
+    [LoggerMessage(401, LogLevel.Information, "Creating Redis connection to: {ConnectionString}")]
+    public static partial void LogConnectionCreating(this ILogger logger, string connectionString);
+
+    [LoggerMessage(402, LogLevel.Information, "Successfully connected to Redis at: {ConnectionString}")]
+    public static partial void LogConnectionSuccess(this ILogger logger, string connectionString);
+
+    [LoggerMessage(403, LogLevel.Debug, "Connection attempt {Attempt}/{MaxAttempts}")]
+    public static partial void LogConnectionAttempt(this ILogger logger, int attempt, int maxAttempts);
+
+    [LoggerMessage(404, LogLevel.Information, "Connected to Redis on attempt {Attempt} after {Duration}ms")]
+    public static partial void LogConnectionSuccessWithRetry(this ILogger logger, int attempt, long duration);
+
+    [LoggerMessage(405, LogLevel.Warning, "Failed to connect to Redis (attempt {Attempt}/{MaxAttempts})")]
+    public static partial void LogConnectionAttemptFailed(this ILogger logger, int attempt, int maxAttempts, Exception ex);
+
+    [LoggerMessage(406, LogLevel.Debug, "Waiting {DelayMs}ms before retry (strategy: {Strategy})")]
+    public static partial void LogConnectionRetryDelay(this ILogger logger, int delayMs, string strategy);
+
+    [LoggerMessage(407, LogLevel.Error, "Failed to connect to Redis after {Attempts} attempts in {Duration}ms")]
+    public static partial void LogConnectionFailed(this ILogger logger, int attempts, long duration, Exception ex);
+
+    [LoggerMessage(408, LogLevel.Debug, "Redis connection timeout settings applied. Connect: {ConnectMs}ms, Sync: {SyncMs}ms, Async: {AsyncMs}ms")]
+    public static partial void LogConnectionTimeoutSettings(this ILogger logger, int connectMs, int syncMs, int asyncMs);
+
+    [LoggerMessage(409, LogLevel.Error, "Redis connection failed: {FailureType} - {Exception}")]
+    public static partial void LogConnectionFailure(this ILogger logger, string failureType, string exception);
+
+    [LoggerMessage(410, LogLevel.Information, "Redis connection restored: {EndPoint}")]
+    public static partial void LogConnectionRestored(this ILogger logger, string endPoint);
+
+    [LoggerMessage(411, LogLevel.Error, "Redis error: {Message} from {EndPoint}")]
+    public static partial void LogRedisError(this ILogger logger, string message, string endPoint);
+
+    [LoggerMessage(412, LogLevel.Error, "Redis internal error: {Origin}")]
+    public static partial void LogRedisInternalError(this ILogger logger, string origin, Exception exception);
+
+    [LoggerMessage(413, LogLevel.Debug, "Health check succeeded in {Duration}ms")]
+    public static partial void LogHealthCheckSuccess(this ILogger logger, long duration);
+
+    [LoggerMessage(414, LogLevel.Warning, "Health check failed {Failures} times, attempting reconnection")]
+    public static partial void LogHealthCheckFailureWithReconnect(this ILogger logger, int failures);
+
+    [LoggerMessage(415, LogLevel.Error, "Auto-reconnection failed")]
+    public static partial void LogAutoReconnectionFailed(this ILogger logger, Exception ex);
+
+    [LoggerMessage(416, LogLevel.Warning, "Health check failed")]
+    public static partial void LogHealthCheckFailed(this ILogger logger, Exception ex);
+
+    [LoggerMessage(417, LogLevel.Information, "Circuit breaker has been reset")]
+    public static partial void LogCircuitBreakerReset(this ILogger logger);
+
+    [LoggerMessage(418, LogLevel.Error, "Error disposing Redis connection")]
+    public static partial void LogConnectionDisposeError(this ILogger logger, Exception ex);
+
+    // Circuit Breaker Log Methods
+    [LoggerMessage(501, LogLevel.Warning, "Circuit breaker recorded failure in {State} state")]
+    public static partial void LogCircuitBreakerFailure(this ILogger logger, CircuitState state, Exception? exception);
+
+    [LoggerMessage(502, LogLevel.Information, "Circuit breaker transitioned from {OldState} to {NewState}")]
+    public static partial void LogCircuitBreakerTransition(this ILogger logger, CircuitState oldState, CircuitState newState);
 }
