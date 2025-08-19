@@ -318,15 +318,37 @@ public class RedisFunctionService : IRedisFunction
                 return null;
 
             // Handle different return types
-            if (typeof(T) == typeof(string)) return result.ToString() as T;
+            if (typeof(T) == typeof(string))
+                return result.ToString() as T;
 
-            if (typeof(T) == typeof(byte[])) return (byte[]?)result as T;
+            if (typeof(T) == typeof(byte[]))
+                return (byte[]?)result as T;
 
+            // Check if result is already a simple type
+            if (result.Resp3Type == ResultType.Integer)
             {
-                // Deserialize complex objects
+                if (typeof(T) == typeof(long))
+                    return (T)(object)(long)result;
+                if (typeof(T) == typeof(int))
+                    return (T)(object)(int)result;
+                if (typeof(T) == typeof(bool))
+                    return (T)(object)((long)result != 0);
+            }
+
+            // Try to deserialize complex objects
+            if (result.Resp3Type == ResultType.BulkString && !result.IsNull)
+            {
                 var bytes = (byte[])result!;
                 return await _serializer.DeserializeAsync<T>(bytes, cancellationToken);
             }
+
+            // Handle arrays
+            if (result.Resp3Type == ResultType.Array)
+                // This would need more complex handling for T[] types
+                // For now, throw a meaningful exception
+                throw new NotSupportedException($"Array return types are not yet supported for type {typeof(T).Name}");
+
+            return default;
         }
         catch (RedisServerException ex) when (ex.Message.Contains("ERR"))
         {

@@ -69,16 +69,11 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         {
             _logger.LogDebug("Publishing to sharded channel: {Channel}", channel);
 
-            var database = await _connection.GetDatabaseAsync();
+            var subscriber = await _connection.GetSubscriberAsync();
             var serialized = await _serializer.SerializeAsync(message, cancellationToken);
 
-            // Execute SPUBLISH command
-            var result = await database.ExecuteAsync(
-                "SPUBLISH",
-                new RedisValue[] { channel, serialized }
-            ).ConfigureAwait(false);
-
-            var subscribers = (long)result;
+            // Use native sharded pub/sub support
+            var subscribers = await subscriber.PublishAsync(RedisChannel.Sharded(channel), serialized).ConfigureAwait(false);
 
             _logger.LogInformation("Published to sharded channel {Channel}, reached {Subscribers} subscribers",
                 channel, subscribers);
@@ -144,57 +139,13 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         }
     }
 
-    public async Task<SubscriptionToken> SubscribePatternAsync<T>(
+    public Task<SubscriptionToken> SubscribePatternAsync<T>(
         string pattern,
         Func<ShardedChannelMessage<T>, CancellationToken, Task> handler,
         CancellationToken cancellationToken = default) where T : class
     {
-        ArgumentException.ThrowIfNullOrEmpty(pattern);
-        ArgumentNullException.ThrowIfNull(handler);
-
-        if (!await EnsureSupportedAsync(cancellationToken)) throw new NotSupportedException("Sharded Pub/Sub is not supported. Requires Redis 7.0+");
-
-        await _subscriptionLock.WaitAsync(cancellationToken);
-        try
-        {
-            _logger.LogDebug("Subscribing to sharded pattern: {Pattern}", pattern);
-
-            var subscription = new ShardedSubscription
-            {
-                Channel = pattern,
-                IsPattern = true
-            };
-
-            _subscriptions[subscription.Id] = subscription;
-
-            // Wrap the typed handler
-            var wrappedHandler = CreateTypedHandler(handler, null, pattern);
-
-            var patternKey = $"pattern:{pattern}";
-            if (!_handlers.TryGetValue(patternKey, out var patternHandlers))
-            {
-                patternHandlers = new List<Func<ShardedChannelMessage<object>, CancellationToken, Task>>();
-                _handlers[patternKey] = patternHandlers;
-
-                // First subscription to this pattern, subscribe to Redis
-                await SubscribeToRedisAsync(pattern, true);
-            }
-
-            patternHandlers.Add(wrappedHandler);
-
-            _logger.LogInformation("Subscribed to sharded pattern: {Pattern}", pattern);
-
-            return new SubscriptionToken(
-                subscription.Id,
-                pattern,
-                SubscriptionType.Pattern,
-                async () => await UnsubscribePatternAsync(pattern, CancellationToken.None)
-            );
-        }
-        finally
-        {
-            _subscriptionLock.Release();
-        }
+        // Sharded pub/sub doesn't support pattern subscriptions
+        throw new NotSupportedException("Sharded Pub/Sub does not support pattern subscriptions. Use regular Pub/Sub for pattern matching.");
     }
 
     public async Task UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)
@@ -225,33 +176,10 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         }
     }
 
-    public async Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)
+    public Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrEmpty(pattern);
-
-        if (!await EnsureSupportedAsync(cancellationToken)) return;
-
-        await _subscriptionLock.WaitAsync(cancellationToken);
-        try
-        {
-            _logger.LogDebug("Unsubscribing from sharded pattern: {Pattern}", pattern);
-
-            var patternKey = $"pattern:{pattern}";
-            if (_handlers.TryRemove(patternKey, out _)) await UnsubscribeFromRedisAsync(pattern, true);
-
-            // Remove related subscriptions
-            var toRemove = _subscriptions.Where(s => s.Value.Channel == pattern && s.Value.IsPattern)
-                .Select(s => s.Key)
-                .ToList();
-
-            foreach (var id in toRemove) _subscriptions.TryRemove(id, out _);
-
-            _logger.LogInformation("Unsubscribed from sharded pattern: {Pattern}", pattern);
-        }
-        finally
-        {
-            _subscriptionLock.Release();
-        }
+        // Sharded pub/sub doesn't support pattern subscriptions
+        throw new NotSupportedException("Sharded Pub/Sub does not support pattern subscriptions. Use regular Pub/Sub for pattern matching.");
     }
 
     public async Task UnsubscribeAsync(SubscriptionToken token, CancellationToken cancellationToken = default)
@@ -274,8 +202,9 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
 
             var database = await _connection.GetDatabaseAsync();
 
-            // Execute PUBSUB SHARDCHANNELS command
-            var channelsResult = await database.ExecuteAsync("PUBSUB", new RedisValue[] { "SHARDCHANNELS" })
+            // Note: PUBSUB SHARDCHANNELS requires raw command execution
+            // StackExchange.Redis doesn't have native support for this command yet
+            var channelsResult = await database.ExecuteAsync("PUBSUB", "SHARDCHANNELS")
                 .ConfigureAwait(false);
 
             var stats = new ShardedPubSubStats
@@ -314,10 +243,11 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
 
             var database = await _connection.GetDatabaseAsync();
 
-            // Execute PUBSUB SHARDNUMSUB command
+            // Note: PUBSUB SHARDNUMSUB requires raw command execution
+            // StackExchange.Redis doesn't have native support for this command yet
             var result = await database.ExecuteAsync(
                 "PUBSUB",
-                new RedisValue[] { "SHARDNUMSUB", channel }
+                "SHARDNUMSUB", channel
             ).ConfigureAwait(false);
 
             if (result.Resp3Type == ResultType.Array)
@@ -356,7 +286,9 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
             try
             {
                 // Try to execute SPUBLISH to check support
-                await database.ExecuteAsync("SPUBLISH", new RedisValue[] { "test", "test" })
+                // Use native sharded channel support
+                var subscriber = await _connection.GetSubscriberAsync();
+                await subscriber.PublishAsync(RedisChannel.Sharded("test"), "test")
                     .ConfigureAwait(false);
                 _isSupported = true;
                 _logger.LogInformation("Sharded Pub/Sub is supported");
@@ -423,49 +355,29 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
 
     private async Task SubscribeToRedisAsync(string channelOrPattern, bool isPattern)
     {
-        var multiplexer = await _connection.GetMultiplexerAsync();
-
-        var command = isPattern ? "PSUBSCRIBE" : "SSUBSCRIBE";
-
-        // Note: StackExchange.Redis doesn't have direct support for SSUBSCRIBE
-        // We need to use Execute on IDatabase for these commands
-        var db = multiplexer.GetDatabase();
-        await db.ExecuteAsync(command, channelOrPattern)
-            .ConfigureAwait(false);
-
-        // Set up message handler using regular pub/sub as fallback
-        var subscriber = multiplexer.GetSubscriber();
         if (isPattern)
-            await subscriber.SubscribeAsync(
-                new RedisChannel(channelOrPattern, RedisChannel.PatternMode.Pattern),
-                async (channel, value) => await HandleMessageAsync(channel, value, true)
-            ).ConfigureAwait(false);
-        else
-            await subscriber.SubscribeAsync(
-                new RedisChannel(channelOrPattern, RedisChannel.PatternMode.Literal),
-                async (channel, value) => await HandleMessageAsync(channel, value, false)
-            ).ConfigureAwait(false);
+            // Sharded pub/sub doesn't support patterns
+            throw new NotSupportedException("Sharded Pub/Sub does not support pattern subscriptions");
+
+        var subscriber = await _connection.GetSubscriberAsync();
+
+        // Use native sharded channel support
+        await subscriber.SubscribeAsync(
+            RedisChannel.Sharded(channelOrPattern),
+            async (channel, value) => await HandleMessageAsync(channel.ToString(), value, false)
+        ).ConfigureAwait(false);
     }
 
     private async Task UnsubscribeFromRedisAsync(string channelOrPattern, bool isPattern)
     {
-        var multiplexer = await _connection.GetMultiplexerAsync();
-        var db = multiplexer.GetDatabase();
-        var subscriber = multiplexer.GetSubscriber();
-
-        var command = isPattern ? "PUNSUBSCRIBE" : "SUNSUBSCRIBE";
-
-        await db.ExecuteAsync(command, channelOrPattern)
-            .ConfigureAwait(false);
-
         if (isPattern)
-            await subscriber.UnsubscribeAsync(
-                new RedisChannel(channelOrPattern, RedisChannel.PatternMode.Pattern)
-            ).ConfigureAwait(false);
-        else
-            await subscriber.UnsubscribeAsync(
-                new RedisChannel(channelOrPattern, RedisChannel.PatternMode.Literal)
-            ).ConfigureAwait(false);
+            // Sharded pub/sub doesn't support patterns
+            throw new NotSupportedException("Sharded Pub/Sub does not support pattern subscriptions");
+
+        var subscriber = await _connection.GetSubscriberAsync();
+
+        // Use native sharded channel support
+        await subscriber.UnsubscribeAsync(RedisChannel.Sharded(channelOrPattern)).ConfigureAwait(false);
     }
 
     private async Task HandleMessageAsync(RedisChannel channel, RedisValue value, bool isPattern)

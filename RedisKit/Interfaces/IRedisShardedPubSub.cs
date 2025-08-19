@@ -6,6 +6,11 @@ namespace RedisKit.Interfaces;
 ///     Interface for Redis Sharded Pub/Sub support (Redis 7.0+)
 ///     Provides scalable pub/sub across cluster shards
 /// </summary>
+/// <remarks>
+///     IMPORTANT: Sharded Pub/Sub does NOT support pattern subscriptions.
+///     All pattern-related methods will throw NotSupportedException.
+///     Use regular Pub/Sub (IRedisPubSubService) for pattern matching.
+/// </remarks>
 public interface IRedisShardedPubSub
 {
     /// <summary>
@@ -32,13 +37,15 @@ public interface IRedisShardedPubSub
         CancellationToken cancellationToken = default) where T : class;
 
     /// <summary>
-    ///     Subscribe to sharded channels matching a pattern
+    ///     NOT SUPPORTED: Sharded Pub/Sub does not support pattern subscriptions
     /// </summary>
     /// <typeparam name="T">Message type</typeparam>
-    /// <param name="pattern">Channel pattern (e.g., "orders:*")</param>
+    /// <param name="pattern">Channel pattern (not supported)</param>
     /// <param name="handler">Message handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Subscription token for unsubscribing</returns>
+    /// <returns>Never returns - throws NotSupportedException</returns>
+    /// <exception cref="NotSupportedException">Always thrown as patterns are not supported</exception>
+    [Obsolete("Sharded Pub/Sub does not support pattern subscriptions. Use regular Pub/Sub for patterns.")]
     Task<SubscriptionToken> SubscribePatternAsync<T>(
         string pattern,
         Func<ShardedChannelMessage<T>, CancellationToken, Task> handler,
@@ -52,10 +59,12 @@ public interface IRedisShardedPubSub
     Task UnsubscribeAsync(string channel, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Unsubscribe from a pattern
+    ///     NOT SUPPORTED: Sharded Pub/Sub does not support pattern subscriptions
     /// </summary>
-    /// <param name="pattern">Channel pattern</param>
+    /// <param name="pattern">Channel pattern (not supported)</param>
     /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="NotSupportedException">Always thrown as patterns are not supported</exception>
+    [Obsolete("Sharded Pub/Sub does not support pattern subscriptions. Use regular Pub/Sub for patterns.")]
     Task UnsubscribePatternAsync(string pattern, CancellationToken cancellationToken = default);
 
     /// <summary>

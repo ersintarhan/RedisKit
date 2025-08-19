@@ -41,15 +41,16 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
         // Simulate Redis 7.0+ support
-        mockDatabase.Execute("FUNCTION LIST", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue[] { }));
+        mockDatabase.ExecuteAsync("FUNCTION LIST")
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue[] { })));
 
-        mockDatabase.Execute("FUNCTION LOAD", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue("mylib")));
+        mockDatabase.ExecuteAsync(Arg.Is<string>(s => s.Contains("FUNCTION LOAD")), Arg.Any<object[]>())
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue("mylib"))));
 
         // Act
         var result = await _service.LoadAsync(libraryCode);
@@ -66,15 +67,16 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
         // Simulate Redis 7.0+ support
-        mockDatabase.Execute("FUNCTION LIST", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue[] { }));
+        mockDatabase.ExecuteAsync("FUNCTION LIST")
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue[] { })));
 
-        mockDatabase.Execute("FUNCTION DELETE", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue("OK")));
+        mockDatabase.ExecuteAsync("FUNCTION DELETE", Arg.Any<object[]>())
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue("OK"))));
 
         // Act
         var result = await _service.DeleteAsync(libraryName);
@@ -92,15 +94,16 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
         // Simulate Redis 7.0+ support
-        mockDatabase.Execute("FUNCTION LIST", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue[] { }));
+        mockDatabase.ExecuteAsync("FUNCTION LIST")
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue[] { })));
 
-        mockDatabase.Execute("FCALL", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue(expectedResult)));
+        mockDatabase.ExecuteAsync("FCALL", Arg.Any<object[]>())
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue(expectedResult))));
 
         // Act
         var result = await _service.CallAsync<string>(functionName);
@@ -116,12 +119,13 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
         // Simulate older Redis (< 7.0)
-        mockDatabase.Execute("FUNCTION LIST", Arg.Any<object[]>())
-            .Returns(x => throw new RedisServerException("ERR unknown command 'FUNCTION'"));
+        mockDatabase.ExecuteAsync("FUNCTION LIST")
+            .Returns<RedisResult>(x => throw new RedisServerException("ERR unknown command 'FUNCTION'"));
 
         // Act
         var result = await _service.IsSupportedAsync();
@@ -179,15 +183,16 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
+        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
         // Simulate Redis 7.0+ support
-        mockDatabase.Execute("FUNCTION LIST", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue[] { }));
+        mockDatabase.ExecuteAsync("FUNCTION LIST")
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue[] { })));
 
-        mockDatabase.Execute("FUNCTION FLUSH", Arg.Any<object[]>())
-            .Returns(RedisResult.Create(new RedisValue("OK")));
+        mockDatabase.ExecuteAsync("FUNCTION FLUSH", Arg.Any<object[]>())
+            .Returns(Task.FromResult(RedisResult.Create(new RedisValue("OK"))));
 
         // Act
         var result = await _service.FlushAsync();
