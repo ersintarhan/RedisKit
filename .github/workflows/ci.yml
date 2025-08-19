@@ -29,26 +29,27 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
-    # Setup Redis on Ubuntu
-    - name: Setup Redis (Ubuntu)
+    # Setup Redis based on OS
+    - name: Start Redis (Docker)
       if: runner.os == 'Linux'
-      uses: shogo82148/actions-setup-redis@v1
-      with:
-        redis-version: '7.x'
-    
-    # Setup Redis on Windows
-    - name: Setup Redis (Windows)
-      if: runner.os == 'Windows'
       run: |
-        echo "Skipping Redis setup on Windows - Integration tests will be skipped"
-      shell: powershell
+        docker run -d --name redis -p 6379:6379 redis:7-alpine
+        sleep 5
+        docker exec redis redis-cli ping
     
-    # Setup Redis on macOS
     - name: Setup Redis (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install redis
         brew services start redis
+        sleep 5
+        redis-cli ping
+    
+    - name: Setup Redis (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        echo "Skipping Redis on Windows - Integration tests will be disabled"
+      shell: powershell
     
     - name: Restore dependencies
       run: dotnet restore
@@ -71,7 +72,9 @@ jobs:
       if: always()
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.configuration }}
-        path: TestResults-${{ matrix.os }}-${{ matrix.configuration }}
+        path: |
+          TestResults-${{ matrix.os }}-${{ matrix.configuration }}
+          TestResults-Integration-${{ matrix.os }}-${{ matrix.configuration }}
     
     - name: Generate coverage report
       if: matrix.os == 'ubuntu-latest' && matrix.configuration == 'Release'

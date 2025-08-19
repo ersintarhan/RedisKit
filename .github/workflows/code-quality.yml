@@ -10,6 +10,17 @@ jobs:
   analysis:
     runs-on: ubuntu-latest
     
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
     - uses: actions/checkout@v4
       with:
@@ -54,6 +65,8 @@ jobs:
           /p:CoverletOutputFormat="opencover" \
           /p:CoverletOutput="./coverage/" \
           /p:ExcludeByFile="**/Program.cs%2c**/Migrations/**"
+      env:
+        REDIS_CONNECTION: localhost:6379
     
     - name: End SonarCloud analysis
       env:
