@@ -41,15 +41,24 @@ public class RedisFunctionService : IRedisFunction
         {
             _logger.LogDebug("Loading function library, replace: {Replace}", replace);
 
-            var multiplexer = await _connection.GetMultiplexerAsync();
-            var database = multiplexer.GetDatabase();
-            var replaceFlag = replace ? " REPLACE" : "";
+            var database = await _connection.GetDatabaseAsync();
 
-            // Execute FUNCTION LOAD command
-            var result = await database.ExecuteAsync(
-                $"FUNCTION LOAD{replaceFlag}",
-                new[] { (RedisValue)libraryCode }
-            ).ConfigureAwait(false);
+            // Execute FUNCTION LOAD command - pass arguments separately
+            RedisResult result;
+            if (replace)
+            {
+                result = await database.ExecuteAsync(
+                    "FUNCTION",
+                    "LOAD", "REPLACE", libraryCode
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                result = await database.ExecuteAsync(
+                    "FUNCTION",
+                    "LOAD", libraryCode
+                ).ConfigureAwait(false);
+            }
 
             var success = result.ToString() == "OK" || !string.IsNullOrEmpty(result.ToString());
 
@@ -86,8 +95,8 @@ public class RedisFunctionService : IRedisFunction
 
             // Execute FUNCTION DELETE command
             var result = await database.ExecuteAsync(
-                "FUNCTION DELETE",
-                new[] { (RedisValue)libraryName }
+                "FUNCTION",
+                new[] { (RedisValue)"DELETE", (RedisValue)libraryName }
             ).ConfigureAwait(false);
 
             var success = result.ToString() == "OK";
@@ -125,18 +134,24 @@ public class RedisFunctionService : IRedisFunction
 
             var database = await _connection.GetDatabaseAsync();
 
-            // Build command
-            var args = new List<RedisValue>();
-            if (!string.IsNullOrEmpty(libraryNamePattern))
-            {
-                args.Add("LIBRARYNAME");
-                args.Add(libraryNamePattern);
-            }
-
-            if (withCode) args.Add("WITHCODE");
-
             // Execute FUNCTION LIST command
-            var result = await database.ExecuteAsync("FUNCTION LIST", args.ToArray()).ConfigureAwait(false);
+            RedisResult result;
+            if (!string.IsNullOrEmpty(libraryNamePattern) && withCode)
+            {
+                result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
+            }
+            else if (!string.IsNullOrEmpty(libraryNamePattern))
+            {
+                result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
+            }
+            else if (withCode)
+            {
+                result = await database.ExecuteAsync("FUNCTION", "LIST", "WITHCODE").ConfigureAwait(false);
+            }
+            else
+            {
+                result = await database.ExecuteAsync("FUNCTION", "LIST").ConfigureAwait(false);
+            }
 
             return ParseFunctionList(result);
         }
@@ -178,8 +193,8 @@ public class RedisFunctionService : IRedisFunction
 
             // Execute FUNCTION FLUSH command
             var result = await database.ExecuteAsync(
-                "FUNCTION FLUSH",
-                new[] { (RedisValue)modeStr }
+                "FUNCTION",
+                new[] { (RedisValue)"FLUSH", (RedisValue)modeStr }
             ).ConfigureAwait(false);
 
             var success = result.ToString() == "OK";
@@ -209,7 +224,7 @@ public class RedisFunctionService : IRedisFunction
             var database = await _connection.GetDatabaseAsync();
 
             // Execute FUNCTION STATS command
-            var result = await database.ExecuteAsync("FUNCTION STATS").ConfigureAwait(false);
+            var result = await database.ExecuteAsync("FUNCTION", "STATS").ConfigureAwait(false);
 
             return ParseFunctionStats(result);
         }
@@ -241,14 +256,19 @@ public class RedisFunctionService : IRedisFunction
             try
             {
                 // Try to execute FUNCTION LIST to check support
-                await database.ExecuteAsync("FUNCTION LIST").ConfigureAwait(false);
+                await database.ExecuteAsync("FUNCTION", "LIST").ConfigureAwait(false);
                 _isSupported = true;
                 _logger.LogInformation("Redis Functions are supported");
             }
-            catch (RedisServerException ex) when (ex.Message.Contains("unknown command"))
+            catch (RedisServerException ex) when (ex.Message.Contains("unknown command") || ex.Message.Contains("ERR unknown command"))
             {
                 _isSupported = false;
                 _logger.LogWarning("Redis Functions are not supported. Requires Redis 7.0+");
+            }
+            catch (Exception ex)
+            {
+                _isSupported = false;
+                _logger.LogWarning(ex, "Error checking Redis Functions support. Assuming not supported.");
             }
 
             return _isSupported.Value;
@@ -311,8 +331,22 @@ public class RedisFunctionService : IRedisFunction
                         commandArgs.Add(serialized);
                     }
 
-            // Execute function
-            var result = await database.ExecuteAsync(command, commandArgs.ToArray()).ConfigureAwait(false);
+            // Execute function - must pass as separate parameters, not as array
+            // StackExchange.Redis requires FCALL/FCALL_RO arguments to be passed individually
+            // See: https://stackoverflow.com/questions/72863268/how-to-call-redis-functions-using-stackexchange-redis
+            
+            // Build the complete command: FCALL functionName numkeys key1 key2... arg1 arg2...
+            var fullCommand = new List<RedisValue> { command };
+            fullCommand.AddRange(commandArgs);
+            
+            // Convert to params array - ExecuteAsync uses params RedisValue[]
+            // We need to call it like: ExecuteAsync("FCALL", "functionName", "2", "key1", "key2", "arg1", "arg2")
+            // NOT like: ExecuteAsync("FCALL", new[] { "functionName", "2", "key1", "key2", "arg1", "arg2" })
+            
+            // Since we can't dynamically create a params call, we need to use reflection or
+            // find the overload that takes object[] params
+            var paramsArray = commandArgs.Select(v => (object)v).ToArray();
+            var result = await database.ExecuteAsync(command, paramsArray).ConfigureAwait(false);
 
             if (result.IsNull)
                 return null;
@@ -522,25 +556,55 @@ public class RedisFunctionService : IRedisFunction
 
             switch (key?.ToLower())
             {
-                case "libraries_count":
-                    stats.LibraryCount = (int)value;
-                    break;
-                case "functions_count":
-                    stats.FunctionCount = (int)value;
-                    break;
-                case "memory":
-                    stats.MemoryUsage = (long)value;
-                    break;
                 case "running_script":
                     stats.RunningFunctions = value.IsNull ? 0 : 1;
                     break;
                 case "engines":
                     if (value.Resp3Type == ResultType.Array)
                     {
-                        var engines = (RedisResult[])value!;
-                        stats.Engines = engines.Select(e => e.ToString() ?? string.Empty).ToList();
+                        var enginesArray = (RedisResult[])value!;
+                        var enginesList = new List<string>();
+                        
+                        // Parse engines array - format: ["LUA", ["libraries_count", 1, "functions_count", 2]]
+                        for (var j = 0; j < enginesArray.Length; j += 2)
+                        {
+                            if (j >= enginesArray.Length)
+                                break;
+                                
+                            var engineName = enginesArray[j].ToString();
+                            if (!string.IsNullOrEmpty(engineName))
+                                enginesList.Add(engineName);
+                            
+                            // Parse engine stats
+                            if (j + 1 < enginesArray.Length && enginesArray[j + 1].Resp3Type == ResultType.Array)
+                            {
+                                var engineStats = (RedisResult[])enginesArray[j + 1]!;
+                                for (var k = 0; k < engineStats.Length; k += 2)
+                                {
+                                    if (k + 1 >= engineStats.Length)
+                                        break;
+                                        
+                                    var statKey = engineStats[k].ToString();
+                                    var statValue = engineStats[k + 1];
+                                    
+                                    switch (statKey?.ToLower())
+                                    {
+                                        case "libraries_count":
+                                            stats.LibraryCount = (int)statValue;
+                                            break;
+                                        case "functions_count":
+                                            stats.FunctionCount = (int)statValue;
+                                            break;
+                                        case "memory":
+                                            stats.MemoryUsage = (long)statValue;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        stats.Engines = enginesList;
                     }
-
                     break;
             }
         }

@@ -364,6 +364,15 @@ public class RedisConnection : IRedisConnection, IDisposable
     {
         var timeouts = _options.TimeoutSettings;
 
+        // Use OperationTimeout if it's been explicitly set (different from default 5s)
+        // This provides backwards compatibility with code that sets OperationTimeout
+        if (_options.OperationTimeout != TimeSpan.FromSeconds(5))
+        {
+            timeouts.ConnectTimeout = _options.OperationTimeout;
+            timeouts.SyncTimeout = _options.OperationTimeout;
+            timeouts.AsyncTimeout = _options.OperationTimeout;
+        }
+
         // Ensure reasonable timeout values (prevent extremely small or large settings)
         var connectTimeout = Math.Max(100, Math.Min(60000, (int)timeouts.ConnectTimeout.TotalMilliseconds));
         var syncTimeout = Math.Max(100, Math.Min(60000, (int)timeouts.SyncTimeout.TotalMilliseconds));

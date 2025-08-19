@@ -135,14 +135,21 @@ public class FunctionLibraryBuilder
             // Add each function
             foreach (var function in _functions.Values)
             {
-                var flags = "";
                 if (function.Flags.Length > 0)
                 {
+                    // With flags, use table syntax
                     var flagList = string.Join(", ", function.Flags.Select(f => $"'{f}'"));
-                    flags = $", {{flags = {{{flagList}}}}}";
+                    sb.AppendLine($"redis.register_function({{");
+                    sb.AppendLine($"    function_name = '{function.Name}',");
+                    sb.AppendLine($"    callback = {function.Implementation},");
+                    sb.AppendLine($"    flags = {{{flagList}}}");
+                    sb.AppendLine($"}})");
                 }
-
-                sb.AppendLine($"redis.register_function('{function.Name}', {function.Implementation}{flags})");
+                else
+                {
+                    // Without flags, use simple syntax
+                    sb.AppendLine($"redis.register_function('{function.Name}', {function.Implementation})");
+                }
                 sb.AppendLine();
             }
         }
