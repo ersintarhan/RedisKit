@@ -1,3 +1,5 @@
+namespace RedisKit;
+
 internal static class RedisConstants
 {
     internal const int MaxRedisKeyLength = 512;

@@ -133,7 +133,7 @@ public class RedisFunctionServiceTests
 
         // Assert  
         Assert.False(result);
-        
+
         // Second call should use cached result
         var result2 = await _service.IsSupportedAsync();
         Assert.False(result2);

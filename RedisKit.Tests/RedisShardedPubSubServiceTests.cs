@@ -29,7 +29,7 @@ public class RedisShardedPubSubServiceTests
         // Setup serializer mock - need to use ReturnsForAnyArgs for generic method
         _serializer.SerializeAsync(Arg.Any<TestMessage>(), Arg.Any<CancellationToken>())
             .ReturnsForAnyArgs(Task.FromResult(new byte[] { 1, 2, 3 }));
-        
+
         _service = new RedisShardedPubSubService(_connection, _logger, _options, _serializer);
     }
 
@@ -40,7 +40,7 @@ public class RedisShardedPubSubServiceTests
         const string channel = "test-channel";
         var message = new TestMessage { Id = 1, Content = "Test" };
         _subscriber.PublishAsync(Arg.Any<RedisChannel>(), Arg.Any<RedisValue>()).Returns(Task.FromResult(5L));
-        
+
         // Serializer mock is already setup in constructor
 
         // Act

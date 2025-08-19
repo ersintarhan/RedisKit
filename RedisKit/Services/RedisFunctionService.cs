@@ -46,19 +46,15 @@ public class RedisFunctionService : IRedisFunction
             // Execute FUNCTION LOAD command - pass arguments separately
             RedisResult result;
             if (replace)
-            {
                 result = await database.ExecuteAsync(
                     "FUNCTION",
                     "LOAD", "REPLACE", libraryCode
                 ).ConfigureAwait(false);
-            }
             else
-            {
                 result = await database.ExecuteAsync(
                     "FUNCTION",
                     "LOAD", libraryCode
                 ).ConfigureAwait(false);
-            }
 
             var success = result.ToString() == "OK" || !string.IsNullOrEmpty(result.ToString());
 
@@ -137,21 +133,13 @@ public class RedisFunctionService : IRedisFunction
             // Execute FUNCTION LIST command
             RedisResult result;
             if (!string.IsNullOrEmpty(libraryNamePattern) && withCode)
-            {
                 result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
-            }
             else if (!string.IsNullOrEmpty(libraryNamePattern))
-            {
                 result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
-            }
             else if (withCode)
-            {
                 result = await database.ExecuteAsync("FUNCTION", "LIST", "WITHCODE").ConfigureAwait(false);
-            }
             else
-            {
                 result = await database.ExecuteAsync("FUNCTION", "LIST").ConfigureAwait(false);
-            }
 
             return ParseFunctionList(result);
         }
@@ -334,15 +322,15 @@ public class RedisFunctionService : IRedisFunction
             // Execute function - must pass as separate parameters, not as array
             // StackExchange.Redis requires FCALL/FCALL_RO arguments to be passed individually
             // See: https://stackoverflow.com/questions/72863268/how-to-call-redis-functions-using-stackexchange-redis
-            
+
             // Build the complete command: FCALL functionName numkeys key1 key2... arg1 arg2...
             var fullCommand = new List<RedisValue> { command };
             fullCommand.AddRange(commandArgs);
-            
+
             // Convert to params array - ExecuteAsync uses params RedisValue[]
             // We need to call it like: ExecuteAsync("FCALL", "functionName", "2", "key1", "key2", "arg1", "arg2")
             // NOT like: ExecuteAsync("FCALL", new[] { "functionName", "2", "key1", "key2", "arg1", "arg2" })
-            
+
             // Since we can't dynamically create a params call, we need to use reflection or
             // find the overload that takes object[] params
             var paramsArray = commandArgs.Select(v => (object)v).ToArray();
@@ -380,19 +368,19 @@ public class RedisFunctionService : IRedisFunction
             if (result.Resp3Type == ResultType.Array)
             {
                 var arrayType = typeof(T);
-                
+
                 // Check if T is an array type
                 if (arrayType.IsArray)
                 {
                     var elementType = arrayType.GetElementType()!;
                     var arrayResult = (RedisResult[])result!;
                     var typedArray = Array.CreateInstance(elementType, arrayResult.Length);
-                    
-                    for (int i = 0; i < arrayResult.Length; i++)
+
+                    for (var i = 0; i < arrayResult.Length; i++)
                     {
                         object? element = null;
                         var item = arrayResult[i];
-                        
+
                         if (elementType == typeof(string))
                         {
                             element = item.ToString();
@@ -415,13 +403,13 @@ public class RedisFunctionService : IRedisFunction
                             var bytes = (byte[])item!;
                             element = await _serializer.DeserializeAsync(bytes, elementType, cancellationToken);
                         }
-                        
+
                         typedArray.SetValue(element, i);
                     }
-                    
+
                     return (T)(object)typedArray;
                 }
-                
+
                 // If T is a List<> or IEnumerable<>, we could handle those too
                 // For now, throw exception for non-array collection types
                 throw new NotSupportedException($"Collection type {typeof(T).Name} is not yet supported. Use array types (T[]) instead.");
@@ -564,17 +552,17 @@ public class RedisFunctionService : IRedisFunction
                     {
                         var enginesArray = (RedisResult[])value!;
                         var enginesList = new List<string>();
-                        
+
                         // Parse engines array - format: ["LUA", ["libraries_count", 1, "functions_count", 2]]
                         for (var j = 0; j < enginesArray.Length; j += 2)
                         {
                             if (j >= enginesArray.Length)
                                 break;
-                                
+
                             var engineName = enginesArray[j].ToString();
                             if (!string.IsNullOrEmpty(engineName))
                                 enginesList.Add(engineName);
-                            
+
                             // Parse engine stats
                             if (j + 1 < enginesArray.Length && enginesArray[j + 1].Resp3Type == ResultType.Array)
                             {
@@ -583,10 +571,10 @@ public class RedisFunctionService : IRedisFunction
                                 {
                                     if (k + 1 >= engineStats.Length)
                                         break;
-                                        
+
                                     var statKey = engineStats[k].ToString();
                                     var statValue = engineStats[k + 1];
-                                    
+
                                     switch (statKey?.ToLower())
                                     {
                                         case "libraries_count":
@@ -602,9 +590,10 @@ public class RedisFunctionService : IRedisFunction
                                 }
                             }
                         }
-                        
+
                         stats.Engines = enginesList;
                     }
+
                     break;
             }
         }

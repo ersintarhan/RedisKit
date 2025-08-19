@@ -32,10 +32,10 @@ namespace RedisKit.Builders;
 /// </example>
 public class FunctionLibraryBuilder
 {
-    private string? _libraryName;
-    private string _engine = "LUA";
-    private string? _description;
     private readonly Dictionary<string, FunctionDefinition> _functions = new();
+    private string? _description;
+    private string _engine = "LUA";
+    private string? _libraryName;
 
     /// <summary>
     ///     Sets the library name (required)
@@ -139,17 +139,18 @@ public class FunctionLibraryBuilder
                 {
                     // With flags, use table syntax
                     var flagList = string.Join(", ", function.Flags.Select(f => $"'{f}'"));
-                    sb.AppendLine($"redis.register_function({{");
+                    sb.AppendLine("redis.register_function({");
                     sb.AppendLine($"    function_name = '{function.Name}',");
                     sb.AppendLine($"    callback = {function.Implementation},");
                     sb.AppendLine($"    flags = {{{flagList}}}");
-                    sb.AppendLine($"}})");
+                    sb.AppendLine("})");
                 }
                 else
                 {
                     // Without flags, use simple syntax
                     sb.AppendLine($"redis.register_function('{function.Name}', {function.Implementation})");
                 }
+
                 sb.AppendLine();
             }
         }
@@ -169,10 +170,7 @@ public class FunctionLibraryBuilder
             foreach (var function in _functions.Values)
             {
                 sb.AppendLine($"// Function: {function.Name}");
-                if (function.Flags.Length > 0)
-                {
-                    sb.AppendLine($"// Flags: {string.Join(", ", function.Flags)}");
-                }
+                if (function.Flags.Length > 0) sb.AppendLine($"// Flags: {string.Join(", ", function.Flags)}");
                 sb.AppendLine(function.Implementation);
                 sb.AppendLine();
             }
