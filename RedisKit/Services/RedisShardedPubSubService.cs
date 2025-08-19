@@ -364,7 +364,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         // Use native sharded channel support
         await subscriber.SubscribeAsync(
             RedisChannel.Sharded(channelOrPattern),
-            async (channel, value) => await HandleMessageAsync(channel.ToString(), value, false)
+            async (channel, value) => await HandleMessageAsync(RedisChannel.Literal(channel.ToString()), value, false)
         ).ConfigureAwait(false);
     }
 

@@ -11,18 +11,18 @@ namespace RedisKit.Serialization;
 /// </summary>
 public static class RedisSerializerFactory
 {
-    private static readonly ConcurrentDictionary<Type, object> _customSerializers = new();
-    private static readonly ConcurrentDictionary<string, IRedisSerializer> _serializerCache = new();
+    private static readonly ConcurrentDictionary<Type, object> CustomSerializers = new();
+    private static readonly ConcurrentDictionary<string, IRedisSerializer> SerializerCache = new();
 
     /// <summary>
     ///     Gets the number of cached serializers
     /// </summary>
-    public static int CacheSize => _serializerCache.Count;
+    public static int CacheSize => SerializerCache.Count;
 
     /// <summary>
     ///     Gets the number of registered custom serializers
     /// </summary>
-    public static int CustomSerializerCount => _customSerializers.Count;
+    public static int CustomSerializerCount => CustomSerializers.Count;
 
     /// <summary>
     ///     Creates a serializer instance based on the specified type
@@ -33,7 +33,7 @@ public static class RedisSerializerFactory
     public static IRedisSerializer Create(SerializerType serializerType, ILoggerFactory? loggerFactory = null)
     {
         var cacheKey = $"{serializerType}";
-        return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, null, loggerFactory));
+        return SerializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, null, loggerFactory));
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public static class RedisSerializerFactory
         ILoggerFactory? loggerFactory = null) where TOptions : class
     {
         var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-        return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerWithTypedOptions(serializerType, options, loggerFactory));
+        return SerializerCache.GetOrAdd(cacheKey, _ => CreateSerializerWithTypedOptions(serializerType, options, loggerFactory));
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public static class RedisSerializerFactory
             return Create(serializerType, loggerFactory);
 
         var cacheKey = $"{serializerType}_{options.GetHashCode()}";
-        return _serializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, options, loggerFactory));
+        return SerializerCache.GetOrAdd(cacheKey, _ => CreateSerializerInstance(serializerType, options, loggerFactory));
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public static class RedisSerializerFactory
     public static IRedisSerializer CreateCustom(Type serializerType, ILoggerFactory? loggerFactory = null)
     {
         ValidateCustomSerializerType(serializerType);
-        return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, null));
+        return (IRedisSerializer)CustomSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, null));
     }
 
     /// <summary>
@@ -89,8 +89,7 @@ public static class RedisSerializerFactory
     public static IRedisSerializer CreateCustom(Type serializerType, object options, ILoggerFactory? loggerFactory = null)
     {
         ValidateCustomSerializerType(serializerType);
-        var cacheKey = $"Custom_{serializerType.FullName}_{options.GetHashCode()}";
-        return (IRedisSerializer)_customSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, options));
+        return (IRedisSerializer)CustomSerializers.GetOrAdd(serializerType, type => CreateCustomSerializerInstance(type, options));
     }
 
     /// <summary>
@@ -101,7 +100,7 @@ public static class RedisSerializerFactory
     {
         ValidateCustomSerializerType(serializerType);
         var instance = CreateCustomSerializerInstance(serializerType, null);
-        _customSerializers[serializerType] = instance;
+        CustomSerializers[serializerType] = instance;
     }
 
     /// <summary>
@@ -111,7 +110,7 @@ public static class RedisSerializerFactory
     /// <param name="serializer">The serializer instance</param>
     public static void RegisterCustomSerializer<TSerializer>(TSerializer serializer) where TSerializer : IRedisSerializer
     {
-        _customSerializers[typeof(TSerializer)] = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        CustomSerializers[typeof(TSerializer)] = serializer ?? throw new ArgumentNullException(nameof(serializer));
     }
 
     /// <summary>
@@ -122,10 +121,14 @@ public static class RedisSerializerFactory
     /// <returns>True if the serializer was found, false otherwise</returns>
     public static bool TryGetCustomSerializer<TSerializer>(out TSerializer? serializer) where TSerializer : IRedisSerializer
     {
-        if (_customSerializers.TryGetValue(typeof(TSerializer), out var instance))
+        if (CustomSerializers.TryGetValue(typeof(TSerializer), out var instance))
         {
             serializer = instance is TSerializer typedSerializer ? typedSerializer : default;
-            return serializer != null;
+            if (serializer is not null)
+            {
+                return true;
+            }
+            
         }
 
         serializer = default;
@@ -137,8 +140,8 @@ public static class RedisSerializerFactory
     /// </summary>
     public static void ClearCache()
     {
-        _serializerCache.Clear();
-        _customSerializers.Clear();
+        SerializerCache.Clear();
+        CustomSerializers.Clear();
     }
 
     #region Private Helper Methods
@@ -259,8 +262,7 @@ public static class RedisSerializerFactory
         Type actualType)
     {
         return new ArgumentException(
-            $"Invalid options type for {serializerType} serializer. Expected {expectedType.Name}, got {actualType.Name}",
-            "options");
+            $"Invalid options type for {serializerType} serializer. Expected {expectedType.Name}, got {actualType.Name}");
     }
 
     #endregion

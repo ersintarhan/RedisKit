@@ -18,7 +18,7 @@ public class Program
         Console.WriteLine("Test 1: MessagePack Serializer (Default)");
         var services1 = new ServiceCollection();
         services1.AddLogging(builder => builder.AddConsole());
-        services1.AddRedisServices(options =>
+        services1.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
             options.Serializer = SerializerType.MessagePack;
@@ -43,7 +43,7 @@ public class Program
         Console.WriteLine("\nTest 2: System.Text.Json Serializer");
         var services2 = new ServiceCollection();
         services2.AddLogging(builder => builder.AddConsole());
-        services2.AddRedisServices(options =>
+        services2.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
             options.Serializer = SerializerType.SystemTextJson;

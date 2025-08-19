@@ -78,8 +78,7 @@ internal class MessagePackRedisSerializer : IRedisSerializer
     ///     Uses MessagePackSerializerOptions.Standard which provides a good balance of features.
     ///     For production use, consider using custom options with compression enabled.
     /// </remarks>
-    public MessagePackRedisSerializer()
-        : this(null, null)
+    public MessagePackRedisSerializer() : this(null, null)
     {
     }
 
@@ -103,8 +102,7 @@ internal class MessagePackRedisSerializer : IRedisSerializer
     /// var serializer = new MessagePackRedisSerializer(options);
     /// </code>
     /// </example>
-    public MessagePackRedisSerializer(MessagePackSerializerOptions? options)
-        : this(null, options)
+    public MessagePackRedisSerializer(MessagePackSerializerOptions? options) : this(null, options)
     {
     }
 
@@ -171,43 +169,6 @@ internal class MessagePackRedisSerializer : IRedisSerializer
     }
 
     /// <summary>
-    ///     Deserializes a MessagePack binary byte array to an object synchronously.
-    /// </summary>
-    /// <typeparam name="T">The target type for deserialization.</typeparam>
-    /// <param name="data">The MessagePack binary byte array. Can be null or empty.</param>
-    /// <returns>
-    ///     The deserialized object of type T, or default(T) if the data is null or empty.
-    /// </returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when deserialization fails due to:
-    ///     - Invalid MessagePack format
-    ///     - Type mismatch
-    ///     - Missing required fields
-    ///     - Data corruption
-    /// </exception>
-    /// <remarks>
-    ///     Empty or null arrays return default(T) for graceful handling.
-    ///     The binary format must match the expected MessagePack structure.
-    ///     Type compatibility is validated during deserialization.
-    /// </remarks>
-    public T? Deserialize<T>(byte[] data)
-    {
-        if (data == null || data.Length == 0)
-            return default;
-
-        try
-        {
-            _logger?.LogMessagePackDeserialize(data.Length, typeof(T).Name);
-            return MessagePackSerializer.Deserialize<T>(data, _options);
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogMessagePackDeserializeError(typeof(T).Name, data.Length, ex);
-            throw new InvalidOperationException($"Failed to deserialize data to type {typeof(T).Name} using MessagePack", ex);
-        }
-    }
-
-    /// <summary>
     ///     Asynchronously serializes an object to a MessagePack binary byte array.
     /// </summary>
     /// <typeparam name="T">The type of object to serialize.</typeparam>
@@ -247,6 +208,54 @@ internal class MessagePackRedisSerializer : IRedisSerializer
             throw new InvalidOperationException($"Failed to serialize object of type {typeof(T).Name} using MessagePack", ex);
         }
     }
+
+
+    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await using var stream = StreamManager.GetStream();
+        await MessagePackSerializer.SerializeAsync(stream, value, _options, cancellationToken);
+        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
+        return (int)stream.Length;
+    }
+
+
+    /// <summary>
+    ///     Deserializes a MessagePack binary byte array to an object synchronously.
+    /// </summary>
+    /// <typeparam name="T">The target type for deserialization.</typeparam>
+    /// <param name="data">The MessagePack binary byte array. Can be null or empty.</param>
+    /// <returns>
+    ///     The deserialized object of type T, or default(T) if the data is null or empty.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when deserialization fails due to:
+    ///     - Invalid MessagePack format
+    ///     - Type mismatch
+    ///     - Missing required fields
+    ///     - Data corruption
+    /// </exception>
+    /// <remarks>
+    ///     Empty or null arrays return default(T) for graceful handling.
+    ///     The binary format must match the expected MessagePack structure.
+    ///     Type compatibility is validated during deserialization.
+    /// </remarks>
+    public T? Deserialize<T>(byte[] data)
+    {
+        if (data == null || data.Length == 0)
+            return default;
+
+        try
+        {
+            _logger?.LogMessagePackDeserialize(data.Length, typeof(T).Name);
+            return MessagePackSerializer.Deserialize<T>(data, _options);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogMessagePackDeserializeError(typeof(T).Name, data.Length, ex);
+            throw new InvalidOperationException($"Failed to deserialize data to type {typeof(T).Name} using MessagePack", ex);
+        }
+    }
+
 
     /// <summary>
     ///     Asynchronously deserializes a MessagePack binary byte array to an object.
@@ -329,18 +338,10 @@ internal class MessagePackRedisSerializer : IRedisSerializer
         }
     }
 
-    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        await using var stream = StreamManager.GetStream();
-        await MessagePackSerializer.SerializeAsync(stream, value, _options, cancellationToken);
-        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
-        return (int)stream.Length;
-    }
-
     public ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
         if (data.IsEmpty) return new ValueTask<T?>(default(T));
-        return new ValueTask<T?>((T?)MessagePackSerializer.Deserialize<T>(data, _options, cancellationToken));
+        return new ValueTask<T?>(MessagePackSerializer.Deserialize<T>(data, _options, cancellationToken));
     }
 
     public ValueTask<object?> DeserializeAsync(ReadOnlyMemory<byte> data, Type type, CancellationToken cancellationToken = default)

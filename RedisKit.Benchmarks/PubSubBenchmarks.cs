@@ -43,7 +43,7 @@ public class PubSubBenchmarks : IDisposable
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
 
-        services.AddRedisServices(options =>
+        services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379"; // Will be mocked
             options.Serializer = SerializerType.MessagePack;

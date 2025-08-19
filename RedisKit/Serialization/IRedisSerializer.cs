@@ -104,34 +104,18 @@ public interface IRedisSerializer
     /// </code>
     /// </example>
     byte[] Serialize<T>(T obj);
-
+    
+    
     /// <summary>
-    ///     Deserializes a byte array to an object synchronously.
+    ///     Asynchronously serializes an object to a buffer.
     /// </summary>
-    /// <typeparam name="T">The type of object to deserialize to.</typeparam>
-    /// <param name="data">The byte array containing serialized data. Can be null or empty.</param>
-    /// <returns>
-    ///     The deserialized object, or null/default if the input is null, empty, or deserialization fails.
-    /// </returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when the data cannot be deserialized to the specified type.
-    /// </exception>
-    /// <remarks>
-    ///     This method should handle null or empty inputs gracefully by returning default(T).
-    ///     Type mismatches should be handled with clear error messages.
-    ///     The method should be able to deserialize data created by the corresponding Serialize method.
-    /// </remarks>
-    /// <example>
-    ///     <code>
-    /// byte[] data = GetFromRedis("user:1");
-    /// var user = serializer.Deserialize&lt;User&gt;(data);
-    /// if (user != null)
-    /// {
-    ///     Console.WriteLine($"Retrieved user: {user.Name}");
-    /// }
-    /// </code>
-    /// </example>
-    T? Deserialize<T>(byte[] data);
+    /// <typeparam name="T">The type of object to serialize.</typeparam>
+    /// <param name="value">The object to serialize.</param>
+    /// <param name="buffer">The buffer to write the serialized data to.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>The number of bytes written to the buffer.</returns>
+    ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default);
+
 
     /// <summary>
     ///     Asynchronously serializes an object to a byte array.
@@ -163,6 +147,40 @@ public interface IRedisSerializer
     /// </example>
     Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default);
 
+    
+    
+    
+    
+
+    /// <summary>
+    ///     Deserializes a byte array to an object synchronously.
+    /// </summary>
+    /// <typeparam name="T">The type of object to deserialize to.</typeparam>
+    /// <param name="data">The byte array containing serialized data. Can be null or empty.</param>
+    /// <returns>
+    ///     The deserialized object, or null/default if the input is null, empty, or deserialization fails.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when the data cannot be deserialized to the specified type.
+    /// </exception>
+    /// <remarks>
+    ///     This method should handle null or empty inputs gracefully by returning default(T).
+    ///     Type mismatches should be handled with clear error messages.
+    ///     The method should be able to deserialize data created by the corresponding Serialize method.
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// byte[] data = GetFromRedis("user:1");
+    /// var user = serializer.Deserialize&lt;User&gt;(data);
+    /// if (user != null)
+    /// {
+    ///     Console.WriteLine($"Retrieved user: {user.Name}");
+    /// }
+    /// </code>
+    /// </example>
+    T? Deserialize<T>(byte[] data);
+    
+    
     /// <summary>
     ///     Asynchronously deserializes a byte array to an object.
     /// </summary>
@@ -236,15 +254,6 @@ public interface IRedisSerializer
     /// </example>
     Task<object?> DeserializeAsync(byte[] data, Type type, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Asynchronously serializes an object to a buffer.
-    /// </summary>
-    /// <typeparam name="T">The type of object to serialize.</typeparam>
-    /// <param name="value">The object to serialize.</param>
-    /// <param name="buffer">The buffer to write the serialized data to.</param>
-    /// <param name="cancellationToken">Token to cancel the operation.</param>
-    /// <returns>The number of bytes written to the buffer.</returns>
-    ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Asynchronously deserializes a memory region to an object.

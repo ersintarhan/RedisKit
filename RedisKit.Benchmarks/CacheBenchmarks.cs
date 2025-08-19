@@ -58,7 +58,7 @@ public class CacheBenchmarks : IDisposable
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
 
         // Mock Redis for benchmarking (we'll use in-memory mock)
-        services.AddRedisServices(options =>
+        services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379"; // Will be mocked
             options.DefaultTtl = TimeSpan.FromMinutes(10);

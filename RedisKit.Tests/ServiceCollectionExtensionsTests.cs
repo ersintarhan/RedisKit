@@ -20,16 +20,16 @@ public class ServiceCollectionExtensionsTests
     #region Service Resolution Tests
 
     [Fact]
-    public void AddRedisServices_MultipleRegistrations_ThrowsOrOverwrites()
+    public void AddRedisKit_MultipleRegistrations_ThrowsOrOverwrites()
     {
         // Act - Register twice with different configurations
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = "first:6379";
             options.CacheKeyPrefix = "first:";
         });
 
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = "second:6379";
             options.CacheKeyPrefix = "second:";
@@ -45,36 +45,36 @@ public class ServiceCollectionExtensionsTests
 
     #endregion
 
-    #region AddRedisServices Tests
+    #region AddRedisKit Legacy Tests
 
     [Fact]
-    public void AddRedisServices_WithNullServices_ThrowsArgumentNullException()
+    public void AddRedisKit_WithNullServices_ThrowsArgumentNullException()
     {
         // Arrange
         IServiceCollection? services = null;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            services!.AddRedisServices(options => { }));
+            services!.AddRedisKit(options => { }));
     }
 
     [Fact]
-    public void AddRedisServices_WithNullConfigureOptions_ThrowsArgumentNullException()
+    public void AddRedisKit_WithNullConfigureOptions_ThrowsArgumentNullException()
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            _services.AddRedisServices(null!));
+            _services.AddRedisKit(null!));
     }
 
     [Fact]
-    public void AddRedisServices_RegistersRedisOptions_Correctly()
+    public void AddRedisKit_RegistersRedisOptions_Correctly()
     {
         // Arrange
         var expectedConnectionString = "test-redis:6379";
         var expectedTtl = TimeSpan.FromMinutes(10);
 
         // Act
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = expectedConnectionString;
             options.DefaultTtl = expectedTtl;
@@ -135,20 +135,20 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_ReturnsServiceCollection_ForChaining()
+    public void AddRedisKit_ReturnsServiceCollection_ForChaining()
     {
         // Act
-        var result = _services.AddRedisServices(options => { options.ConnectionString = "localhost:6379"; });
+        var result = _services.AddRedisKit(options => { options.ConnectionString = "localhost:6379"; });
 
         // Assert
         Assert.Same(_services, result);
     }
 
     [Fact]
-    public void AddRedisServices_WithCustomSerializer_ConfiguresCorrectly()
+    public void AddRedisKit_WithCustomSerializer_ConfiguresCorrectly()
     {
         // Act
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
             options.Serializer = SerializerType.MessagePack;
@@ -162,7 +162,7 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_WithAllOptions_ConfiguresCorrectly()
+    public void AddRedisKit_WithAllOptions_ConfiguresCorrectly()
     {
         // Arrange
         var expectedConnectionString = "redis-cluster:6379";
@@ -174,7 +174,7 @@ public class ServiceCollectionExtensionsTests
         var expectedRetryDelay = TimeSpan.FromSeconds(2);
 
         // Act
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = expectedConnectionString;
             options.DefaultTtl = expectedTtl;
@@ -254,11 +254,11 @@ public class ServiceCollectionExtensionsTests
     #region Validation Tests
 
     [Fact]
-    public void AddRedisServices_WithEmptyConnectionString_DoesNotThrowDuringRegistration()
+    public void AddRedisKit_WithEmptyConnectionString_DoesNotThrowDuringRegistration()
     {
         // Registration should succeed, but connection creation would fail later
         // Act & Assert - Should not throw during registration
-        _services.AddRedisServices(options => { options.ConnectionString = ""; });
+        _services.AddRedisKit(options => { options.ConnectionString = ""; });
 
         var serviceProvider = _services.BuildServiceProvider();
         var options = serviceProvider.GetRequiredService<IOptions<RedisOptions>>();
@@ -268,10 +268,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddRedisServices_WithInvalidTtl_StoresValue()
+    public void AddRedisKit_WithInvalidTtl_StoresValue()
     {
         // Act
-        _services.AddRedisServices(options =>
+        _services.AddRedisKit(options =>
         {
             options.ConnectionString = "localhost:6379";
             options.DefaultTtl = TimeSpan.FromSeconds(-1); // Invalid TTL

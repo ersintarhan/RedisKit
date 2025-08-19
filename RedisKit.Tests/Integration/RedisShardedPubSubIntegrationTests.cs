@@ -160,9 +160,11 @@ public class RedisShardedPubSubIntegrationTests : IntegrationTestBase
         // Act & Assert
         await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
+#pragma warning disable CS0618 // Type or member is obsolete - Testing that it throws NotSupportedException
             await ShardedPubSubService!.SubscribePatternAsync<TestMessage>(
                 "test:*",
                 async (msg, ct) => await Task.CompletedTask);
+#pragma warning restore CS0618 // Type or member is obsolete
         });
     }
 

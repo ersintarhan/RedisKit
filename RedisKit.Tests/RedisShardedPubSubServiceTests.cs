@@ -59,10 +59,8 @@ public class RedisShardedPubSubServiceTests
     {
         // Arrange
         const string channel = "test-channel";
-        var handlerCalled = false;
-        Func<ShardedChannelMessage<TestMessage>, CancellationToken, Task> handler = (msg, ct) =>
+        Func<ShardedChannelMessage<TestMessage>, CancellationToken, Task> handler = (_, _) =>
         {
-            handlerCalled = true;
             return Task.CompletedTask;
         };
 
@@ -70,6 +68,7 @@ public class RedisShardedPubSubServiceTests
         var token = await _service.SubscribeAsync(channel, handler);
 
         // Assert
+
         Assert.NotNull(token);
         Assert.Equal(channel, token.ChannelOrPattern);
         Assert.Equal(SubscriptionType.Channel, token.Type);

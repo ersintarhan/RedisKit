@@ -172,33 +172,24 @@ public class RedisFunctionService : IRedisFunction
     {
         if (!await EnsureSupportedAsync(cancellationToken)) throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
 
-        try
-        {
-            _logger.LogWarning("Flushing all function libraries, mode: {Mode}", mode);
+        _logger.LogWarning("Flushing all function libraries, mode: {Mode}", mode);
+        var database = await _connection.GetDatabaseAsync();
+        var modeStr = mode == FlushMode.Sync ? "SYNC" : "ASYNC";
 
-            var database = await _connection.GetDatabaseAsync();
-            var modeStr = mode == FlushMode.Sync ? "SYNC" : "ASYNC";
+        // Execute FUNCTION FLUSH command
+        var result = await database.ExecuteAsync(
+            "FUNCTION",
+            "FLUSH", modeStr
+        ).ConfigureAwait(false);
 
-            // Execute FUNCTION FLUSH command
-            var result = await database.ExecuteAsync(
-                "FUNCTION",
-                "FLUSH", modeStr
-            ).ConfigureAwait(false);
+        var success = result.ToString() == "OK";
 
-            var success = result.ToString() == "OK";
+        if (success)
+            _logger.LogInformation("All function libraries flushed successfully");
+        else
+            _logger.LogError("Failed to flush function libraries");
 
-            if (success)
-                _logger.LogInformation("All function libraries flushed successfully");
-            else
-                _logger.LogError("Failed to flush function libraries");
-
-            return success;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error flushing function libraries");
-            throw;
-        }
+        return success;
     }
 
     public async Task<FunctionStats> GetStatsAsync(CancellationToken cancellationToken = default)
@@ -415,17 +406,12 @@ public class RedisFunctionService : IRedisFunction
                 throw new NotSupportedException($"Collection type {typeof(T).Name} is not yet supported. Use array types (T[]) instead.");
             }
 
-            return default;
+            return null;
         }
         catch (RedisServerException ex)
         {
             _logger.LogError(ex, "Function execution error: {Message}", ex.Message);
             throw new InvalidOperationException($"Function execution failed: {ex.Message}", ex);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error calling function {FunctionName}", functionName);
-            throw;
         }
     }
 

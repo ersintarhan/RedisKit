@@ -62,8 +62,7 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
     /// <remarks>
     ///     Uses default JsonSerializerOptions with camelCase naming policy and compact formatting.
     /// </remarks>
-    public SystemTextJsonRedisSerializer()
-        : this(null, null)
+    public SystemTextJsonRedisSerializer() : this(null, null)
     {
     }
 
@@ -89,8 +88,7 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
     /// var serializer = new SystemTextJsonRedisSerializer(options);
     /// </code>
     /// </example>
-    public SystemTextJsonRedisSerializer(JsonSerializerOptions? options)
-        : this(null, options)
+    public SystemTextJsonRedisSerializer(JsonSerializerOptions? options) : this(null, options)
     {
     }
 
@@ -132,6 +130,7 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
     /// </summary>
     /// <value>Returns "SystemTextJson" to identify this as the System.Text.Json implementation.</value>
     public string Name => "SystemTextJson";
+
 
     /// <summary>
     ///     Serializes an object to a UTF-8 encoded JSON byte array synchronously.
@@ -199,59 +198,6 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
         }
     }
 
-    /// <summary>
-    ///     Deserializes a UTF-8 encoded JSON byte array to an object synchronously.
-    /// </summary>
-    /// <typeparam name="T">The target type for deserialization.</typeparam>
-    /// <param name="data">The UTF-8 encoded JSON byte array. Must not be null.</param>
-    /// <returns>
-    ///     The deserialized object of type T, or default(T) if the data array is empty.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">Thrown when data is null.</exception>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when deserialization fails due to:
-    ///     - Invalid JSON syntax
-    ///     - Type mismatch between JSON and target type
-    ///     - Missing required properties
-    ///     - Invalid UTF-8 encoding
-    /// </exception>
-    /// <remarks>
-    ///     Empty arrays return default(T) for graceful handling of missing cache entries.
-    ///     Large data (>10MB) triggers a warning log for monitoring potential memory issues.
-    ///     The method validates JSON structure and type compatibility during deserialization.
-    /// </remarks>
-    public T? Deserialize<T>(byte[] data)
-    {
-        if (data == null)
-            throw new ArgumentNullException(nameof(data));
-
-        if (data.Length == 0)
-            return default;
-
-        // Validate for extremely large data to prevent memory issues
-        if (data.Length > 10 * 1024 * 1024) // 10MB limit
-            _logger?.LogLargeDataDeserializationWarning(data.Length, typeof(T).Name);
-
-        try
-        {
-            _logger?.LogJsonDeserialize(data.Length, typeof(T).Name);
-
-            return JsonSerializer.Deserialize<T>(data, Options);
-        }
-        catch (JsonException jsonEx)
-        {
-            _logger?.LogJsonDeserializeError(typeof(T).Name, data.Length, jsonEx.Message, jsonEx);
-            throw new InvalidOperationException(
-                $"Failed to deserialize data to type {typeof(T).Name}: {jsonEx.Message}", jsonEx);
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "Unexpected error when deserializing data to type {Type}", typeof(T).Name);
-            throw new InvalidOperationException(
-                $"Failed to deserialize data to type {typeof(T).Name} using System.Text.Json. " +
-                $"Error: {ex.Message}", ex);
-        }
-    }
 
     /// <summary>
     ///     Asynchronously serializes an object to a UTF-8 encoded JSON byte array.
@@ -309,6 +255,69 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
             _logger?.LogError(ex, "Unexpected error when serializing object of type {Type}", typeof(T).Name);
             throw new InvalidOperationException(
                 $"Failed to serialize object of type {typeof(T).Name}: {ex.Message}", ex);
+        }
+    }
+
+    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await using var stream = StreamManager.GetStream();
+        await JsonSerializer.SerializeAsync(stream, value, Options, cancellationToken);
+        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
+        return (int)stream.Length;
+    }
+
+
+    /// <summary>
+    ///     Deserializes a UTF-8 encoded JSON byte array to an object synchronously.
+    /// </summary>
+    /// <typeparam name="T">The target type for deserialization.</typeparam>
+    /// <param name="data">The UTF-8 encoded JSON byte array. Must not be null.</param>
+    /// <returns>
+    ///     The deserialized object of type T, or default(T) if the data array is empty.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown when data is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when deserialization fails due to:
+    ///     - Invalid JSON syntax
+    ///     - Type mismatch between JSON and target type
+    ///     - Missing required properties
+    ///     - Invalid UTF-8 encoding
+    /// </exception>
+    /// <remarks>
+    ///     Empty arrays return default(T) for graceful handling of missing cache entries.
+    ///     Large data (>10MB) triggers a warning log for monitoring potential memory issues.
+    ///     The method validates JSON structure and type compatibility during deserialization.
+    /// </remarks>
+    public T? Deserialize<T>(byte[] data)
+    {
+        if (data == null)
+            throw new ArgumentNullException(nameof(data));
+
+        if (data.Length == 0)
+            return default;
+
+        // Validate for extremely large data to prevent memory issues
+        if (data.Length > 10 * 1024 * 1024) // 10MB limit
+            _logger?.LogLargeDataDeserializationWarning(data.Length, typeof(T).Name);
+
+        try
+        {
+            _logger?.LogJsonDeserialize(data.Length, typeof(T).Name);
+
+            return JsonSerializer.Deserialize<T>(data, Options);
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger?.LogJsonDeserializeError(typeof(T).Name, data.Length, jsonEx.Message, jsonEx);
+            throw new InvalidOperationException(
+                $"Failed to deserialize data to type {typeof(T).Name}: {jsonEx.Message}", jsonEx);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Unexpected error when deserializing data to type {Type}", typeof(T).Name);
+            throw new InvalidOperationException(
+                $"Failed to deserialize data to type {typeof(T).Name} using System.Text.Json. " +
+                $"Error: {ex.Message}", ex);
         }
     }
 
@@ -408,14 +417,6 @@ internal class SystemTextJsonRedisSerializer : IRedisSerializer
             _logger?.LogError(ex, "Failed to deserialize data to type {Type} using System.Text.Json (async)", type.Name);
             throw new InvalidOperationException($"Failed to deserialize data to type {type.Name} using System.Text.Json (async)", ex);
         }
-    }
-
-    public async ValueTask<int> SerializeAsync<T>(T value, Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        await using var stream = StreamManager.GetStream();
-        await JsonSerializer.SerializeAsync(stream, value, Options, cancellationToken);
-        stream.GetBuffer().AsMemory(0, (int)stream.Length).CopyTo(buffer);
-        return (int)stream.Length;
     }
 
     public async ValueTask<T?> DeserializeAsync<T>(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)

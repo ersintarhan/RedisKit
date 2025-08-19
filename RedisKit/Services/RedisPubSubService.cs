@@ -385,9 +385,12 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         CancellationToken cancellationToken = default) where T : class
     {
         // Convert metadata handler to match internal signature
-        Func<string, T, CancellationToken, Task> metadataHandler = async (ch, msg, ct) => { await handler(msg, ch, ct); };
+        async Task MetadataHandler(string ch, T msg, CancellationToken ct)
+        {
+            await handler(msg, ch, ct);
+        }
 
-        return await SubscribeInternalAsync<T>(channel, SubscriptionType.Channel, null!, metadataHandler, cancellationToken);
+        return await SubscribeInternalAsync<T>(channel, SubscriptionType.Channel, null!, MetadataHandler, cancellationToken);
     }
 
     #endregion
@@ -476,10 +479,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
         // Pattern matching - find all matching patterns
         var allHandlers = new List<SubscriptionHandler>();
-        foreach (var kvp in _patternHandlers)
-            if (PatternMatcher.IsMatch(kvp.Key, key))
-                allHandlers.AddRange(kvp.Value);
-
+        allHandlers.AddRange(_patternHandlers.Where(kvp => PatternMatcher.IsMatch(kvp.Key, key)).SelectMany(kvp => kvp.Value));
         return allHandlers.Count > 0 ? allHandlers : null;
     }
 

@@ -161,14 +161,14 @@ public class DistributedLockTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string resource)
+    public async Task AcquireLockAsync_WithInvalidResource_ThrowsArgumentException(string? resource)
     {
         // Arrange
         var expiry = TimeSpan.FromSeconds(10);
         var sut = CreateSut();
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireLockAsync(resource, expiry));
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireLockAsync(resource!, expiry));
     }
 
     [Theory]

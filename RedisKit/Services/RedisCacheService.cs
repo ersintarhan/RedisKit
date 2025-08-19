@@ -18,8 +18,7 @@ namespace RedisKit.Services;
 /// </summary>
 public class RedisCacheService : IRedisCacheService
 {
-    private const string ValueCannotBeNullOrEmpty = "Value cannot be null or empty";
-
+    
     // Lua script for SET with EXPIRE
     private const string SetWithExpireScript = @"
             local count = 0
