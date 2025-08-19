@@ -1,10 +1,10 @@
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using RedisKit.Extensions;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -18,7 +18,6 @@ namespace RedisKit.Services;
 /// </summary>
 public class RedisCacheService : IRedisCacheService
 {
-    
     // Lua script for SET with EXPIRE
     private const string SetWithExpireScript = @"
             local count = 0
@@ -33,17 +32,11 @@ public class RedisCacheService : IRedisCacheService
 
     private readonly IRedisConnection _connection;
     private readonly ILogger<RedisCacheService> _logger;
-    private readonly SemaphoreSlim _luaScriptDetectionLock = new(1, 1);
+    private readonly AsyncLazy<bool> _luaScriptSupport;
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
     private readonly ObjectPool<List<Task>>? _taskListPool;
     private string _keyPrefix = string.Empty;
-
-
-    // Lua script support detection
-    private bool? _supportsLuaScripts;
-
-    private bool _useFallbackMode;
 
     public RedisCacheService(
         IRedisConnection connection,
@@ -65,6 +58,24 @@ public class RedisCacheService : IRedisCacheService
             if (provider is DefaultObjectPoolProvider defaultProvider) defaultProvider.MaximumRetained = _options.Pooling.MaxPoolSize;
             _taskListPool = provider.Create<List<Task>>();
         }
+
+        // Initialize Lua script support detection lazily
+        _luaScriptSupport = new AsyncLazy<bool>(async () =>
+        {
+            try
+            {
+                var database = await GetDatabaseAsync().ConfigureAwait(false);
+                var result = await database.ScriptEvaluateAsync("return 'PONG'").ConfigureAwait(false);
+                var supported = result?.ToString() == "PONG";
+                _logger.LogDebug("Lua script support detected: {Supported}", supported);
+                return supported;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Lua script support check failed, using fallback mode");
+                return false;
+            }
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
 
@@ -75,39 +86,24 @@ public class RedisCacheService : IRedisCacheService
         ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
-        try
-        {
-            _logger.LogGetAsync(prefixedKey);
-            var database = await GetDatabaseAsync();
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogGetAsync(prefixedKey);
+                var database = await GetDatabaseAsync();
 
-            var value = await database.StringGetAsync(prefixedKey).ConfigureAwait(false);
-            if (value.IsNullOrEmpty)
-                return null;
+                var value = await database.StringGetAsync(prefixedKey).ConfigureAwait(false);
+                if (value.IsNullOrEmpty)
+                    return null;
 
-            var result = await _serializer.DeserializeAsync<T>((ReadOnlyMemory<byte>)value, cancellationToken);
-            _logger.LogGetAsyncSuccess(prefixedKey);
-            return result;
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogGetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogGetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogGetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogGetAsyncError(prefixedKey, ex);
-            throw;
-        }
+                var result = await _serializer.DeserializeAsync<T>((ReadOnlyMemory<byte>)value, cancellationToken);
+                _logger.LogGetAsyncSuccess(prefixedKey);
+                return result;
+            },
+            _logger,
+            prefixedKey,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     public async ValueTask SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
@@ -118,46 +114,26 @@ public class RedisCacheService : IRedisCacheService
         ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
-        byte[]? buffer = null;
-        try
-        {
-            _logger.LogSetAsync(prefixedKey);
-            var database = await GetDatabaseAsync();
+        await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogSetAsync(prefixedKey);
+                var database = await GetDatabaseAsync();
 
-            buffer = ArrayPool<byte>.Shared.Rent(1024);
-            var length = await _serializer.SerializeAsync(value, buffer, cancellationToken).ConfigureAwait(false);
-            var serializedValue = new ReadOnlyMemory<byte>(buffer, 0, length);
+                using var buffer = new SafeSerializationBuffer();
+                var length = await _serializer.SerializeAsync(value, buffer.Buffer, cancellationToken).ConfigureAwait(false);
+                var serializedValue = new ReadOnlyMemory<byte>(buffer.Buffer, 0, length);
 
-            var expiry = ttl ?? _options.DefaultTtl;
+                var expiry = ttl ?? _options.DefaultTtl;
 
-            await database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
+                await database.StringSetAsync(prefixedKey, serializedValue, expiry).ConfigureAwait(false);
 
-            _logger.LogSetAsyncSuccess(prefixedKey);
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogSetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogSetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogSetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogSetAsyncError(prefixedKey, ex);
-            throw;
-        }
-        finally
-        {
-            if (buffer != null) ArrayPool<byte>.Shared.Return(buffer);
-        }
+                _logger.LogSetAsyncSuccess(prefixedKey);
+            },
+            _logger,
+            prefixedKey,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     public async Task DeleteAsync(string key, CancellationToken cancellationToken = default)
@@ -167,35 +143,20 @@ public class RedisCacheService : IRedisCacheService
         ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
-        try
-        {
-            _logger.LogDeleteAsync(prefixedKey);
-            var database = await GetDatabaseAsync();
+        await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogDeleteAsync(prefixedKey);
+                var database = await GetDatabaseAsync();
 
-            await database.KeyDeleteAsync(prefixedKey).ConfigureAwait(false);
+                await database.KeyDeleteAsync(prefixedKey).ConfigureAwait(false);
 
-            _logger.LogDeleteAsyncSuccess(prefixedKey);
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogDeleteAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogDeleteAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogDeleteAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDeleteAsyncError(prefixedKey, ex);
-            throw;
-        }
+                _logger.LogDeleteAsyncSuccess(prefixedKey);
+            },
+            _logger,
+            prefixedKey,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     public async Task<Dictionary<string, T?>> GetManyAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken = default) where T : class
@@ -277,7 +238,7 @@ public class RedisCacheService : IRedisCacheService
             _logger.LogSetManyAsync(values.Count);
             var stopwatch = Stopwatch.StartNew();
 
-            await EnsureLuaScriptSupportChecked();
+            // Lua support will be checked lazily when needed
 
             await ProcessBatchesAsync(values, expiry, cancellationToken);
 
@@ -395,20 +356,9 @@ public class RedisCacheService : IRedisCacheService
     }
 
 
-    private async Task EnsureLuaScriptSupportChecked()
+    private async Task<bool> IsLuaSupportedAsync()
     {
-        if (_supportsLuaScripts == null)
-        {
-            await _luaScriptDetectionLock.WaitAsync();
-            try
-            {
-                _supportsLuaScripts ??= await CheckLuaScriptSupport();
-            }
-            finally
-            {
-                _luaScriptDetectionLock.Release();
-            }
-        }
+        return await _luaScriptSupport.Value.ConfigureAwait(false);
     }
 
     private async Task ProcessBatchesAsync<T>(IDictionary<string, T> values, TimeSpan expiry, CancellationToken cancellationToken)
@@ -457,7 +407,8 @@ public class RedisCacheService : IRedisCacheService
 
     private async Task SetChunkAsync((RedisKey Key, RedisValue Value)[] serializedPairs, TimeSpan expiry)
     {
-        if (_supportsLuaScripts.GetValueOrDefault() && !_useFallbackMode && expiry != TimeSpan.Zero)
+        var luaSupported = await IsLuaSupportedAsync().ConfigureAwait(false);
+        if (luaSupported && expiry != TimeSpan.Zero)
             await SetManyWithLuaScript(serializedPairs, expiry);
         else
             await SetManyWithFallback(serializedPairs, expiry);
@@ -474,47 +425,9 @@ public class RedisCacheService : IRedisCacheService
     {
         if (stopwatch.ElapsedMilliseconds > RedisConstants.SlowOperationThreshold)
             _logger.LogSlowSetManyAsync(count, stopwatch.ElapsedMilliseconds,
-                _supportsLuaScripts.GetValueOrDefault() ? "Lua" : "Fallback");
+                _luaScriptSupport.GetValueOrDefault() ? "Lua" : "Fallback");
     }
 
-    private async Task<bool> CheckLuaScriptSupport()
-    {
-        try
-        {
-            var database = await GetDatabaseAsync();
-            // Test with a simple Lua script
-            var testScript = "return redis.call('PING')";
-            var result = await database.ScriptEvaluateAsync(testScript).ConfigureAwait(false);
-            var supported = result.ToString() == "PONG";
-
-            if (supported)
-                _logger.LogLuaScriptSupported();
-            else
-                _logger.LogLuaScriptTestFailed();
-
-            return supported;
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogLuaScriptNotSupported(ex);
-            return false;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogLuaScriptNotSupported(ex);
-            return false;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogLuaScriptNotSupported(ex);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogLuaScriptNotSupported(ex);
-            return false;
-        }
-    }
 
     private static int CalculateOptimalChunkSize(int totalCount)
     {
@@ -542,7 +455,7 @@ public class RedisCacheService : IRedisCacheService
         catch (RedisServerException ex) when (ex.Message.Contains("NOSCRIPT"))
         {
             _logger.LogLuaScriptNotInCache();
-            _useFallbackMode = true;
+            // Fallback to non-Lua implementation
             await SetManyWithFallback(pairs, expiry);
         }
         catch (Exception ex) when (ex is RedisConnectionException ||
@@ -550,13 +463,12 @@ public class RedisCacheService : IRedisCacheService
                                    ex is RedisServerException)
         {
             _logger.LogLuaScriptExecutionFailed(ex);
-            _useFallbackMode = true;
+            // Fallback to non-Lua implementation
             await SetManyWithFallback(pairs, expiry);
         }
         catch (Exception ex)
         {
             _logger.LogLuaScriptExecutionFailed(ex);
-            _useFallbackMode = true;
             throw;
         }
     }

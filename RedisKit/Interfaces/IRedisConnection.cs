@@ -22,7 +22,7 @@ public interface IRedisConnection
     ///     Gets the underlying ConnectionMultiplexer instance.
     /// </summary>
     Task<IConnectionMultiplexer> GetMultiplexerAsync();
-    
+
     /// <summary>
     ///     Gets the current connection health status.
     /// </summary>
@@ -39,7 +39,7 @@ public interface IRedisConnection
     ///     Use this for monitoring dashboards and health endpoints.
     /// </remarks>
     ConnectionHealthStatus GetHealthStatus();
-    
+
     /// <summary>
     ///     Resets the circuit breaker to closed state, allowing connections to proceed.
     /// </summary>

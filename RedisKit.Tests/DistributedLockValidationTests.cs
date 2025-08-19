@@ -5,6 +5,7 @@ using NSubstitute;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
+using StackExchange.Redis;
 using Xunit;
 
 namespace RedisKit.Tests;
@@ -12,8 +13,8 @@ namespace RedisKit.Tests;
 public class DistributedLockValidationTests
 {
     private readonly IRedisConnection _connection;
-    private readonly ILogger<RedisDistributedLock> _logger;
     private readonly RedisDistributedLock _lockService;
+    private readonly ILogger<RedisDistributedLock> _logger;
 
     public DistributedLockValidationTests()
     {
@@ -41,14 +42,14 @@ public class DistributedLockValidationTests
     {
         // Arrange
         var expiry = TimeSpan.FromSeconds(1);
-        var database = Substitute.For<StackExchange.Redis.IDatabaseAsync>();
+        var database = Substitute.For<IDatabaseAsync>();
         _connection.GetDatabaseAsync().Returns(Task.FromResult(database));
         database.StringSetAsync(
-            Arg.Any<StackExchange.Redis.RedisKey>(),
-            Arg.Any<StackExchange.Redis.RedisValue>(),
-            Arg.Any<TimeSpan?>(),
-            Arg.Any<StackExchange.Redis.When>(),
-            Arg.Any<StackExchange.Redis.CommandFlags>())
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                Arg.Any<When>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(false)); // Lock not acquired, but no exception
 
         // Act & Assert
@@ -74,14 +75,14 @@ public class DistributedLockValidationTests
     {
         // Arrange
         var expiry = TimeSpan.FromHours(1);
-        var database = Substitute.For<StackExchange.Redis.IDatabaseAsync>();
+        var database = Substitute.For<IDatabaseAsync>();
         _connection.GetDatabaseAsync().Returns(Task.FromResult(database));
         database.StringSetAsync(
-            Arg.Any<StackExchange.Redis.RedisKey>(),
-            Arg.Any<StackExchange.Redis.RedisValue>(),
-            Arg.Any<TimeSpan?>(),
-            Arg.Any<StackExchange.Redis.When>(),
-            Arg.Any<StackExchange.Redis.CommandFlags>())
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                Arg.Any<When>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(false)); // Lock not acquired, but no exception
 
         // Act & Assert
@@ -144,14 +145,14 @@ public class DistributedLockValidationTests
     {
         // Arrange
         var expiry = TimeSpan.FromSeconds(seconds);
-        var database = Substitute.For<StackExchange.Redis.IDatabaseAsync>();
+        var database = Substitute.For<IDatabaseAsync>();
         _connection.GetDatabaseAsync().Returns(Task.FromResult(database));
         database.StringSetAsync(
-            Arg.Any<StackExchange.Redis.RedisKey>(),
-            Arg.Any<StackExchange.Redis.RedisValue>(),
-            Arg.Any<TimeSpan?>(),
-            Arg.Any<StackExchange.Redis.When>(),
-            Arg.Any<StackExchange.Redis.CommandFlags>())
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                Arg.Any<When>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(false));
 
         // Act & Assert

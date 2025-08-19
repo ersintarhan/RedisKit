@@ -37,12 +37,18 @@ internal sealed class RedisLockHandle : ILockHandle
         // Setup auto-renewal if enabled
         if (enableAutoRenewal && expiry.TotalMilliseconds > 1000)
         {
-            var renewalInterval = TimeSpan.FromMilliseconds(expiry.TotalMilliseconds / 3);
+            var renewalInterval = CalculateRenewalInterval(expiry);
             _renewalTimer = new Timer(
                 async _ => await TryRenewAsync(),
                 null,
                 renewalInterval,
                 renewalInterval);
+
+            _logger?.LogDebug(
+                "Auto-renewal enabled for lock {Resource} with interval: {RenewalInterval}ms (expiry: {Expiry}ms)",
+                Resource,
+                renewalInterval.TotalMilliseconds,
+                expiry.TotalMilliseconds);
         }
     }
 
@@ -141,7 +147,6 @@ internal sealed class RedisLockHandle : ILockHandle
 
         // Release the lock synchronously with timeout to prevent hanging
         if (_isAcquired)
-        {
             try
             {
                 Task.Run(async () => await ReleaseAsync().ConfigureAwait(false))
@@ -151,7 +156,6 @@ internal sealed class RedisLockHandle : ILockHandle
             {
                 _logger?.LogWarning(ex, "Failed to release lock {Resource} during synchronous disposal", Resource);
             }
-        }
     }
 
     private async Task TryRenewAsync()
@@ -177,6 +181,34 @@ internal sealed class RedisLockHandle : ILockHandle
             _logger?.LogError(ex, "Error during lock auto-renewal for resource: {Resource}", Resource);
             _isAcquired = false;
         }
+    }
+
+    /// <summary>
+    ///     Calculates an optimized renewal interval based on lock expiry time.
+    ///     Prevents excessive CPU usage for short-lived locks while ensuring timely renewal.
+    /// </summary>
+    private static TimeSpan CalculateRenewalInterval(TimeSpan expiry)
+    {
+        // Define bounds for renewal interval
+        const int MIN_RENEWAL_MS = 1000; // Minimum 1 second
+        const int MAX_RENEWAL_MS = 30000; // Maximum 30 seconds
+
+        // Calculate interval as 1/3 of expiry (standard practice)
+        var calculatedInterval = expiry.TotalMilliseconds / 3;
+
+        // Apply minimum bound to prevent excessive renewals
+        if (calculatedInterval < MIN_RENEWAL_MS)
+            // For very short locks, use minimum interval
+            return TimeSpan.FromMilliseconds(MIN_RENEWAL_MS);
+
+        // Apply maximum bound for very long locks
+        if (calculatedInterval > MAX_RENEWAL_MS)
+            // For very long locks, cap at maximum interval
+            // This ensures we still renew frequently enough
+            return TimeSpan.FromMilliseconds(MAX_RENEWAL_MS);
+
+        // Use calculated interval if within bounds
+        return TimeSpan.FromMilliseconds(calculatedInterval);
     }
 
     private static string GetLockKey(string resource)

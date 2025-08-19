@@ -104,8 +104,8 @@ public interface IRedisSerializer
     /// </code>
     /// </example>
     byte[] Serialize<T>(T obj);
-    
-    
+
+
     /// <summary>
     ///     Asynchronously serializes an object to a buffer.
     /// </summary>
@@ -147,10 +147,6 @@ public interface IRedisSerializer
     /// </example>
     Task<byte[]> SerializeAsync<T>(T obj, CancellationToken cancellationToken = default);
 
-    
-    
-    
-    
 
     /// <summary>
     ///     Deserializes a byte array to an object synchronously.
@@ -179,8 +175,8 @@ public interface IRedisSerializer
     /// </code>
     /// </example>
     T? Deserialize<T>(byte[] data);
-    
-    
+
+
     /// <summary>
     ///     Asynchronously deserializes a byte array to an object.
     /// </summary>

@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using StackExchange.Redis;
 using RedisKit.Services;
+using StackExchange.Redis;
 using Xunit;
 
 namespace RedisKit.Tests;
@@ -71,13 +71,13 @@ public class RedisLockHandleTests
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
         var newExpiry = TimeSpan.FromSeconds(60);
-        
+
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         // Act
@@ -93,13 +93,13 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(0)));
 
         // Act
@@ -129,13 +129,13 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         // Act
@@ -155,13 +155,13 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         await handle.ReleaseAsync();
@@ -183,14 +183,14 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         // Configure the mock for both sync and async
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         // Act
@@ -209,12 +209,12 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         _database.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         await handle.DisposeAsync();
@@ -237,14 +237,14 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         // Configure the mock for both sync and async
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         // Act
@@ -253,7 +253,7 @@ public class RedisLockHandleTests
         // Assert
         // The IsAcquired property returns false if disposed OR if expired
         // We can't directly test IsAcquired because it checks both _isAcquired AND expiry time
-        
+
         // Verify that the release was attempted
         Thread.Sleep(100); // Give time for async operation
         asyncDatabase.Received().ScriptEvaluateAsync(
@@ -268,12 +268,12 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(30), false, _logger);
-        
+
         _database.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromException<RedisResult>(new RedisException("Connection lost")));
 
         // Act
@@ -281,7 +281,7 @@ public class RedisLockHandleTests
 
         // Assert
         Thread.Sleep(6000); // Wait for timeout (5 seconds) plus buffer
-        
+
         // The warning log happens in the synchronous Dispose method
         _logger.Received().Log(
             LogLevel.Warning,
@@ -296,10 +296,10 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromMilliseconds(1), false, _logger);
-        
+
         // Act
         Thread.Sleep(10); // Wait for expiry
-        
+
         // Assert
         handle.IsAcquired.Should().BeFalse();
     }
@@ -309,13 +309,13 @@ public class RedisLockHandleTests
     {
         // Arrange
         var handle = new RedisLockHandle(_database, "resource", "lockId", TimeSpan.FromSeconds(3), true, _logger);
-        
+
         var asyncDatabase = (IDatabaseAsync)_database;
         asyncDatabase.ScriptEvaluateAsync(
-            Arg.Any<string>(),
-            Arg.Any<RedisKey[]>(),
-            Arg.Any<RedisValue[]>(),
-            Arg.Any<CommandFlags>())
+                Arg.Any<string>(),
+                Arg.Any<RedisKey[]>(),
+                Arg.Any<RedisValue[]>(),
+                Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
         // Act

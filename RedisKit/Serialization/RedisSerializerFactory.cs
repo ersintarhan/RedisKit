@@ -124,11 +124,7 @@ public static class RedisSerializerFactory
         if (CustomSerializers.TryGetValue(typeof(TSerializer), out var instance))
         {
             serializer = instance is TSerializer typedSerializer ? typedSerializer : default;
-            if (serializer is not null)
-            {
-                return true;
-            }
-            
+            if (serializer is not null) return true;
         }
 
         serializer = default;

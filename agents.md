@@ -2,32 +2,6 @@
 
 This is a .NET 9 project that requires Redis for full functionality.
 
-### Quick Setup
-Run the following command to set up the development environment:
-```bash
-sudo bash jules-setup.sh
-```
-
-### Manual Setup
-If automatic setup fails, use these commands:
-
-```bash
-# Install .NET 9 SDK
-wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
-chmod +x dotnet-install.sh
-./dotnet-install.sh --channel 9.0 --install-dir /usr/share/dotnet
-sudo ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
-
-# Install Redis
-sudo apt-get update && sudo apt-get install -y redis-server
-sudo service redis-server start
-
-# Build and test
-dotnet restore
-dotnet build
-dotnet test --filter "Category!=Integration"
-```
-
 ## Project Structure
 
 - **RedisKit/**: Main library implementation

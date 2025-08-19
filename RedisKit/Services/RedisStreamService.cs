@@ -169,7 +169,11 @@ public class RedisStreamService : IRedisStreamService
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+
+        if (options == null)
+            throw new ArgumentNullException(nameof(options));
+
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options), "Options value cannot be null");
 
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
@@ -254,17 +258,17 @@ public class RedisStreamService : IRedisStreamService
                 // Extract the data field and deserialize
                 var value = GetDataFieldValue(entry);
 
-                if (!value.IsNullOrEmpty)
-                    try
-                    {
-                        var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
-                        result[entry.Id!] = deserialized;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
-                        result[entry.Id!] = null;
-                    }
+                if (value.IsNullOrEmpty) continue;
+                try
+                {
+                    var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                    result[entry.Id!] = deserialized;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
+                    result[entry.Id!] = null;
+                }
             }
 
             _logger.LogReadAsyncSuccess(prefixedStream, result.Count);
@@ -353,17 +357,17 @@ public class RedisStreamService : IRedisStreamService
                 // Extract the data field and deserialize
                 var value = GetDataFieldValue(entry);
 
-                if (!value.IsNullOrEmpty)
-                    try
-                    {
-                        var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
-                        result[entry.Id!] = deserialized;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
-                        result[entry.Id!] = null;
-                    }
+                if (value.IsNullOrEmpty) continue;
+                try
+                {
+                    var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                    result[entry.Id!] = deserialized;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
+                    result[entry.Id!] = null;
+                }
             }
 
             _logger.LogReadGroupAsyncSuccess(prefixedStream, groupName, consumerName, result.Count);
@@ -702,16 +706,11 @@ public class RedisStreamService : IRedisStreamService
             var timedOutMessages = await GetTimedOutMessagesAsync(stream, groupName, consumerName, retryConfig, cancellationToken);
             _logger.LogDebug("Found {Count} timed out messages to retry", timedOutMessages.Count);
 
-            foreach (var pendingMessage in timedOutMessages)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
+            foreach (var pendingMessage in timedOutMessages.TakeWhile(_ => !cancellationToken.IsCancellationRequested))
                 await ProcessPendingMessageAsync(
                     stream, groupName, consumerName,
                     pendingMessage.MessageId.ToString(),
                     processor, retryConfig, result, cancellationToken);
-            }
 
             result.ElapsedTime = DateTime.UtcNow - startTime;
             LogRetryCompletion(result);
@@ -1120,13 +1119,12 @@ public class RedisStreamService : IRedisStreamService
             (long)retryConfig.IdleTimeout.TotalMilliseconds,
             new[] { messageId }, cancellationToken);
 
-        if (claimed.Count == 0 || !claimed.ContainsKey(messageId))
+        if (claimed.Count == 0 || !claimed.TryGetValue(messageId, out var message))
         {
             _logger.LogWarning("Failed to claim message {MessageId}", messageId);
             return false;
         }
 
-        var message = claimed[messageId];
         if (message == null)
             return false;
 

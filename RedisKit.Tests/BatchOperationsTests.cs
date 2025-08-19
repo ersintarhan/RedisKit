@@ -1,7 +1,5 @@
 using FluentAssertions;
 using NSubstitute;
-using RedisKit.Interfaces;
-using RedisKit.Models;
 using RedisKit.Serialization;
 using RedisKit.Services;
 using StackExchange.Redis;
@@ -12,14 +10,21 @@ namespace RedisKit.Tests;
 public class BatchOperationsTests
 {
     private readonly IBatch _batch;
-    private readonly IRedisSerializer _serializer;
     private readonly BatchOperations _batchOperations;
+    private readonly IRedisSerializer _serializer;
 
     public BatchOperationsTests()
     {
         _batch = Substitute.For<IBatch>();
         _serializer = Substitute.For<IRedisSerializer>();
         _batchOperations = new BatchOperations(_batch, _serializer);
+    }
+
+
+    private class TestData
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
     }
 
     #region DeleteAsync Tests
@@ -29,7 +34,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "test:key";
-        _batch.KeyDeleteAsync(key, CommandFlags.None)
+        _batch.KeyDeleteAsync(key)
             .Returns(Task.FromResult(true));
 
         // Act
@@ -37,7 +42,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeTrue();
-        await _batch.Received(1).KeyDeleteAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyDeleteAsync(key);
     }
 
     [Fact]
@@ -45,7 +50,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "test:nonexistent";
-        _batch.KeyDeleteAsync(key, CommandFlags.None)
+        _batch.KeyDeleteAsync(key)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -53,7 +58,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyDeleteAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyDeleteAsync(key);
     }
 
     [Fact]
@@ -61,7 +66,7 @@ public class BatchOperationsTests
     {
         // Arrange
         string? key = null;
-        _batch.KeyDeleteAsync(key!, CommandFlags.None)
+        _batch.KeyDeleteAsync(key!)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -69,7 +74,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyDeleteAsync(key!, CommandFlags.None);
+        await _batch.Received(1).KeyDeleteAsync(key!);
     }
 
     [Fact]
@@ -77,7 +82,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "";
-        _batch.KeyDeleteAsync(key, CommandFlags.None)
+        _batch.KeyDeleteAsync(key)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -85,7 +90,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyDeleteAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyDeleteAsync(key);
     }
 
     #endregion
@@ -97,7 +102,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "test:existing";
-        _batch.KeyExistsAsync(key, CommandFlags.None)
+        _batch.KeyExistsAsync(key)
             .Returns(Task.FromResult(true));
 
         // Act
@@ -105,7 +110,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeTrue();
-        await _batch.Received(1).KeyExistsAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyExistsAsync(key);
     }
 
     [Fact]
@@ -113,7 +118,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "test:nonexistent";
-        _batch.KeyExistsAsync(key, CommandFlags.None)
+        _batch.KeyExistsAsync(key)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -121,7 +126,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyExistsAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyExistsAsync(key);
     }
 
     [Fact]
@@ -129,7 +134,7 @@ public class BatchOperationsTests
     {
         // Arrange
         string? key = null;
-        _batch.KeyExistsAsync(key!, CommandFlags.None)
+        _batch.KeyExistsAsync(key!)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -137,7 +142,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyExistsAsync(key!, CommandFlags.None);
+        await _batch.Received(1).KeyExistsAsync(key!);
     }
 
     [Fact]
@@ -145,7 +150,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "";
-        _batch.KeyExistsAsync(key, CommandFlags.None)
+        _batch.KeyExistsAsync(key)
             .Returns(Task.FromResult(false));
 
         // Act
@@ -153,7 +158,7 @@ public class BatchOperationsTests
 
         // Assert
         result.Should().BeFalse();
-        await _batch.Received(1).KeyExistsAsync(key, CommandFlags.None);
+        await _batch.Received(1).KeyExistsAsync(key);
     }
 
     #endregion
@@ -166,25 +171,25 @@ public class BatchOperationsTests
         // Arrange
         const string keyToDelete = "test:delete";
         const string keyToCheck = "test:check";
-        
-        _batch.KeyDeleteAsync(keyToDelete, CommandFlags.None)
+
+        _batch.KeyDeleteAsync(keyToDelete)
             .Returns(Task.FromResult(true));
-        _batch.KeyExistsAsync(keyToCheck, CommandFlags.None)
+        _batch.KeyExistsAsync(keyToCheck)
             .Returns(Task.FromResult(true));
 
         // Act
         var deleteTask = _batchOperations.DeleteAsync(keyToDelete);
         var existsTask = _batchOperations.ExistsAsync(keyToCheck);
-        
+
         var deleteResult = await deleteTask;
         var existsResult = await existsTask;
 
         // Assert
         deleteResult.Should().BeTrue();
         existsResult.Should().BeTrue();
-        
-        await _batch.Received(1).KeyDeleteAsync(keyToDelete, CommandFlags.None);
-        await _batch.Received(1).KeyExistsAsync(keyToCheck, CommandFlags.None);
+
+        await _batch.Received(1).KeyDeleteAsync(keyToDelete);
+        await _batch.Received(1).KeyExistsAsync(keyToCheck);
     }
 
     [Fact]
@@ -193,12 +198,10 @@ public class BatchOperationsTests
         // Arrange
         var keys = new[] { "key1", "key2", "key3" };
         var results = new[] { true, false, true };
-        
-        for (int i = 0; i < keys.Length; i++)
-        {
-            _batch.KeyDeleteAsync(keys[i], CommandFlags.None)
+
+        for (var i = 0; i < keys.Length; i++)
+            _batch.KeyDeleteAsync(keys[i])
                 .Returns(Task.FromResult(results[i]));
-        }
 
         // Act
         var tasks = keys.Select(key => _batchOperations.DeleteAsync(key)).ToArray();
@@ -206,11 +209,8 @@ public class BatchOperationsTests
 
         // Assert
         actualResults.Should().BeEquivalentTo(results);
-        
-        foreach (var key in keys)
-        {
-            await _batch.Received(1).KeyDeleteAsync(key, CommandFlags.None);
-        }
+
+        foreach (var key in keys) await _batch.Received(1).KeyDeleteAsync(key);
     }
 
     [Fact]
@@ -219,12 +219,10 @@ public class BatchOperationsTests
         // Arrange
         var keys = new[] { "key1", "key2", "key3", "key4" };
         var results = new[] { true, true, false, true };
-        
-        for (int i = 0; i < keys.Length; i++)
-        {
-            _batch.KeyExistsAsync(keys[i], CommandFlags.None)
+
+        for (var i = 0; i < keys.Length; i++)
+            _batch.KeyExistsAsync(keys[i])
                 .Returns(Task.FromResult(results[i]));
-        }
 
         // Act
         var tasks = keys.Select(key => _batchOperations.ExistsAsync(key)).ToArray();
@@ -232,11 +230,8 @@ public class BatchOperationsTests
 
         // Assert
         actualResults.Should().BeEquivalentTo(results);
-        
-        foreach (var key in keys)
-        {
-            await _batch.Received(1).KeyExistsAsync(key, CommandFlags.None);
-        }
+
+        foreach (var key in keys) await _batch.Received(1).KeyExistsAsync(key);
     }
 
     #endregion
@@ -248,7 +243,7 @@ public class BatchOperationsTests
     {
         // Arrange
         const string key = "test:key";
-        _batch.KeyDeleteAsync(key, CommandFlags.None)
+        _batch.KeyDeleteAsync(key)
             .Returns(Task.FromResult(true));
 
         // Act
@@ -272,11 +267,4 @@ public class BatchOperationsTests
     }
 
     #endregion
-
-
-    private class TestData
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-    }
 }

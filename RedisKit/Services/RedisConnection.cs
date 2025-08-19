@@ -223,6 +223,23 @@ public class RedisConnection : IRedisConnection, IDisposable
     }
 
     /// <summary>
+    ///     Resets the circuit breaker to closed state, allowing connections to proceed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous reset operation.</returns>
+    /// <remarks>
+    ///     Use this method to manually recover from circuit breaker open state.
+    ///     This is useful when you know the underlying issue has been resolved.
+    ///     The circuit breaker will return to closed state and reset all failure counters.
+    ///     Warning: Only reset the circuit breaker when you're confident the issue is resolved,
+    ///     otherwise it may immediately open again due to continued failures.
+    /// </remarks>
+    public async Task ResetCircuitBreakerAsync()
+    {
+        await _circuitBreaker.ResetAsync().ConfigureAwait(false);
+        _logger.LogCircuitBreakerReset();
+    }
+
+    /// <summary>
     ///     Gets the Redis connection multiplexer with advanced retry and circuit breaker protection.
     /// </summary>
     /// <returns>
@@ -531,23 +548,6 @@ public class RedisConnection : IRedisConnection, IDisposable
         }
 
         return _healthStatus;
-    }
-
-    /// <summary>
-    ///     Resets the circuit breaker to closed state, allowing connections to proceed.
-    /// </summary>
-    /// <returns>A task representing the asynchronous reset operation.</returns>
-    /// <remarks>
-    ///     Use this method to manually recover from circuit breaker open state.
-    ///     This is useful when you know the underlying issue has been resolved.
-    ///     The circuit breaker will return to closed state and reset all failure counters.
-    ///     Warning: Only reset the circuit breaker when you're confident the issue is resolved,
-    ///     otherwise it may immediately open again due to continued failures.
-    /// </remarks>
-    public async Task ResetCircuitBreakerAsync()
-    {
-        await _circuitBreaker.ResetAsync().ConfigureAwait(false);
-        _logger.LogCircuitBreakerReset();
     }
 
     protected virtual void Dispose(bool disposing)

@@ -10,9 +10,9 @@ namespace RedisKit.Tests;
 
 public class RedisCircuitBreakerTests
 {
+    private readonly RedisCircuitBreaker _circuitBreaker;
     private readonly ILogger<RedisCircuitBreaker> _logger;
     private readonly CircuitBreakerSettings _settings;
-    private readonly RedisCircuitBreaker _circuitBreaker;
 
     public RedisCircuitBreakerTests()
     {
@@ -57,14 +57,11 @@ public class RedisCircuitBreakerTests
     public async Task RecordFailureAsync_AfterThreshold_OpensCircuit()
     {
         // Act
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
 
         // Assert
         _circuitBreaker.State.Should().Be(CircuitState.Open);
-        
+
         // Verify logging
         _logger.Received().Log(
             LogLevel.Warning,
@@ -94,10 +91,7 @@ public class RedisCircuitBreakerTests
     public async Task CanExecuteAsync_WhenOpen_ReturnsFalse()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
 
         // Act
         var result = await _circuitBreaker.CanExecuteAsync();
@@ -111,10 +105,7 @@ public class RedisCircuitBreakerTests
     public async Task CanExecuteAsync_AfterBreakDuration_TransitionsToHalfOpen()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
 
         // Act
         await Task.Delay(_settings.BreakDuration.Add(TimeSpan.FromMilliseconds(100)));
@@ -123,7 +114,7 @@ public class RedisCircuitBreakerTests
         // Assert
         result.Should().BeTrue();
         _circuitBreaker.State.Should().Be(CircuitState.HalfOpen);
-        
+
         // Verify logging
         _logger.Received().Log(
             LogLevel.Information,
@@ -137,23 +128,17 @@ public class RedisCircuitBreakerTests
     public async Task RecordSuccessAsync_InHalfOpen_AfterThreshold_ClosesCircuit()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
-        
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
+
         await Task.Delay(_settings.BreakDuration.Add(TimeSpan.FromMilliseconds(100)));
         await _circuitBreaker.CanExecuteAsync(); // Transition to HalfOpen
 
         // Act
-        for (var i = 0; i < _settings.SuccessThreshold; i++)
-        {
-            await _circuitBreaker.RecordSuccessAsync();
-        }
+        for (var i = 0; i < _settings.SuccessThreshold; i++) await _circuitBreaker.RecordSuccessAsync();
 
         // Assert
         _circuitBreaker.State.Should().Be(CircuitState.Closed);
-        
+
         // Verify logging
         _logger.Received().Log(
             LogLevel.Information,
@@ -167,11 +152,8 @@ public class RedisCircuitBreakerTests
     public async Task RecordFailureAsync_InHalfOpen_ReopensCircuit()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
-        
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
+
         await Task.Delay(_settings.BreakDuration.Add(TimeSpan.FromMilliseconds(100)));
         await _circuitBreaker.CanExecuteAsync(); // Transition to HalfOpen
 
@@ -186,10 +168,7 @@ public class RedisCircuitBreakerTests
     public async Task ResetAsync_ResetsToClosedState()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
 
         // Act
         await _circuitBreaker.ResetAsync();
@@ -219,10 +198,7 @@ public class RedisCircuitBreakerTests
     public async Task GetStats_WhenOpen_ReturnsTimeUntilHalfOpen()
     {
         // Arrange
-        for (var i = 0; i < _settings.FailureThreshold; i++)
-        {
-            await _circuitBreaker.RecordFailureAsync();
-        }
+        for (var i = 0; i < _settings.FailureThreshold; i++) await _circuitBreaker.RecordFailureAsync();
 
         // Act
         var stats = _circuitBreaker.GetStats();
@@ -276,7 +252,7 @@ public class RedisCircuitBreakerTests
         // Arrange
         await _circuitBreaker.RecordFailureAsync();
         await _circuitBreaker.RecordFailureAsync();
-        
+
         // Act
         await Task.Delay(TimeSpan.FromMilliseconds(100));
         await _circuitBreaker.RecordSuccessAsync();

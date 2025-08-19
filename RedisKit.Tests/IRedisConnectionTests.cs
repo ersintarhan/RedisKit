@@ -8,7 +8,7 @@ using Xunit;
 namespace RedisKit.Tests;
 
 /// <summary>
-/// Tests for IRedisConnection interface methods
+///     Tests for IRedisConnection interface methods
 /// </summary>
 public class IRedisConnectionTests
 {
@@ -51,7 +51,7 @@ public class IRedisConnectionTests
         status.TotalRequests.Should().Be(100);
         status.FailedRequests.Should().Be(5);
         status.SuccessRate.Should().BeApproximately(0.95, 0.01);
-        
+
         _connection.Received(1).GetHealthStatus();
     }
 
@@ -70,7 +70,7 @@ public class IRedisConnectionTests
             FailedRequests = 100,
             LastError = "Connection timeout"
         };
-        
+
         _connection.GetHealthStatus().Returns(unhealthyStatus);
 
         // Act
@@ -83,7 +83,7 @@ public class IRedisConnectionTests
         status.CircuitState.Should().Be(CircuitState.Open);
         status.LastError.Should().Be("Connection timeout");
         status.SuccessRate.Should().Be(0);
-        
+
         _connection.Received(1).GetHealthStatus();
     }
 
@@ -101,7 +101,7 @@ public class IRedisConnectionTests
             TotalRequests = 50,
             FailedRequests = 10
         };
-        
+
         _connection.GetHealthStatus().Returns(halfOpenStatus);
 
         // Act
@@ -111,7 +111,7 @@ public class IRedisConnectionTests
         status.Should().NotBeNull();
         status.CircuitState.Should().Be(CircuitState.HalfOpen);
         status.SuccessRate.Should().BeApproximately(0.8, 0.01);
-        
+
         _connection.Received(1).GetHealthStatus();
     }
 
@@ -130,7 +130,7 @@ public class IRedisConnectionTests
         status1.Should().BeSameAs(_healthStatus);
         status2.Should().BeSameAs(_healthStatus);
         status3.Should().BeSameAs(_healthStatus);
-        
+
         _connection.Received(3).GetHealthStatus();
     }
 
@@ -175,9 +175,8 @@ public class IRedisConnectionTests
             .Returns(Task.FromException(expectedException));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _connection.ResetCircuitBreakerAsync());
-        
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _connection.ResetCircuitBreakerAsync());
+
         exception.Message.Should().Be("Cannot reset circuit breaker");
         await _connection.Received(1).ResetCircuitBreakerAsync();
     }
@@ -188,14 +187,13 @@ public class IRedisConnectionTests
         // Arrange
         var cts = new CancellationTokenSource();
         cts.Cancel();
-        
+
         _connection.ResetCircuitBreakerAsync()
             .Returns(Task.FromCanceled(cts.Token));
 
         // Act & Assert
-        await Assert.ThrowsAsync<TaskCanceledException>(
-            () => _connection.ResetCircuitBreakerAsync());
-        
+        await Assert.ThrowsAsync<TaskCanceledException>(() => _connection.ResetCircuitBreakerAsync());
+
         await _connection.Received(1).ResetCircuitBreakerAsync();
     }
 
@@ -228,9 +226,8 @@ public class IRedisConnectionTests
             .Returns(Task.FromException<IDatabaseAsync>(expectedException));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _connection.GetDatabaseAsync());
-        
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _connection.GetDatabaseAsync());
+
         exception.Message.Should().Be("Connection failed");
         await _connection.Received(1).GetDatabaseAsync();
     }
@@ -264,9 +261,8 @@ public class IRedisConnectionTests
             .Returns(Task.FromException<ISubscriber>(expectedException));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _connection.GetSubscriberAsync());
-        
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _connection.GetSubscriberAsync());
+
         exception.Message.Should().Be("Cannot get subscriber");
         await _connection.Received(1).GetSubscriberAsync();
     }
@@ -300,9 +296,8 @@ public class IRedisConnectionTests
             .Returns(Task.FromException<IConnectionMultiplexer>(expectedException));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _connection.GetMultiplexerAsync());
-        
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _connection.GetMultiplexerAsync());
+
         exception.Message.Should().Be("Cannot get multiplexer");
         await _connection.Received(1).GetMultiplexerAsync();
     }
@@ -318,7 +313,7 @@ public class IRedisConnectionTests
         var database = Substitute.For<IDatabaseAsync>();
         var subscriber = Substitute.For<ISubscriber>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
-        
+
         _connection.GetHealthStatus().Returns(_healthStatus);
         _connection.ResetCircuitBreakerAsync().Returns(Task.CompletedTask);
         _connection.GetDatabaseAsync().Returns(Task.FromResult(database));
@@ -337,7 +332,7 @@ public class IRedisConnectionTests
         db.Should().BeSameAs(database);
         sub.Should().BeSameAs(subscriber);
         mux.Should().BeSameAs(multiplexer);
-        
+
         _connection.Received(1).GetHealthStatus();
         await _connection.Received(1).ResetCircuitBreakerAsync();
         await _connection.Received(1).GetDatabaseAsync();
@@ -354,13 +349,13 @@ public class IRedisConnectionTests
             TotalRequests = 100,
             FailedRequests = 25
         };
-        
+
         var status2 = new ConnectionHealthStatus
         {
             TotalRequests = 0,
             FailedRequests = 0
         };
-        
+
         var status3 = new ConnectionHealthStatus
         {
             TotalRequests = 1000,

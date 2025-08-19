@@ -263,10 +263,10 @@ public class RedisConnectionTests : IDisposable
     {
         // Arrange
         var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
-        
+
         // Get initial status
         var initialStatus = connection.GetHealthStatus();
-        
+
         // Act
         connection.Dispose();
         var statusAfterDispose = connection.GetHealthStatus();
@@ -280,13 +280,13 @@ public class RedisConnectionTests : IDisposable
     public void GetHealthStatus_WithCircuitBreakerEnabled_ReflectsCircuitState()
     {
         // Arrange
-        _options.CircuitBreaker = new CircuitBreakerSettings 
-        { 
+        _options.CircuitBreaker = new CircuitBreakerSettings
+        {
             Enabled = true,
             BreakDuration = TimeSpan.FromSeconds(30),
             FailureThreshold = 5
         };
-        
+
         var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 
         // Act
@@ -306,13 +306,13 @@ public class RedisConnectionTests : IDisposable
     public async Task ResetCircuitBreakerAsync_ResetsCircuitBreaker()
     {
         // Arrange
-        _options.CircuitBreaker = new CircuitBreakerSettings 
-        { 
+        _options.CircuitBreaker = new CircuitBreakerSettings
+        {
             Enabled = true,
             BreakDuration = TimeSpan.FromSeconds(30),
             FailureThreshold = 3
         };
-        
+
         var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 
         // Act
@@ -359,13 +359,13 @@ public class RedisConnectionTests : IDisposable
     public async Task ResetCircuitBreakerAsync_LogsResetAction()
     {
         // Arrange
-        _options.CircuitBreaker = new CircuitBreakerSettings 
-        { 
+        _options.CircuitBreaker = new CircuitBreakerSettings
+        {
             Enabled = true,
             BreakDuration = TimeSpan.FromSeconds(30),
             FailureThreshold = 5
         };
-        
+
         var connection = new RedisConnection(_mockLogger.Object, _mockOptions.Object);
 
         // Act

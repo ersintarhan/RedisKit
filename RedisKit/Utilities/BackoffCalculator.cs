@@ -36,8 +36,8 @@ internal static class BackoffCalculator
         };
 
         // Add jitter to all strategies (except ExponentialWithJitter and DecorrelatedJitter which already have it)
-        if (config.EnableJitter && 
-            config.Strategy != BackoffStrategy.ExponentialWithJitter && 
+        if (config.EnableJitter &&
+            config.Strategy != BackoffStrategy.ExponentialWithJitter &&
             config.Strategy != BackoffStrategy.DecorrelatedJitter)
         {
             var jitterRange = baseDelay.TotalMilliseconds * config.JitterFactor;
@@ -46,6 +46,7 @@ internal static class BackoffCalculator
             {
                 jitter = (_random.NextDouble() * 2 - 1) * jitterRange / 2; // ±jitterFactor/2
             }
+
             baseDelay = TimeSpan.FromMilliseconds(Math.Max(0, baseDelay.TotalMilliseconds + jitter));
         }
 

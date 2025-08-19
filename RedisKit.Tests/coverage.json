@@ -1119,28 +1119,28 @@
         },
         "System.Threading.Tasks.Task`1<System.Boolean> RedisKit.Services.BatchOperations::DeleteAsync(System.String)": {
           "Lines": {
-            "54": 9,
-            "55": 9,
-            "56": 9
+            "54": 11,
+            "55": 11,
+            "56": 11
           },
           "Branches": []
         },
         "System.Threading.Tasks.Task`1<System.Boolean> RedisKit.Services.BatchOperations::ExistsAsync(System.String)": {
           "Lines": {
-            "59": 9,
-            "60": 9,
-            "61": 9
+            "59": 10,
+            "60": 10,
+            "61": 10
           },
           "Branches": []
         },
         "System.Void RedisKit.Services.BatchOperations::.ctor(StackExchange.Redis.IBatch,RedisKit.Serialization.IRedisSerializer)": {
           "Lines": {
-            "12": 14,
-            "14": 14,
-            "15": 14,
-            "16": 14,
-            "17": 14,
-            "18": 14
+            "12": 17,
+            "14": 17,
+            "15": 17,
+            "16": 17,
+            "17": 17,
+            "18": 17
           },
           "Branches": []
         }
@@ -1148,14 +1148,14 @@
       "RedisKit.Services.BatchOperations/<GetResultsAsync>d__8": {
         "System.Void RedisKit.Services.BatchOperations/<GetResultsAsync>d__8::MoveNext()": {
           "Lines": {
-            "64": 3,
-            "66": 3,
-            "67": 3,
-            "68": 3,
+            "64": 5,
+            "66": 5,
+            "67": 5,
+            "68": 5,
             "70": 0,
             "71": 0,
             "72": 0,
-            "74": 3
+            "74": 5
           },
           "Branches": []
         }
@@ -1204,29 +1204,29 @@
       "RedisKit.Services.MultiLockHandle": {
         "System.Collections.Generic.IReadOnlyList`1<RedisKit.Interfaces.ILockHandle> RedisKit.Services.MultiLockHandle::get_Locks()": {
           "Lines": {
-            "15": 0
+            "15": 7
           },
           "Branches": []
         },
         "System.Void RedisKit.Services.MultiLockHandle::Dispose()": {
           "Lines": {
-            "34": 0,
-            "35": 0,
-            "36": 0,
-            "37": 0
+            "34": 6,
+            "35": 6,
+            "36": 6,
+            "37": 6
           },
           "Branches": []
         },
         "System.Void RedisKit.Services.MultiLockHandle::Dispose(System.Boolean)": {
           "Lines": {
-            "40": 0,
-            "41": 0,
-            "42": 0,
-            "43": 0,
-            "47": 0,
-            "49": 0,
-            "50": 0,
-            "51": 0
+            "40": 12,
+            "41": 12,
+            "42": 3,
+            "43": 3,
+            "47": 6,
+            "49": 3,
+            "50": 3,
+            "51": 12
           },
           "Branches": [
             {
@@ -1235,7 +1235,7 @@
               "EndOffset": 14,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 0
+              "Hits": 3
             },
             {
               "Line": 43,
@@ -1243,7 +1243,7 @@
               "EndOffset": 20,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 0
+              "Hits": 3
             },
             {
               "Line": 43,
@@ -1251,7 +1251,7 @@
               "EndOffset": 50,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 0
+              "Hits": 3
             },
             {
               "Line": 41,
@@ -1259,16 +1259,16 @@
               "EndOffset": 58,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 0
+              "Hits": 12
             }
           ]
         },
         "System.Void RedisKit.Services.MultiLockHandle::.ctor(System.Collections.Generic.List`1<RedisKit.Interfaces.ILockHandle>)": {
           "Lines": {
-            "10": 0,
-            "11": 0,
-            "12": 0,
-            "13": 0
+            "10": 20,
+            "11": 20,
+            "12": 20,
+            "13": 19
           },
           "Branches": [
             {
@@ -1277,7 +1277,7 @@
               "EndOffset": 13,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 0
+              "Hits": 1
             },
             {
               "Line": 12,
@@ -1285,7 +1285,7 @@
               "EndOffset": 25,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 0
+              "Hits": 19
             }
           ]
         }
@@ -1293,7 +1293,7 @@
       "RedisKit.Services.MultiLockHandle/<>c__DisplayClass5_0": {
         "System.Threading.Tasks.Task RedisKit.Services.MultiLockHandle/<>c__DisplayClass5_0::<ReleaseAllAsync>b__0(RedisKit.Interfaces.ILockHandle)": {
           "Lines": {
-            "22": 0
+            "22": 141
           },
           "Branches": []
         }
@@ -1301,11 +1301,11 @@
       "RedisKit.Services.MultiLockHandle/<DisposeAsync>d__6": {
         "System.Void RedisKit.Services.MultiLockHandle/<DisposeAsync>d__6::MoveNext()": {
           "Lines": {
-            "27": 0,
-            "28": 0,
-            "29": 0,
-            "30": 0,
-            "31": 0
+            "27": 6,
+            "28": 6,
+            "29": 6,
+            "30": 6,
+            "31": 6
           },
           "Branches": []
         }
@@ -1313,13 +1313,13 @@
       "RedisKit.Services.MultiLockHandle/<DisposeAsyncCore>d__9": {
         "System.Void RedisKit.Services.MultiLockHandle/<DisposeAsyncCore>d__9::MoveNext()": {
           "Lines": {
-            "54": 0,
-            "55": 0,
-            "56": 0,
-            "57": 0,
-            "58": 0,
-            "59": 0,
-            "60": 0
+            "54": 6,
+            "55": 6,
+            "56": 4,
+            "57": 4,
+            "58": 4,
+            "59": 4,
+            "60": 6
           },
           "Branches": [
             {
@@ -1328,7 +1328,7 @@
               "EndOffset": 36,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 0
+              "Hits": 4
             },
             {
               "Line": 55,
@@ -1336,7 +1336,7 @@
               "EndOffset": 168,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 0
+              "Hits": 6
             }
           ]
         }
@@ -1344,11 +1344,11 @@
       "RedisKit.Services.MultiLockHandle/<ReleaseAllAsync>d__5": {
         "System.Void RedisKit.Services.MultiLockHandle/<ReleaseAllAsync>d__5::MoveNext()": {
           "Lines": {
-            "18": 0,
-            "19": 0,
-            "20": 0,
-            "23": 0,
-            "24": 0
+            "18": 14,
+            "19": 14,
+            "20": 1,
+            "23": 13,
+            "24": 13
           },
           "Branches": [
             {
@@ -1357,7 +1357,7 @@
               "EndOffset": 61,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 0
+              "Hits": 1
             },
             {
               "Line": 19,
@@ -1365,7 +1365,7 @@
               "EndOffset": 66,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 0
+              "Hits": 13
             }
           ]
         }
@@ -1375,83 +1375,83 @@
       "RedisKit.Services.RedisCacheService": {
         "System.Void RedisKit.Services.RedisCacheService::SetKeyPrefix(System.String)": {
           "Lines": {
-            "372": 1,
-            "373": 1,
-            "374": 1,
-            "375": 0
+            "371": 6,
+            "372": 6,
+            "373": 5,
+            "374": 3
           },
           "Branches": [
             {
-              "Line": 374,
+              "Line": 373,
               "Offset": 11,
               "EndOffset": 13,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 1
+              "Hits": 2
             },
             {
-              "Line": 374,
+              "Line": 373,
               "Offset": 11,
               "EndOffset": 25,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 0
+              "Hits": 3
             }
           ]
         },
         "System.Void RedisKit.Services.RedisCacheService::ValidateRedisKey(System.String)": {
           "Lines": {
-            "393": 1,
-            "395": 1,
-            "396": 1
+            "392": 16,
+            "394": 22,
+            "395": 10
           },
           "Branches": [
             {
-              "Line": 395,
+              "Line": 394,
               "Offset": 7,
               "EndOffset": 9,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 0
+              "Hits": 13
             },
             {
-              "Line": 395,
+              "Line": 394,
               "Offset": 7,
               "EndOffset": 24,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 1
+              "Hits": 3
             },
             {
-              "Line": 395,
+              "Line": 394,
               "Offset": 27,
               "EndOffset": 29,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 0
+              "Hits": 6
             },
             {
-              "Line": 395,
+              "Line": 394,
               "Offset": 27,
               "EndOffset": 83,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 1
+              "Hits": 10
             }
           ]
         },
         "System.Void RedisKit.Services.RedisCacheService::ValidateKeyValuePair(System.Collections.Generic.KeyValuePair`2<System.String,T>)": {
           "Lines": {
+            "450": 0,
             "451": 0,
             "452": 0,
-            "453": 0,
+            "454": 0,
             "455": 0,
-            "456": 0,
-            "457": 0
+            "456": 0
           },
           "Branches": [
             {
-              "Line": 455,
+              "Line": 454,
               "Offset": 56,
               "EndOffset": 58,
               "Path": 0,
@@ -1459,7 +1459,7 @@
               "Hits": 0
             },
             {
-              "Line": 455,
+              "Line": 454,
               "Offset": 56,
               "EndOffset": 69,
               "Path": 1,
@@ -1470,15 +1470,15 @@
         },
         "System.Void RedisKit.Services.RedisCacheService::LogProgressIfNeeded(System.Int32,System.Int32)": {
           "Lines": {
+            "467": 0,
             "468": 0,
             "469": 0,
             "470": 0,
-            "471": 0,
-            "472": 0
+            "471": 0
           },
           "Branches": [
             {
-              "Line": 469,
+              "Line": 468,
               "Offset": 7,
               "EndOffset": 9,
               "Path": 0,
@@ -1486,7 +1486,7 @@
               "Hits": 0
             },
             {
-              "Line": 469,
+              "Line": 468,
               "Offset": 7,
               "EndOffset": 21,
               "Path": 1,
@@ -1494,7 +1494,7 @@
               "Hits": 0
             },
             {
-              "Line": 469,
+              "Line": 468,
               "Offset": 24,
               "EndOffset": 26,
               "Path": 0,
@@ -1502,7 +1502,7 @@
               "Hits": 0
             },
             {
-              "Line": 469,
+              "Line": 468,
               "Offset": 24,
               "EndOffset": 40,
               "Path": 1,
@@ -1513,15 +1513,15 @@
         },
         "System.Void RedisKit.Services.RedisCacheService::LogPerformanceIfSlow(System.Diagnostics.Stopwatch,System.Int32)": {
           "Lines": {
+            "474": 0,
             "475": 0,
             "476": 0,
             "477": 0,
-            "478": 0,
-            "479": 0
+            "478": 0
           },
           "Branches": [
             {
-              "Line": 476,
+              "Line": 475,
               "Offset": 17,
               "EndOffset": 19,
               "Path": 0,
@@ -1529,7 +1529,7 @@
               "Hits": 0
             },
             {
-              "Line": 477,
+              "Line": 476,
               "Offset": 43,
               "EndOffset": 45,
               "Path": 0,
@@ -1537,7 +1537,7 @@
               "Hits": 0
             },
             {
-              "Line": 477,
+              "Line": 476,
               "Offset": 43,
               "EndOffset": 52,
               "Path": 1,
@@ -1545,7 +1545,7 @@
               "Hits": 0
             },
             {
-              "Line": 476,
+              "Line": 475,
               "Offset": 17,
               "EndOffset": 63,
               "Path": 1,
@@ -1556,6 +1556,7 @@
         },
         "System.Int32 RedisKit.Services.RedisCacheService::CalculateOptimalChunkSize(System.Int32)": {
           "Lines": {
+            "520": 0,
             "521": 0,
             "522": 0,
             "523": 0,
@@ -1563,12 +1564,11 @@
             "525": 0,
             "526": 0,
             "527": 0,
-            "528": 0,
-            "529": 0
+            "528": 0
           },
           "Branches": [
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 11,
               "EndOffset": 13,
               "Path": 0,
@@ -1576,7 +1576,7 @@
               "Hits": 0
             },
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 11,
               "EndOffset": 20,
               "Path": 1,
@@ -1584,7 +1584,7 @@
               "Hits": 0
             },
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 16,
               "EndOffset": 30,
               "Path": 1,
@@ -1592,7 +1592,7 @@
               "Hits": 0
             },
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 16,
               "EndOffset": 34,
               "Path": 0,
@@ -1600,7 +1600,7 @@
               "Hits": 0
             },
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 26,
               "EndOffset": 39,
               "Path": 1,
@@ -1608,7 +1608,7 @@
               "Hits": 0
             },
             {
-              "Line": 522,
+              "Line": 521,
               "Offset": 26,
               "EndOffset": 47,
               "Path": 0,
@@ -1619,37 +1619,37 @@
         },
         "System.Threading.Tasks.Task`1<StackExchange.Redis.IDatabaseAsync> RedisKit.Services.RedisCacheService::GetDatabaseAsync()": {
           "Lines": {
-            "600": 0,
-            "601": 0,
-            "602": 0
+            "599": 5,
+            "600": 5,
+            "601": 5
           },
           "Branches": []
         },
         "System.Void RedisKit.Services.RedisCacheService::.ctor(RedisKit.Interfaces.IRedisConnection,Microsoft.Extensions.Logging.ILogger`1<RedisKit.Services.RedisCacheService>,Microsoft.Extensions.Options.IOptions`1<RedisKit.Models.RedisOptions>,Microsoft.Extensions.ObjectPool.ObjectPoolProvider)": {
           "Lines": {
-            "37": 32,
-            "41": 32,
-            "49": 32,
-            "50": 32,
-            "51": 32,
-            "52": 32,
-            "53": 32,
-            "54": 32,
-            "55": 32,
-            "56": 32,
-            "57": 32,
-            "61": 32,
-            "63": 32,
-            "64": 32,
-            "65": 32,
-            "66": 64,
-            "67": 32,
-            "68": 32,
-            "69": 32
+            "36": 48,
+            "40": 48,
+            "48": 48,
+            "49": 48,
+            "50": 48,
+            "51": 48,
+            "52": 48,
+            "53": 48,
+            "54": 48,
+            "55": 48,
+            "56": 48,
+            "60": 48,
+            "62": 48,
+            "63": 48,
+            "64": 48,
+            "65": 80,
+            "66": 48,
+            "67": 48,
+            "68": 48
           },
           "Branches": [
             {
-              "Line": 55,
+              "Line": 54,
               "Offset": 35,
               "EndOffset": 37,
               "Path": 0,
@@ -1657,15 +1657,15 @@
               "Hits": 0
             },
             {
-              "Line": 55,
+              "Line": 54,
               "Offset": 35,
               "EndOffset": 49,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 56,
+              "Line": 55,
               "Offset": 57,
               "EndOffset": 59,
               "Path": 0,
@@ -1673,15 +1673,15 @@
               "Hits": 0
             },
             {
-              "Line": 56,
+              "Line": 55,
               "Offset": 57,
               "EndOffset": 71,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 57,
+              "Line": 56,
               "Offset": 78,
               "EndOffset": 80,
               "Path": 0,
@@ -1689,15 +1689,15 @@
               "Hits": 0
             },
             {
-              "Line": 57,
+              "Line": 56,
               "Offset": 78,
               "EndOffset": 83,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 57,
+              "Line": 56,
               "Offset": 90,
               "EndOffset": 92,
               "Path": 0,
@@ -1705,23 +1705,23 @@
               "Hits": 0
             },
             {
-              "Line": 57,
+              "Line": 56,
               "Offset": 90,
               "EndOffset": 104,
               "Path": 1,
               "Ordinal": 7,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 63,
+              "Line": 62,
               "Offset": 150,
               "EndOffset": 152,
               "Path": 0,
               "Ordinal": 8,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 65,
+              "Line": 64,
               "Offset": 156,
               "EndOffset": 158,
               "Path": 0,
@@ -1729,15 +1729,15 @@
               "Hits": 32
             },
             {
-              "Line": 65,
+              "Line": 64,
               "Offset": 156,
               "EndOffset": 164,
               "Path": 1,
               "Ordinal": 11,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 66,
+              "Line": 65,
               "Offset": 178,
               "EndOffset": 180,
               "Path": 0,
@@ -1745,124 +1745,124 @@
               "Hits": 32
             },
             {
-              "Line": 66,
+              "Line": 65,
               "Offset": 178,
               "EndOffset": 203,
               "Path": 1,
               "Ordinal": 13,
-              "Hits": 32
+              "Hits": 48
             },
             {
-              "Line": 63,
+              "Line": 62,
               "Offset": 150,
               "EndOffset": 216,
               "Path": 1,
               "Ordinal": 9,
-              "Hits": 32
+              "Hits": 48
             }
           ]
         }
       },
       "RedisKit.Services.RedisCacheService/<>c": {
-        "StackExchange.Redis.RedisKey RedisKit.Services.RedisCacheService/<>c::<SetManyWithLuaScript>b__32_0(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
+        "StackExchange.Redis.RedisKey RedisKit.Services.RedisCacheService/<>c::<SetManyWithLuaScript>b__31_0(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
+          "Lines": {
+            "535": 0
+          },
+          "Branches": []
+        },
+        "StackExchange.Redis.RedisValue RedisKit.Services.RedisCacheService/<>c::<SetManyWithLuaScript>b__31_1(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
           "Lines": {
             "536": 0
           },
           "Branches": []
         },
-        "StackExchange.Redis.RedisValue RedisKit.Services.RedisCacheService/<>c::<SetManyWithLuaScript>b__32_1(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
+        "System.Collections.Generic.KeyValuePair`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue> RedisKit.Services.RedisCacheService/<>c::<SetManyWithFallback>b__32_0(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
           "Lines": {
-            "537": 0
+            "573": 0
           },
           "Branches": []
         },
-        "System.Collections.Generic.KeyValuePair`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue> RedisKit.Services.RedisCacheService/<>c::<SetManyWithFallback>b__33_0(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
+        "System.Collections.Generic.KeyValuePair`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue> RedisKit.Services.RedisCacheService/<>c::<SetManyWithFallback>b__32_1(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
           "Lines": {
-            "574": 0
-          },
-          "Branches": []
-        },
-        "System.Collections.Generic.KeyValuePair`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue> RedisKit.Services.RedisCacheService/<>c::<SetManyWithFallback>b__33_1(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
-          "Lines": {
-            "584": 0
+            "583": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<>c__DisplayClass15_0`1": {
-        "StackExchange.Redis.RedisKey RedisKit.Services.RedisCacheService/<>c__DisplayClass15_0`1::<GetManyAsync>b__0(System.String)": {
+      "RedisKit.Services.RedisCacheService/<>c__DisplayClass14_0`1": {
+        "StackExchange.Redis.RedisKey RedisKit.Services.RedisCacheService/<>c__DisplayClass14_0`1::<GetManyAsync>b__0(System.String)": {
           "Lines": {
-            "209": 0
+            "208": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<>c__DisplayClass15_2`1/<<GetManyAsync>b__1>d": {
-        "System.Void RedisKit.Services.RedisCacheService/<>c__DisplayClass15_2`1/<<GetManyAsync>b__1>d::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<>c__DisplayClass14_2`1/<<GetManyAsync>b__1>d": {
+        "System.Void RedisKit.Services.RedisCacheService/<>c__DisplayClass14_2`1/<<GetManyAsync>b__1>d::MoveNext()": {
           "Lines": {
+            "230": 0,
             "231": 0,
             "232": 0,
-            "233": 0,
-            "234": 0
+            "233": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<>c__DisplayClass25_0`1/<<SerializeChunkAsync>b__0>d": {
-        "System.Void RedisKit.Services.RedisCacheService/<>c__DisplayClass25_0`1/<<SerializeChunkAsync>b__0>d::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<>c__DisplayClass24_0`1/<<SerializeChunkAsync>b__0>d": {
+        "System.Void RedisKit.Services.RedisCacheService/<>c__DisplayClass24_0`1/<<SerializeChunkAsync>b__0>d::MoveNext()": {
           "Lines": {
+            "437": 0,
             "438": 0,
-            "439": 0,
+            "440": 0,
             "441": 0,
             "442": 0,
-            "443": 0,
-            "444": 0
+            "443": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<>c__DisplayClass33_1": {
-        "System.Threading.Tasks.Task`1<System.Boolean> RedisKit.Services.RedisCacheService/<>c__DisplayClass33_1::<SetManyWithFallback>b__2(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
+      "RedisKit.Services.RedisCacheService/<>c__DisplayClass32_1": {
+        "System.Threading.Tasks.Task`1<System.Boolean> RedisKit.Services.RedisCacheService/<>c__DisplayClass32_1::<SetManyWithFallback>b__2(System.ValueTuple`2<StackExchange.Redis.RedisKey,StackExchange.Redis.RedisValue>)": {
           "Lines": {
-            "593": 0
+            "592": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<CheckLuaScriptSupport>d__30": {
-        "System.Void RedisKit.Services.RedisCacheService/<CheckLuaScriptSupport>d__30::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<CheckLuaScriptSupport>d__29": {
+        "System.Void RedisKit.Services.RedisCacheService/<CheckLuaScriptSupport>d__29::MoveNext()": {
           "Lines": {
-            "482": 0,
+            "481": 0,
+            "483": 0,
             "484": 0,
-            "485": 0,
+            "486": 0,
             "487": 0,
             "488": 0,
-            "489": 0,
+            "490": 0,
             "491": 0,
-            "492": 0,
-            "494": 0,
-            "496": 0,
+            "493": 0,
+            "495": 0,
+            "497": 0,
             "498": 0,
             "499": 0,
             "500": 0,
-            "501": 0,
+            "502": 0,
             "503": 0,
             "504": 0,
             "505": 0,
-            "506": 0,
+            "507": 0,
             "508": 0,
             "509": 0,
             "510": 0,
-            "511": 0,
+            "512": 0,
             "513": 0,
             "514": 0,
             "515": 0,
-            "516": 0,
-            "518": 0
+            "517": 0
           },
           "Branches": [
             {
-              "Line": 491,
+              "Line": 490,
               "Offset": 356,
               "EndOffset": 358,
               "Path": 0,
@@ -1870,7 +1870,7 @@
               "Hits": 0
             },
             {
-              "Line": 491,
+              "Line": 490,
               "Offset": 356,
               "EndOffset": 377,
               "Path": 1,
@@ -1880,59 +1880,59 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<DeleteAsync>d__14": {
-        "System.Void RedisKit.Services.RedisCacheService/<DeleteAsync>d__14::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<DeleteAsync>d__13": {
+        "System.Void RedisKit.Services.RedisCacheService/<DeleteAsync>d__13::MoveNext()": {
           "Lines": {
-            "165": 1,
-            "166": 1,
+            "164": 2,
+            "165": 2,
+            "167": 1,
             "168": 0,
-            "169": 0,
+            "171": 0,
             "172": 0,
             "173": 0,
-            "174": 0,
-            "176": 0,
+            "175": 0,
+            "177": 0,
             "178": 0,
             "179": 0,
             "180": 0,
             "181": 0,
             "182": 0,
-            "183": 0,
+            "184": 0,
             "185": 0,
             "186": 0,
             "187": 0,
-            "188": 0,
+            "189": 0,
             "190": 0,
             "191": 0,
             "192": 0,
-            "193": 0,
+            "194": 0,
             "195": 0,
             "196": 0,
             "197": 0,
-            "198": 0,
-            "200": 0
+            "199": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<EnsureLuaScriptSupportChecked>d__23": {
-        "System.Void RedisKit.Services.RedisCacheService/<EnsureLuaScriptSupportChecked>d__23::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<EnsureLuaScriptSupportChecked>d__22": {
+        "System.Void RedisKit.Services.RedisCacheService/<EnsureLuaScriptSupportChecked>d__22::MoveNext()": {
           "Lines": {
+            "399": 0,
             "400": 0,
             "401": 0,
             "402": 0,
-            "403": 0,
+            "404": 0,
             "405": 0,
             "406": 0,
-            "407": 0,
+            "408": 0,
             "409": 0,
             "410": 0,
             "411": 0,
-            "412": 0,
-            "413": 0
+            "412": 0
           },
           "Branches": [
             {
-              "Line": 401,
+              "Line": 400,
               "Offset": 47,
               "EndOffset": 52,
               "Path": 0,
@@ -1940,7 +1940,7 @@
               "Hits": 0
             },
             {
-              "Line": 406,
+              "Line": 405,
               "Offset": 207,
               "EndOffset": 209,
               "Path": 0,
@@ -1948,7 +1948,7 @@
               "Hits": 0
             },
             {
-              "Line": 406,
+              "Line": 405,
               "Offset": 207,
               "EndOffset": 226,
               "Path": 1,
@@ -1956,7 +1956,7 @@
               "Hits": 0
             },
             {
-              "Line": 401,
+              "Line": 400,
               "Offset": 47,
               "EndOffset": 416,
               "Path": 1,
@@ -1966,93 +1966,93 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<ExecuteBatchAsync>d__21": {
-        "System.Void RedisKit.Services.RedisCacheService/<ExecuteBatchAsync>d__21::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<ExecuteBatchAsync>d__20": {
+        "System.Void RedisKit.Services.RedisCacheService/<ExecuteBatchAsync>d__20::MoveNext()": {
           "Lines": {
-            "378": 1,
-            "379": 1,
-            "380": 1,
-            "381": 1,
-            "382": 1,
-            "384": 1,
-            "386": 1,
-            "388": 1,
-            "389": 1
+            "377": 4,
+            "378": 4,
+            "379": 4,
+            "380": 4,
+            "381": 4,
+            "383": 4,
+            "385": 3,
+            "387": 3,
+            "388": 3
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<ExistsAsync>d__17": {
-        "System.Void RedisKit.Services.RedisCacheService/<ExistsAsync>d__17::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<ExistsAsync>d__16": {
+        "System.Void RedisKit.Services.RedisCacheService/<ExistsAsync>d__16::MoveNext()": {
           "Lines": {
-            "313": 0,
-            "314": 0,
+            "312": 1,
+            "313": 1,
+            "315": 1,
             "316": 0,
-            "317": 0,
+            "319": 0,
             "320": 0,
             "321": 0,
-            "322": 0,
-            "324": 0,
+            "323": 0,
+            "325": 0,
             "326": 0,
-            "327": 0,
+            "328": 0,
             "329": 0,
             "330": 0,
             "331": 0,
-            "332": 0,
+            "333": 0,
             "334": 0,
             "335": 0,
             "336": 0,
-            "337": 0,
+            "338": 0,
             "339": 0,
             "340": 0,
             "341": 0,
-            "342": 0,
+            "343": 0,
             "344": 0,
             "345": 0,
             "346": 0,
-            "347": 0,
-            "349": 0
+            "348": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<GetAsync>d__12`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<GetAsync>d__12`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<GetAsync>d__11`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<GetAsync>d__11`1::MoveNext()": {
           "Lines": {
-            "73": 1,
-            "74": 1,
+            "72": 2,
+            "73": 2,
+            "75": 1,
             "76": 0,
-            "77": 0,
+            "79": 0,
             "80": 0,
             "81": 0,
-            "82": 0,
+            "83": 0,
             "84": 0,
             "85": 0,
-            "86": 0,
+            "87": 0,
             "88": 0,
             "89": 0,
-            "90": 0,
+            "91": 0,
             "92": 0,
             "93": 0,
             "94": 0,
-            "95": 0,
+            "96": 0,
             "97": 0,
             "98": 0,
             "99": 0,
-            "100": 0,
+            "101": 0,
             "102": 0,
             "103": 0,
             "104": 0,
-            "105": 0,
+            "106": 0,
             "107": 0,
             "108": 0,
             "109": 0,
-            "110": 0,
-            "112": 0
+            "111": 0
           },
           "Branches": [
             {
-              "Line": 85,
+              "Line": 84,
               "Offset": 425,
               "EndOffset": 427,
               "Path": 0,
@@ -2060,7 +2060,7 @@
               "Hits": 0
             },
             {
-              "Line": 85,
+              "Line": 84,
               "Offset": 425,
               "EndOffset": 440,
               "Path": 1,
@@ -2070,67 +2070,67 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<GetBytesAsync>d__18": {
-        "System.Void RedisKit.Services.RedisCacheService/<GetBytesAsync>d__18::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<GetBytesAsync>d__17": {
+        "System.Void RedisKit.Services.RedisCacheService/<GetBytesAsync>d__17::MoveNext()": {
           "Lines": {
-            "352": 0,
-            "353": 0,
-            "354": 0,
-            "355": 0,
-            "356": 0,
-            "357": 0,
-            "358": 0
+            "351": 7,
+            "352": 7,
+            "353": 6,
+            "354": 5,
+            "355": 5,
+            "356": 5,
+            "357": 5
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<GetManyAsync>d__15`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<GetManyAsync>d__15`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<GetManyAsync>d__14`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<GetManyAsync>d__14`1::MoveNext()": {
           "Lines": {
+            "202": 0,
             "203": 0,
-            "204": 0,
+            "205": 0,
             "206": 0,
-            "207": 0,
+            "210": 0,
             "211": 0,
             "212": 0,
-            "213": 0,
+            "215": 0,
             "216": 0,
             "217": 0,
-            "218": 0,
-            "220": 0,
-            "222": 0,
+            "219": 0,
+            "221": 0,
+            "223": 0,
             "224": 0,
             "225": 0,
             "226": 0,
             "227": 0,
-            "228": 0,
-            "230": 0,
-            "235": 0,
-            "237": 0,
-            "239": 0,
+            "229": 0,
+            "234": 0,
+            "236": 0,
+            "238": 0,
+            "240": 0,
             "241": 0,
-            "242": 0,
+            "243": 0,
             "244": 0,
             "245": 0,
             "246": 0,
-            "247": 0,
+            "248": 0,
             "249": 0,
             "250": 0,
             "251": 0,
-            "252": 0,
+            "253": 0,
             "254": 0,
             "255": 0,
             "256": 0,
-            "257": 0,
+            "258": 0,
             "259": 0,
             "260": 0,
             "261": 0,
-            "262": 0,
-            "264": 0
+            "263": 0
           },
           "Branches": [
             {
-              "Line": 207,
+              "Line": 206,
               "Offset": 114,
               "EndOffset": 116,
               "Path": 0,
@@ -2138,7 +2138,7 @@
               "Hits": 0
             },
             {
-              "Line": 207,
+              "Line": 206,
               "Offset": 114,
               "EndOffset": 127,
               "Path": 1,
@@ -2146,7 +2146,7 @@
               "Hits": 0
             },
             {
-              "Line": 224,
+              "Line": 223,
               "Offset": 887,
               "EndOffset": 644,
               "Path": 1,
@@ -2154,7 +2154,7 @@
               "Hits": 0
             },
             {
-              "Line": 227,
+              "Line": 226,
               "Offset": 731,
               "EndOffset": 733,
               "Path": 0,
@@ -2162,7 +2162,7 @@
               "Hits": 0
             },
             {
-              "Line": 227,
+              "Line": 226,
               "Offset": 731,
               "EndOffset": 783,
               "Path": 1,
@@ -2170,7 +2170,7 @@
               "Hits": 0
             },
             {
-              "Line": 224,
+              "Line": 223,
               "Offset": 887,
               "EndOffset": 892,
               "Path": 0,
@@ -2178,7 +2178,7 @@
               "Hits": 0
             },
             {
-              "Line": 239,
+              "Line": 238,
               "Offset": 1103,
               "EndOffset": 1006,
               "Path": 1,
@@ -2186,7 +2186,7 @@
               "Hits": 0
             },
             {
-              "Line": 239,
+              "Line": 238,
               "Offset": 1103,
               "EndOffset": 1105,
               "Path": 0,
@@ -2196,24 +2196,24 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<ProcessBatchesAsync>d__24`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<ProcessBatchesAsync>d__24`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<ProcessBatchesAsync>d__23`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<ProcessBatchesAsync>d__23`1::MoveNext()": {
           "Lines": {
+            "416": 0,
             "417": 0,
             "418": 0,
-            "419": 0,
+            "420": 0,
             "421": 0,
             "422": 0,
             "423": 0,
             "424": 0,
             "425": 0,
             "426": 0,
-            "427": 0,
-            "428": 0
+            "427": 0
           },
           "Branches": [
             {
-              "Line": 421,
+              "Line": 420,
               "Offset": 442,
               "EndOffset": 98,
               "Path": 1,
@@ -2221,7 +2221,7 @@
               "Hits": 0
             },
             {
-              "Line": 421,
+              "Line": 420,
               "Offset": 442,
               "EndOffset": 447,
               "Path": 0,
@@ -2231,64 +2231,64 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SerializeChunkAsync>d__25`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<SerializeChunkAsync>d__25`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SerializeChunkAsync>d__24`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<SerializeChunkAsync>d__24`1::MoveNext()": {
           "Lines": {
+            "432": 0,
             "433": 0,
             "434": 0,
-            "435": 0,
-            "437": 0,
-            "440": 0,
+            "436": 0,
+            "439": 0,
+            "445": 0,
             "446": 0,
-            "447": 0,
-            "448": 0
+            "447": 0
           },
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetAsync>d__13`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetAsync>d__13`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetAsync>d__12`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetAsync>d__12`1::MoveNext()": {
           "Lines": {
-            "115": 1,
+            "114": 2,
+            "115": 2,
             "116": 1,
-            "117": 0,
+            "118": 1,
             "119": 0,
-            "120": 0,
-            "122": 0,
+            "121": 0,
+            "123": 0,
             "124": 0,
             "125": 0,
-            "126": 0,
+            "127": 0,
             "128": 0,
             "129": 0,
-            "130": 0,
-            "132": 0,
-            "134": 0,
+            "131": 0,
+            "133": 0,
+            "135": 0,
             "136": 0,
             "137": 0,
             "138": 0,
             "139": 0,
             "140": 0,
-            "141": 0,
+            "142": 0,
             "143": 0,
             "144": 0,
             "145": 0,
-            "146": 0,
+            "147": 0,
             "148": 0,
             "149": 0,
             "150": 0,
-            "151": 0,
+            "152": 0,
             "153": 0,
             "154": 0,
             "155": 0,
-            "156": 0,
+            "158": 0,
             "159": 0,
             "160": 0,
-            "161": 0,
-            "162": 0
+            "161": 0
           },
           "Branches": [
             {
-              "Line": 132,
+              "Line": 131,
               "Offset": 505,
               "EndOffset": 507,
               "Path": 0,
@@ -2296,7 +2296,7 @@
               "Hits": 0
             },
             {
-              "Line": 132,
+              "Line": 131,
               "Offset": 505,
               "EndOffset": 525,
               "Path": 1,
@@ -2304,7 +2304,7 @@
               "Hits": 0
             },
             {
-              "Line": 160,
+              "Line": 159,
               "Offset": 923,
               "EndOffset": 925,
               "Path": 0,
@@ -2312,7 +2312,7 @@
               "Hits": 0
             },
             {
-              "Line": 160,
+              "Line": 159,
               "Offset": 923,
               "EndOffset": 943,
               "Path": 1,
@@ -2322,21 +2322,21 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetBytesAsync>d__19": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetBytesAsync>d__19::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetBytesAsync>d__18": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetBytesAsync>d__18::MoveNext()": {
           "Lines": {
+            "360": 0,
             "361": 0,
             "362": 0,
             "363": 0,
             "364": 0,
             "365": 0,
             "366": 0,
-            "367": 0,
-            "368": 0
+            "367": 0
           },
           "Branches": [
             {
-              "Line": 367,
+              "Line": 366,
               "Offset": 271,
               "EndOffset": 273,
               "Path": 0,
@@ -2344,7 +2344,7 @@
               "Hits": 0
             },
             {
-              "Line": 367,
+              "Line": 366,
               "Offset": 271,
               "EndOffset": 291,
               "Path": 1,
@@ -2354,18 +2354,18 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetChunkAsync>d__27": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetChunkAsync>d__27::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetChunkAsync>d__26": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetChunkAsync>d__26::MoveNext()": {
           "Lines": {
+            "459": 0,
             "460": 0,
             "461": 0,
-            "462": 0,
-            "464": 0,
-            "465": 0
+            "463": 0,
+            "464": 0
           },
           "Branches": [
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 45,
               "EndOffset": 47,
               "Path": 0,
@@ -2373,7 +2373,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 58,
               "EndOffset": 60,
               "Path": 0,
@@ -2381,7 +2381,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 45,
               "EndOffset": 78,
               "Path": 1,
@@ -2389,7 +2389,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 58,
               "EndOffset": 78,
               "Path": 1,
@@ -2397,7 +2397,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 81,
               "EndOffset": 83,
               "Path": 0,
@@ -2405,7 +2405,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 460,
               "Offset": 81,
               "EndOffset": 198,
               "Path": 1,
@@ -2415,44 +2415,44 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetManyAsync>d__16`1": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetManyAsync>d__16`1::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetManyAsync>d__15`1": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetManyAsync>d__15`1::MoveNext()": {
           "Lines": {
+            "266": 0,
             "267": 0,
-            "268": 0,
-            "270": 0,
-            "273": 0,
+            "269": 0,
+            "272": 0,
+            "274": 0,
             "275": 0,
-            "276": 0,
+            "277": 0,
             "278": 0,
-            "279": 0,
-            "281": 0,
-            "283": 0,
+            "280": 0,
+            "282": 0,
+            "284": 0,
             "285": 0,
-            "286": 0,
+            "287": 0,
             "288": 0,
             "289": 0,
             "290": 0,
             "291": 0,
             "292": 0,
-            "293": 0,
+            "294": 0,
             "295": 0,
             "296": 0,
             "297": 0,
-            "298": 0,
+            "299": 0,
             "300": 0,
             "301": 0,
             "302": 0,
-            "303": 0,
+            "304": 0,
             "305": 0,
             "306": 0,
             "307": 0,
-            "308": 0,
-            "310": 0
+            "309": 0
           },
           "Branches": [
             {
-              "Line": 270,
+              "Line": 269,
               "Offset": 48,
               "EndOffset": 50,
               "Path": 0,
@@ -2460,7 +2460,7 @@
               "Hits": 0
             },
             {
-              "Line": 270,
+              "Line": 269,
               "Offset": 48,
               "EndOffset": 68,
               "Path": 1,
@@ -2468,7 +2468,7 @@
               "Hits": 0
             },
             {
-              "Line": 275,
+              "Line": 274,
               "Offset": 123,
               "EndOffset": 125,
               "Path": 0,
@@ -2476,7 +2476,7 @@
               "Hits": 0
             },
             {
-              "Line": 275,
+              "Line": 274,
               "Offset": 123,
               "EndOffset": 158,
               "Path": 1,
@@ -2486,32 +2486,32 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetManyWithFallback>d__33": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetManyWithFallback>d__33::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetManyWithFallback>d__32": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetManyWithFallback>d__32::MoveNext()": {
           "Lines": {
-            "566": 0,
-            "568": 0,
+            "565": 0,
+            "567": 0,
+            "569": 0,
             "570": 0,
-            "571": 0,
-            "573": 0,
+            "572": 0,
+            "574": 0,
             "575": 0,
             "576": 0,
-            "577": 0,
-            "579": 0,
-            "581": 0,
-            "583": 0,
-            "585": 0,
-            "588": 0,
+            "578": 0,
+            "580": 0,
+            "582": 0,
+            "584": 0,
+            "587": 0,
+            "590": 0,
             "591": 0,
-            "592": 0,
+            "593": 0,
             "594": 0,
             "595": 0,
-            "596": 0,
-            "597": 0
+            "596": 0
           },
           "Branches": [
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 232,
               "EndOffset": 234,
               "Path": 0,
@@ -2519,7 +2519,7 @@
               "Hits": 0
             },
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 232,
               "EndOffset": 237,
               "Path": 1,
@@ -2527,7 +2527,7 @@
               "Hits": 0
             },
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 251,
               "EndOffset": 253,
               "Path": 0,
@@ -2535,7 +2535,7 @@
               "Hits": 0
             },
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 251,
               "EndOffset": 274,
               "Path": 1,
@@ -2543,7 +2543,7 @@
               "Hits": 0
             },
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 277,
               "EndOffset": 282,
               "Path": 0,
@@ -2551,7 +2551,7 @@
               "Hits": 0
             },
             {
-              "Line": 570,
+              "Line": 569,
               "Offset": 277,
               "EndOffset": 471,
               "Path": 1,
@@ -2561,12 +2561,13 @@
           ]
         }
       },
-      "RedisKit.Services.RedisCacheService/<SetManyWithLuaScript>d__32": {
-        "System.Void RedisKit.Services.RedisCacheService/<SetManyWithLuaScript>d__32::MoveNext()": {
+      "RedisKit.Services.RedisCacheService/<SetManyWithLuaScript>d__31": {
+        "System.Void RedisKit.Services.RedisCacheService/<SetManyWithLuaScript>d__31::MoveNext()": {
           "Lines": {
-            "532": 0,
+            "531": 0,
+            "533": 0,
             "534": 0,
-            "535": 0,
+            "537": 0,
             "538": 0,
             "539": 0,
             "540": 0,
@@ -2590,12 +2591,11 @@
             "558": 0,
             "559": 0,
             "560": 0,
-            "561": 0,
-            "563": 0
+            "562": 0
           },
           "Branches": [
             {
-              "Line": 540,
+              "Line": 539,
               "Offset": 538,
               "EndOffset": 540,
               "Path": 0,
@@ -2603,7 +2603,7 @@
               "Hits": 0
             },
             {
-              "Line": 540,
+              "Line": 539,
               "Offset": 538,
               "EndOffset": 571,
               "Path": 1,
@@ -4491,20 +4491,20 @@
       "RedisKit.Services.RedisDistributedLock": {
         "System.String RedisKit.Services.RedisDistributedLock::GenerateLockId()": {
           "Lines": {
-            "250": 14,
-            "251": 14,
-            "252": 14
+            "250": 47,
+            "251": 47,
+            "252": 47
           },
           "Branches": []
         },
         "System.String RedisKit.Services.RedisDistributedLock::GetLockKey(System.String)": {
           "Lines": {
-            "255": 16,
-            "258": 16,
-            "259": 16,
-            "260": 16,
-            "261": 16,
-            "262": 16
+            "255": 49,
+            "258": 49,
+            "259": 49,
+            "260": 49,
+            "261": 49,
+            "262": 49
           },
           "Branches": []
         },
@@ -4598,27 +4598,27 @@
       "RedisKit.Services.RedisDistributedLock/<AcquireLockAsync>d__4": {
         "System.Void RedisKit.Services.RedisDistributedLock/<AcquireLockAsync>d__4::MoveNext()": {
           "Lines": {
-            "37": 28,
-            "38": 28,
+            "37": 61,
+            "38": 61,
             "39": 3,
-            "41": 25,
+            "41": 58,
             "42": 5,
-            "45": 20,
+            "45": 53,
             "46": 3,
-            "48": 17,
+            "48": 50,
             "49": 3,
-            "52": 14,
+            "52": 47,
             "53": 0,
-            "55": 14,
-            "56": 14,
-            "57": 14,
-            "60": 14,
-            "61": 14,
-            "62": 14,
-            "63": 14,
-            "64": 14,
-            "65": 14,
-            "67": 14,
+            "55": 47,
+            "56": 47,
+            "57": 47,
+            "60": 47,
+            "61": 47,
+            "62": 47,
+            "63": 47,
+            "64": 47,
+            "65": 47,
+            "67": 47,
             "68": 1,
             "69": 1,
             "72": 1,
@@ -4629,9 +4629,9 @@
             "78": 1,
             "79": 1,
             "80": 1,
-            "83": 13,
-            "84": 13,
-            "85": 14
+            "83": 46,
+            "84": 46,
+            "85": 47
           },
           "Branches": [
             {
@@ -4648,7 +4648,7 @@
               "EndOffset": 74,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 25
+              "Hits": 58
             },
             {
               "Line": 41,
@@ -4664,7 +4664,7 @@
               "EndOffset": 110,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 20
+              "Hits": 53
             },
             {
               "Line": 45,
@@ -4680,7 +4680,7 @@
               "EndOffset": 150,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 17
+              "Hits": 50
             },
             {
               "Line": 48,
@@ -4696,7 +4696,7 @@
               "EndOffset": 189,
               "Path": 1,
               "Ordinal": 7,
-              "Hits": 14
+              "Hits": 47
             },
             {
               "Line": 52,
@@ -4712,7 +4712,7 @@
               "EndOffset": 229,
               "Path": 1,
               "Ordinal": 9,
-              "Hits": 14
+              "Hits": 47
             },
             {
               "Line": 67,
@@ -4744,7 +4744,7 @@
               "EndOffset": 816,
               "Path": 1,
               "Ordinal": 11,
-              "Hits": 13
+              "Hits": 46
             },
             {
               "Line": 83,
@@ -4760,7 +4760,7 @@
               "EndOffset": 833,
               "Path": 1,
               "Ordinal": 15,
-              "Hits": 13
+              "Hits": 46
             }
           ]
         }
@@ -4775,18 +4775,18 @@
             "98": 0,
             "100": 1,
             "101": 1,
-            "103": 6,
-            "104": 5,
-            "105": 5,
-            "107": 5,
-            "108": 5,
+            "103": 39,
+            "104": 38,
+            "105": 38,
+            "107": 38,
+            "108": 38,
             "109": 0,
             "110": 0,
             "111": 0,
-            "115": 5,
-            "116": 5,
-            "118": 10,
-            "119": 5,
+            "115": 38,
+            "116": 38,
+            "118": 75,
+            "119": 38,
             "121": 1,
             "122": 1,
             "124": 1,
@@ -4831,7 +4831,7 @@
               "EndOffset": 139,
               "Path": 1,
               "Ordinal": 15,
-              "Hits": 5
+              "Hits": 38
             },
             {
               "Line": 108,
@@ -4863,7 +4863,7 @@
               "EndOffset": 400,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 5
+              "Hits": 38
             },
             {
               "Line": 116,
@@ -4879,7 +4879,7 @@
               "EndOffset": 450,
               "Path": 1,
               "Ordinal": 9,
-              "Hits": 1
+              "Hits": 34
             },
             {
               "Line": 118,
@@ -4887,7 +4887,7 @@
               "EndOffset": 483,
               "Path": 0,
               "Ordinal": 10,
-              "Hits": 5
+              "Hits": 37
             },
             {
               "Line": 118,
@@ -4895,7 +4895,7 @@
               "EndOffset": 594,
               "Path": 1,
               "Ordinal": 11,
-              "Hits": 5
+              "Hits": 38
             },
             {
               "Line": 103,
@@ -4903,7 +4903,7 @@
               "EndOffset": 620,
               "Path": 0,
               "Ordinal": 12,
-              "Hits": 5
+              "Hits": 38
             },
             {
               "Line": 103,
@@ -5308,43 +5308,43 @@
       "RedisKit.Services.RedisFunctionService": {
         "System.Collections.Generic.IEnumerable`1<RedisKit.Models.FunctionLibraryInfo> RedisKit.Services.RedisFunctionService::ParseFunctionList(StackExchange.Redis.RedisResult)": {
           "Lines": {
-            "433": 5,
-            "434": 5,
-            "436": 5,
+            "419": 5,
+            "420": 5,
+            "422": 5,
+            "423": 0,
+            "425": 5,
+            "426": 21,
+            "427": 3,
+            "428": 3,
+            "429": 0,
+            "431": 3,
+            "432": 3,
+            "434": 26,
+            "435": 10,
+            "436": 10,
             "437": 0,
-            "439": 5,
-            "440": 21,
-            "441": 3,
-            "442": 3,
-            "443": 0,
+            "439": 10,
+            "440": 10,
+            "442": 10,
             "445": 3,
             "446": 3,
-            "448": 26,
-            "449": 10,
-            "450": 10,
+            "448": 3,
+            "449": 3,
             "451": 0,
-            "453": 10,
-            "454": 10,
-            "456": 10,
-            "459": 3,
-            "460": 3,
+            "452": 0,
+            "454": 1,
+            "455": 1,
+            "457": 6,
+            "458": 3,
+            "460": 10,
             "462": 3,
             "463": 3,
-            "465": 0,
-            "466": 0,
-            "468": 1,
-            "469": 1,
-            "471": 6,
-            "472": 3,
-            "474": 10,
-            "476": 3,
-            "477": 3,
-            "479": 5,
-            "480": 5
+            "465": 5,
+            "466": 5
           },
           "Branches": [
             {
-              "Line": 436,
+              "Line": 422,
               "Offset": 21,
               "EndOffset": 23,
               "Path": 0,
@@ -5352,7 +5352,7 @@
               "Hits": 0
             },
             {
-              "Line": 436,
+              "Line": 422,
               "Offset": 21,
               "EndOffset": 30,
               "Path": 1,
@@ -5360,7 +5360,7 @@
               "Hits": 5
             },
             {
-              "Line": 440,
+              "Line": 426,
               "Offset": 414,
               "EndOffset": 49,
               "Path": 1,
@@ -5368,7 +5368,7 @@
               "Hits": 3
             },
             {
-              "Line": 442,
+              "Line": 428,
               "Offset": 74,
               "EndOffset": 81,
               "Path": 1,
@@ -5376,7 +5376,7 @@
               "Hits": 3
             },
             {
-              "Line": 448,
+              "Line": 434,
               "Offset": 387,
               "EndOffset": 105,
               "Path": 1,
@@ -5384,7 +5384,7 @@
               "Hits": 10
             },
             {
-              "Line": 450,
+              "Line": 436,
               "Offset": 123,
               "EndOffset": 130,
               "Path": 1,
@@ -5392,7 +5392,7 @@
               "Hits": 10
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 153,
               "EndOffset": 155,
               "Path": 0,
@@ -5400,7 +5400,7 @@
               "Hits": 0
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 153,
               "EndOffset": 158,
               "Path": 1,
@@ -5408,7 +5408,7 @@
               "Hits": 10
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 183,
               "EndOffset": 185,
               "Path": 0,
@@ -5416,7 +5416,7 @@
               "Hits": 7
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 197,
               "EndOffset": 199,
               "Path": 0,
@@ -5424,7 +5424,7 @@
               "Hits": 4
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 211,
               "EndOffset": 213,
               "Path": 0,
@@ -5432,7 +5432,7 @@
               "Hits": 4
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 225,
               "EndOffset": 227,
               "Path": 0,
@@ -5440,7 +5440,7 @@
               "Hits": 3
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 183,
               "EndOffset": 243,
               "Path": 1,
@@ -5448,7 +5448,7 @@
               "Hits": 3
             },
             {
-              "Line": 459,
+              "Line": 445,
               "Offset": 253,
               "EndOffset": 255,
               "Path": 0,
@@ -5456,7 +5456,7 @@
               "Hits": 0
             },
             {
-              "Line": 459,
+              "Line": 445,
               "Offset": 253,
               "EndOffset": 261,
               "Path": 1,
@@ -5464,7 +5464,7 @@
               "Hits": 3
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 197,
               "EndOffset": 269,
               "Path": 1,
@@ -5472,7 +5472,7 @@
               "Hits": 3
             },
             {
-              "Line": 462,
+              "Line": 448,
               "Offset": 279,
               "EndOffset": 281,
               "Path": 0,
@@ -5480,7 +5480,7 @@
               "Hits": 0
             },
             {
-              "Line": 462,
+              "Line": 448,
               "Offset": 279,
               "EndOffset": 287,
               "Path": 1,
@@ -5488,7 +5488,7 @@
               "Hits": 3
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 211,
               "EndOffset": 295,
               "Path": 1,
@@ -5496,7 +5496,7 @@
               "Hits": 0
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 225,
               "EndOffset": 312,
               "Path": 1,
@@ -5504,7 +5504,7 @@
               "Hits": 1
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 239,
               "EndOffset": 329,
               "Path": 1,
@@ -5512,7 +5512,7 @@
               "Hits": 3
             },
             {
-              "Line": 471,
+              "Line": 457,
               "Offset": 343,
               "EndOffset": 345,
               "Path": 0,
@@ -5520,7 +5520,7 @@
               "Hits": 3
             },
             {
-              "Line": 456,
+              "Line": 442,
               "Offset": 239,
               "EndOffset": 368,
               "Path": 0,
@@ -5528,7 +5528,7 @@
               "Hits": 10
             },
             {
-              "Line": 471,
+              "Line": 457,
               "Offset": 343,
               "EndOffset": 368,
               "Path": 1,
@@ -5536,7 +5536,7 @@
               "Hits": 10
             },
             {
-              "Line": 450,
+              "Line": 436,
               "Offset": 123,
               "EndOffset": 392,
               "Path": 0,
@@ -5544,7 +5544,7 @@
               "Hits": 3
             },
             {
-              "Line": 448,
+              "Line": 434,
               "Offset": 387,
               "EndOffset": 392,
               "Path": 0,
@@ -5552,7 +5552,7 @@
               "Hits": 3
             },
             {
-              "Line": 442,
+              "Line": 428,
               "Offset": 74,
               "EndOffset": 402,
               "Path": 0,
@@ -5560,7 +5560,7 @@
               "Hits": 3
             },
             {
-              "Line": 440,
+              "Line": 426,
               "Offset": 414,
               "EndOffset": 419,
               "Path": 0,
@@ -5571,41 +5571,41 @@
         },
         "System.Collections.Generic.List`1<RedisKit.Models.FunctionInfo> RedisKit.Services.RedisFunctionService::ParseFunctions(StackExchange.Redis.RedisResult[])": {
           "Lines": {
-            "483": 3,
-            "484": 3,
-            "486": 15,
-            "487": 3,
-            "488": 3,
-            "489": 0,
+            "469": 3,
+            "470": 3,
+            "472": 15,
+            "473": 3,
+            "474": 3,
+            "475": 0,
+            "477": 3,
+            "478": 3,
+            "480": 24,
+            "481": 9,
+            "482": 9,
+            "483": 0,
+            "485": 9,
+            "486": 9,
+            "488": 9,
             "491": 3,
             "492": 3,
-            "494": 24,
-            "495": 9,
-            "496": 9,
-            "497": 0,
-            "499": 9,
-            "500": 9,
-            "502": 9,
-            "505": 3,
-            "506": 3,
+            "494": 3,
+            "495": 3,
+            "497": 3,
+            "498": 3,
+            "499": 3,
+            "500": 3,
+            "501": 3,
+            "502": 3,
+            "504": 3,
+            "506": 9,
             "508": 3,
             "509": 3,
             "511": 3,
-            "512": 3,
-            "513": 3,
-            "514": 3,
-            "515": 3,
-            "516": 3,
-            "518": 3,
-            "520": 9,
-            "522": 3,
-            "523": 3,
-            "525": 3,
-            "526": 3
+            "512": 3
           },
           "Branches": [
             {
-              "Line": 486,
+              "Line": 472,
               "Offset": 371,
               "EndOffset": 17,
               "Path": 1,
@@ -5613,7 +5613,7 @@
               "Hits": 3
             },
             {
-              "Line": 488,
+              "Line": 474,
               "Offset": 38,
               "EndOffset": 45,
               "Path": 1,
@@ -5621,7 +5621,7 @@
               "Hits": 3
             },
             {
-              "Line": 494,
+              "Line": 480,
               "Offset": 348,
               "EndOffset": 68,
               "Path": 1,
@@ -5629,7 +5629,7 @@
               "Hits": 9
             },
             {
-              "Line": 496,
+              "Line": 482,
               "Offset": 86,
               "EndOffset": 93,
               "Path": 1,
@@ -5637,7 +5637,7 @@
               "Hits": 9
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 116,
               "EndOffset": 118,
               "Path": 0,
@@ -5645,7 +5645,7 @@
               "Hits": 0
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 116,
               "EndOffset": 121,
               "Path": 1,
@@ -5653,7 +5653,7 @@
               "Hits": 9
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 146,
               "EndOffset": 148,
               "Path": 0,
@@ -5661,7 +5661,7 @@
               "Hits": 6
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 160,
               "EndOffset": 162,
               "Path": 0,
@@ -5669,7 +5669,7 @@
               "Hits": 3
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 146,
               "EndOffset": 181,
               "Path": 1,
@@ -5677,7 +5677,7 @@
               "Hits": 3
             },
             {
-              "Line": 505,
+              "Line": 491,
               "Offset": 191,
               "EndOffset": 193,
               "Path": 0,
@@ -5685,7 +5685,7 @@
               "Hits": 0
             },
             {
-              "Line": 505,
+              "Line": 491,
               "Offset": 191,
               "EndOffset": 199,
               "Path": 1,
@@ -5693,7 +5693,7 @@
               "Hits": 3
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 160,
               "EndOffset": 207,
               "Path": 1,
@@ -5701,7 +5701,7 @@
               "Hits": 3
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 174,
               "EndOffset": 224,
               "Path": 1,
@@ -5709,7 +5709,7 @@
               "Hits": 3
             },
             {
-              "Line": 511,
+              "Line": 497,
               "Offset": 238,
               "EndOffset": 240,
               "Path": 0,
@@ -5717,7 +5717,7 @@
               "Hits": 3
             },
             {
-              "Line": 502,
+              "Line": 488,
               "Offset": 174,
               "EndOffset": 329,
               "Path": 0,
@@ -5725,7 +5725,7 @@
               "Hits": 9
             },
             {
-              "Line": 511,
+              "Line": 497,
               "Offset": 238,
               "EndOffset": 329,
               "Path": 1,
@@ -5733,7 +5733,7 @@
               "Hits": 9
             },
             {
-              "Line": 496,
+              "Line": 482,
               "Offset": 86,
               "EndOffset": 353,
               "Path": 0,
@@ -5741,7 +5741,7 @@
               "Hits": 3
             },
             {
-              "Line": 494,
+              "Line": 480,
               "Offset": 348,
               "EndOffset": 353,
               "Path": 0,
@@ -5749,7 +5749,7 @@
               "Hits": 3
             },
             {
-              "Line": 488,
+              "Line": 474,
               "Offset": 38,
               "EndOffset": 363,
               "Path": 0,
@@ -5757,7 +5757,7 @@
               "Hits": 3
             },
             {
-              "Line": 486,
+              "Line": 472,
               "Offset": 371,
               "EndOffset": 376,
               "Path": 0,
@@ -5765,7 +5765,7 @@
               "Hits": 3
             },
             {
-              "Line": 514,
+              "Line": 500,
               "Offset": 7,
               "EndOffset": 9,
               "Path": 0,
@@ -5773,7 +5773,7 @@
               "Hits": 0
             },
             {
-              "Line": 514,
+              "Line": 500,
               "Offset": 7,
               "EndOffset": 15,
               "Path": 1,
@@ -5784,60 +5784,60 @@
         },
         "RedisKit.Models.FunctionStats RedisKit.Services.RedisFunctionService::ParseFunctionStats(StackExchange.Redis.RedisResult)": {
           "Lines": {
-            "529": 1,
-            "530": 1,
-            "532": 1,
-            "533": 0,
+            "515": 1,
+            "516": 1,
+            "518": 1,
+            "519": 0,
+            "521": 1,
+            "523": 6,
+            "524": 2,
+            "525": 2,
+            "526": 0,
+            "528": 2,
+            "529": 2,
+            "531": 2,
+            "534": 1,
             "535": 1,
-            "537": 6,
-            "538": 2,
-            "539": 2,
-            "540": 0,
-            "542": 2,
-            "543": 2,
-            "545": 2,
+            "537": 1,
+            "538": 1,
+            "539": 1,
+            "540": 1,
+            "543": 4,
+            "544": 1,
+            "545": 1,
+            "546": 0,
             "548": 1,
             "549": 1,
-            "551": 1,
-            "552": 1,
+            "550": 1,
             "553": 1,
             "554": 1,
-            "557": 4,
-            "558": 1,
-            "559": 1,
-            "560": 0,
-            "562": 1,
-            "563": 1,
-            "564": 1,
+            "555": 1,
+            "556": 6,
+            "557": 2,
+            "558": 2,
+            "559": 0,
+            "561": 2,
+            "562": 2,
+            "564": 2,
             "567": 1,
             "568": 1,
-            "569": 1,
-            "570": 6,
-            "571": 2,
-            "572": 2,
+            "570": 1,
+            "571": 1,
             "573": 0,
-            "575": 2,
+            "574": 0,
             "576": 2,
-            "578": 2,
+            "577": 1,
+            "578": 1,
+            "580": 1,
             "581": 1,
-            "582": 1,
-            "584": 1,
-            "585": 1,
-            "587": 0,
-            "588": 0,
-            "590": 2,
-            "591": 1,
-            "592": 1,
-            "594": 1,
-            "595": 1,
-            "597": 1,
-            "599": 2,
-            "601": 1,
-            "602": 1
+            "583": 1,
+            "585": 2,
+            "587": 1,
+            "588": 1
           },
           "Branches": [
             {
-              "Line": 532,
+              "Line": 518,
               "Offset": 21,
               "EndOffset": 23,
               "Path": 0,
@@ -5845,7 +5845,7 @@
               "Hits": 0
             },
             {
-              "Line": 532,
+              "Line": 518,
               "Offset": 21,
               "EndOffset": 30,
               "Path": 1,
@@ -5853,7 +5853,7 @@
               "Hits": 1
             },
             {
-              "Line": 537,
+              "Line": 523,
               "Offset": 568,
               "EndOffset": 45,
               "Path": 1,
@@ -5861,7 +5861,7 @@
               "Hits": 2
             },
             {
-              "Line": 539,
+              "Line": 525,
               "Offset": 62,
               "EndOffset": 69,
               "Path": 1,
@@ -5869,7 +5869,7 @@
               "Hits": 2
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 90,
               "EndOffset": 92,
               "Path": 0,
@@ -5877,7 +5877,7 @@
               "Hits": 0
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 90,
               "EndOffset": 95,
               "Path": 1,
@@ -5885,7 +5885,7 @@
               "Hits": 2
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 120,
               "EndOffset": 122,
               "Path": 0,
@@ -5893,7 +5893,7 @@
               "Hits": 1
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 120,
               "EndOffset": 141,
               "Path": 1,
@@ -5901,7 +5901,7 @@
               "Hits": 1
             },
             {
-              "Line": 548,
+              "Line": 534,
               "Offset": 149,
               "EndOffset": 151,
               "Path": 0,
@@ -5909,7 +5909,7 @@
               "Hits": 0
             },
             {
-              "Line": 548,
+              "Line": 534,
               "Offset": 149,
               "EndOffset": 154,
               "Path": 1,
@@ -5917,7 +5917,7 @@
               "Hits": 1
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 134,
               "EndOffset": 166,
               "Path": 1,
@@ -5925,7 +5925,7 @@
               "Hits": 1
             },
             {
-              "Line": 551,
+              "Line": 537,
               "Offset": 180,
               "EndOffset": 185,
               "Path": 0,
@@ -5933,7 +5933,7 @@
               "Hits": 1
             },
             {
-              "Line": 557,
+              "Line": 543,
               "Offset": 533,
               "EndOffset": 210,
               "Path": 1,
@@ -5941,7 +5941,7 @@
               "Hits": 1
             },
             {
-              "Line": 559,
+              "Line": 545,
               "Offset": 226,
               "EndOffset": 233,
               "Path": 1,
@@ -5949,7 +5949,7 @@
               "Hits": 1
             },
             {
-              "Line": 563,
+              "Line": 549,
               "Offset": 259,
               "EndOffset": 261,
               "Path": 0,
@@ -5957,7 +5957,7 @@
               "Hits": 1
             },
             {
-              "Line": 563,
+              "Line": 549,
               "Offset": 259,
               "EndOffset": 271,
               "Path": 1,
@@ -5965,7 +5965,7 @@
               "Hits": 1
             },
             {
-              "Line": 567,
+              "Line": 553,
               "Offset": 279,
               "EndOffset": 281,
               "Path": 0,
@@ -5973,7 +5973,7 @@
               "Hits": 1
             },
             {
-              "Line": 567,
+              "Line": 553,
               "Offset": 279,
               "EndOffset": 298,
               "Path": 1,
@@ -5981,7 +5981,7 @@
               "Hits": 0
             },
             {
-              "Line": 567,
+              "Line": 553,
               "Offset": 303,
               "EndOffset": 308,
               "Path": 0,
@@ -5989,7 +5989,7 @@
               "Hits": 1
             },
             {
-              "Line": 570,
+              "Line": 556,
               "Offset": 508,
               "EndOffset": 331,
               "Path": 1,
@@ -5997,7 +5997,7 @@
               "Hits": 2
             },
             {
-              "Line": 572,
+              "Line": 558,
               "Offset": 349,
               "EndOffset": 356,
               "Path": 1,
@@ -6005,7 +6005,7 @@
               "Hits": 2
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 379,
               "EndOffset": 381,
               "Path": 0,
@@ -6013,7 +6013,7 @@
               "Hits": 0
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 379,
               "EndOffset": 384,
               "Path": 1,
@@ -6021,7 +6021,7 @@
               "Hits": 2
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 409,
               "EndOffset": 411,
               "Path": 0,
@@ -6029,7 +6029,7 @@
               "Hits": 1
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 423,
               "EndOffset": 425,
               "Path": 0,
@@ -6037,7 +6037,7 @@
               "Hits": 0
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 409,
               "EndOffset": 441,
               "Path": 1,
@@ -6045,7 +6045,7 @@
               "Hits": 1
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 423,
               "EndOffset": 457,
               "Path": 1,
@@ -6053,7 +6053,7 @@
               "Hits": 1
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 437,
               "EndOffset": 473,
               "Path": 1,
@@ -6061,7 +6061,7 @@
               "Hits": 0
             },
             {
-              "Line": 578,
+              "Line": 564,
               "Offset": 437,
               "EndOffset": 489,
               "Path": 0,
@@ -6069,7 +6069,7 @@
               "Hits": 2
             },
             {
-              "Line": 572,
+              "Line": 558,
               "Offset": 349,
               "EndOffset": 513,
               "Path": 0,
@@ -6077,7 +6077,7 @@
               "Hits": 1
             },
             {
-              "Line": 570,
+              "Line": 556,
               "Offset": 508,
               "EndOffset": 513,
               "Path": 0,
@@ -6085,7 +6085,7 @@
               "Hits": 1
             },
             {
-              "Line": 567,
+              "Line": 553,
               "Offset": 303,
               "EndOffset": 514,
               "Path": 1,
@@ -6093,7 +6093,7 @@
               "Hits": 1
             },
             {
-              "Line": 559,
+              "Line": 545,
               "Offset": 226,
               "EndOffset": 538,
               "Path": 0,
@@ -6101,7 +6101,7 @@
               "Hits": 1
             },
             {
-              "Line": 557,
+              "Line": 543,
               "Offset": 533,
               "EndOffset": 538,
               "Path": 0,
@@ -6109,7 +6109,7 @@
               "Hits": 1
             },
             {
-              "Line": 545,
+              "Line": 531,
               "Offset": 134,
               "EndOffset": 550,
               "Path": 0,
@@ -6117,7 +6117,7 @@
               "Hits": 2
             },
             {
-              "Line": 551,
+              "Line": 537,
               "Offset": 180,
               "EndOffset": 550,
               "Path": 1,
@@ -6125,7 +6125,7 @@
               "Hits": 2
             },
             {
-              "Line": 539,
+              "Line": 525,
               "Offset": 62,
               "EndOffset": 573,
               "Path": 0,
@@ -6133,7 +6133,7 @@
               "Hits": 1
             },
             {
-              "Line": 537,
+              "Line": 523,
               "Offset": 568,
               "EndOffset": 573,
               "Path": 0,
@@ -6244,7 +6244,7 @@
       "RedisKit.Services.RedisFunctionService/<>c__16`1": {
         "System.Object RedisKit.Services.RedisFunctionService/<>c__16`1::<CallFunctionInternalAsync>b__16_0(StackExchange.Redis.RedisValue)": {
           "Lines": {
-            "336": 48
+            "327": 48
           },
           "Branches": []
         }
@@ -6262,112 +6262,108 @@
       "RedisKit.Services.RedisFunctionService/<CallFunctionInternalAsync>d__16`1": {
         "System.Void RedisKit.Services.RedisFunctionService/<CallFunctionInternalAsync>d__16`1::MoveNext()": {
           "Lines": {
-            "276": 11,
+            "267": 11,
+            "268": 11,
+            "270": 11,
+            "273": 11,
+            "274": 11,
+            "275": 11,
             "277": 11,
-            "279": 11,
+            "280": 11,
+            "281": 11,
             "282": 11,
             "283": 11,
             "284": 11,
-            "286": 11,
-            "289": 11,
-            "290": 11,
-            "291": 11,
+            "287": 11,
+            "288": 22,
+            "289": 5,
             "292": 11,
-            "293": 11,
-            "296": 11,
-            "297": 22,
-            "298": 5,
-            "301": 11,
-            "302": 38,
-            "303": 10,
+            "293": 38,
+            "294": 10,
+            "295": 0,
+            "296": 0,
+            "297": 0,
+            "298": 10,
+            "299": 10,
+            "300": 10,
+            "301": 10,
+            "302": 0,
+            "303": 0,
             "304": 0,
             "305": 0,
-            "306": 0,
-            "307": 10,
-            "308": 10,
-            "309": 10,
-            "310": 10,
+            "307": 0,
+            "309": 0,
+            "310": 0,
             "311": 0,
-            "312": 0,
-            "313": 0,
-            "314": 0,
-            "316": 0,
-            "318": 0,
-            "319": 0,
-            "320": 0,
-            "327": 11,
+            "318": 11,
+            "319": 11,
             "328": 11,
-            "337": 11,
-            "339": 10,
-            "340": 0,
-            "343": 10,
-            "344": 8,
-            "346": 2,
+            "330": 10,
+            "331": 0,
+            "334": 10,
+            "335": 8,
+            "337": 2,
+            "338": 0,
+            "341": 2,
+            "342": 0,
+            "343": 0,
+            "344": 0,
+            "345": 0,
+            "346": 0,
             "347": 0,
-            "350": 2,
-            "351": 0,
-            "352": 0,
+            "348": 0,
+            "349": 0,
+            "352": 2,
             "353": 0,
             "354": 0,
             "355": 0,
-            "356": 0,
-            "357": 0,
-            "358": 0,
+            "359": 2,
+            "360": 2,
             "361": 2,
-            "362": 0,
-            "363": 0,
-            "364": 0,
+            "364": 2,
+            "365": 2,
+            "366": 2,
+            "367": 2,
             "368": 2,
-            "369": 2,
-            "370": 2,
-            "373": 2,
-            "374": 2,
-            "375": 2,
-            "376": 2,
-            "377": 2,
-            "379": 20,
-            "380": 8,
-            "381": 8,
-            "382": 8,
-            "384": 8,
-            "385": 6,
-            "386": 6,
-            "387": 6,
-            "388": 2,
+            "370": 20,
+            "371": 8,
+            "372": 8,
+            "373": 8,
+            "375": 8,
+            "376": 6,
+            "377": 6,
+            "378": 6,
+            "379": 2,
+            "380": 0,
+            "381": 0,
+            "382": 0,
+            "383": 2,
+            "384": 0,
+            "385": 0,
+            "386": 0,
+            "387": 2,
+            "388": 0,
             "389": 0,
             "390": 0,
-            "391": 0,
+            "391": 2,
             "392": 2,
-            "393": 0,
-            "394": 0,
-            "395": 0,
+            "394": 2,
+            "395": 2,
             "396": 2,
-            "397": 0,
-            "398": 0,
-            "399": 0,
-            "400": 2,
+            "398": 8,
+            "399": 8,
             "401": 2,
-            "403": 2,
-            "404": 2,
-            "405": 2,
-            "407": 8,
-            "408": 8,
-            "410": 2,
-            "415": 0,
-            "418": 0,
-            "420": 1,
-            "421": 1,
-            "422": 1,
-            "423": 1,
-            "425": 0,
-            "426": 0,
-            "427": 0,
-            "428": 0,
-            "430": 10
+            "406": 0,
+            "409": 0,
+            "411": 1,
+            "412": 1,
+            "413": 1,
+            "414": 1,
+            "416": 10
           },
           "Branches": [
             {
-              "Line": 276,
+              "Line": 267,
               "Offset": 16,
               "EndOffset": 27,
               "Path": 0,
@@ -6375,7 +6371,7 @@
               "Hits": 11
             },
             {
-              "Line": 279,
+              "Line": 270,
               "Offset": 169,
               "EndOffset": 171,
               "Path": 0,
@@ -6383,7 +6379,7 @@
               "Hits": 0
             },
             {
-              "Line": 276,
+              "Line": 267,
               "Offset": 16,
               "EndOffset": 182,
               "Path": 1,
@@ -6391,7 +6387,7 @@
               "Hits": 21
             },
             {
-              "Line": 279,
+              "Line": 270,
               "Offset": 169,
               "EndOffset": 182,
               "Path": 1,
@@ -6399,7 +6395,7 @@
               "Hits": 21
             },
             {
-              "Line": 283,
+              "Line": 274,
               "Offset": 279,
               "EndOffset": 281,
               "Path": 0,
@@ -6407,7 +6403,7 @@
               "Hits": 7
             },
             {
-              "Line": 283,
+              "Line": 274,
               "Offset": 279,
               "EndOffset": 285,
               "Path": 1,
@@ -6415,7 +6411,7 @@
               "Hits": 4
             },
             {
-              "Line": 283,
+              "Line": 274,
               "Offset": 302,
               "EndOffset": 304,
               "Path": 0,
@@ -6423,7 +6419,7 @@
               "Hits": 5
             },
             {
-              "Line": 283,
+              "Line": 274,
               "Offset": 302,
               "EndOffset": 308,
               "Path": 1,
@@ -6431,7 +6427,7 @@
               "Hits": 6
             },
             {
-              "Line": 289,
+              "Line": 280,
               "Offset": 488,
               "EndOffset": 490,
               "Path": 0,
@@ -6439,7 +6435,7 @@
               "Hits": 7
             },
             {
-              "Line": 289,
+              "Line": 280,
               "Offset": 488,
               "EndOffset": 494,
               "Path": 1,
@@ -6447,7 +6443,7 @@
               "Hits": 4
             },
             {
-              "Line": 296,
+              "Line": 287,
               "Offset": 525,
               "EndOffset": 527,
               "Path": 0,
@@ -6455,7 +6451,7 @@
               "Hits": 4
             },
             {
-              "Line": 297,
+              "Line": 288,
               "Offset": 626,
               "EndOffset": 549,
               "Path": 1,
@@ -6463,7 +6459,7 @@
               "Hits": 5
             },
             {
-              "Line": 297,
+              "Line": 288,
               "Offset": 626,
               "EndOffset": 628,
               "Path": 0,
@@ -6471,7 +6467,7 @@
               "Hits": 4
             },
             {
-              "Line": 296,
+              "Line": 287,
               "Offset": 525,
               "EndOffset": 635,
               "Path": 1,
@@ -6479,7 +6475,7 @@
               "Hits": 11
             },
             {
-              "Line": 301,
+              "Line": 292,
               "Offset": 648,
               "EndOffset": 653,
               "Path": 0,
@@ -6487,7 +6483,7 @@
               "Hits": 6
             },
             {
-              "Line": 302,
+              "Line": 293,
               "Offset": 1087,
               "EndOffset": 678,
               "Path": 1,
@@ -6495,7 +6491,7 @@
               "Hits": 10
             },
             {
-              "Line": 303,
+              "Line": 294,
               "Offset": 710,
               "EndOffset": 712,
               "Path": 0,
@@ -6503,7 +6499,7 @@
               "Hits": 0
             },
             {
-              "Line": 303,
+              "Line": 294,
               "Offset": 710,
               "EndOffset": 736,
               "Path": 1,
@@ -6511,7 +6507,7 @@
               "Hits": 10
             },
             {
-              "Line": 307,
+              "Line": 298,
               "Offset": 766,
               "EndOffset": 768,
               "Path": 0,
@@ -6519,7 +6515,7 @@
               "Hits": 10
             },
             {
-              "Line": 307,
+              "Line": 298,
               "Offset": 766,
               "EndOffset": 798,
               "Path": 1,
@@ -6527,7 +6523,7 @@
               "Hits": 0
             },
             {
-              "Line": 311,
+              "Line": 302,
               "Offset": 828,
               "EndOffset": 830,
               "Path": 0,
@@ -6535,7 +6531,7 @@
               "Hits": 0
             },
             {
-              "Line": 311,
+              "Line": 302,
               "Offset": 828,
               "EndOffset": 860,
               "Path": 1,
@@ -6543,7 +6539,7 @@
               "Hits": 0
             },
             {
-              "Line": 302,
+              "Line": 293,
               "Offset": 1087,
               "EndOffset": 1092,
               "Path": 0,
@@ -6551,7 +6547,7 @@
               "Hits": 6
             },
             {
-              "Line": 301,
+              "Line": 292,
               "Offset": 648,
               "EndOffset": 1099,
               "Path": 1,
@@ -6559,7 +6555,7 @@
               "Hits": 11
             },
             {
-              "Line": 336,
+              "Line": 327,
               "Offset": 1159,
               "EndOffset": 1161,
               "Path": 0,
@@ -6567,7 +6563,7 @@
               "Hits": 3
             },
             {
-              "Line": 336,
+              "Line": 327,
               "Offset": 1159,
               "EndOffset": 1184,
               "Path": 1,
@@ -6575,7 +6571,7 @@
               "Hits": 11
             },
             {
-              "Line": 339,
+              "Line": 330,
               "Offset": 1365,
               "EndOffset": 1367,
               "Path": 0,
@@ -6583,7 +6579,7 @@
               "Hits": 0
             },
             {
-              "Line": 339,
+              "Line": 330,
               "Offset": 1365,
               "EndOffset": 1380,
               "Path": 1,
@@ -6591,7 +6587,7 @@
               "Hits": 10
             },
             {
-              "Line": 343,
+              "Line": 334,
               "Offset": 1409,
               "EndOffset": 1411,
               "Path": 0,
@@ -6599,7 +6595,7 @@
               "Hits": 8
             },
             {
-              "Line": 343,
+              "Line": 334,
               "Offset": 1409,
               "EndOffset": 1438,
               "Path": 1,
@@ -6607,7 +6603,7 @@
               "Hits": 2
             },
             {
-              "Line": 346,
+              "Line": 337,
               "Offset": 1467,
               "EndOffset": 1469,
               "Path": 0,
@@ -6615,7 +6611,7 @@
               "Hits": 0
             },
             {
-              "Line": 346,
+              "Line": 337,
               "Offset": 1467,
               "EndOffset": 1496,
               "Path": 1,
@@ -6623,7 +6619,7 @@
               "Hits": 2
             },
             {
-              "Line": 350,
+              "Line": 341,
               "Offset": 1514,
               "EndOffset": 1519,
               "Path": 0,
@@ -6631,7 +6627,7 @@
               "Hits": 0
             },
             {
-              "Line": 352,
+              "Line": 343,
               "Offset": 1549,
               "EndOffset": 1551,
               "Path": 0,
@@ -6639,7 +6635,7 @@
               "Hits": 0
             },
             {
-              "Line": 352,
+              "Line": 343,
               "Offset": 1549,
               "EndOffset": 1578,
               "Path": 1,
@@ -6647,7 +6643,7 @@
               "Hits": 0
             },
             {
-              "Line": 354,
+              "Line": 345,
               "Offset": 1607,
               "EndOffset": 1609,
               "Path": 0,
@@ -6655,7 +6651,7 @@
               "Hits": 0
             },
             {
-              "Line": 354,
+              "Line": 345,
               "Offset": 1607,
               "EndOffset": 1636,
               "Path": 1,
@@ -6663,7 +6659,7 @@
               "Hits": 0
             },
             {
-              "Line": 356,
+              "Line": 347,
               "Offset": 1665,
               "EndOffset": 1667,
               "Path": 0,
@@ -6671,7 +6667,7 @@
               "Hits": 0
             },
             {
-              "Line": 356,
+              "Line": 347,
               "Offset": 1665,
               "EndOffset": 1698,
               "Path": 1,
@@ -6679,7 +6675,7 @@
               "Hits": 0
             },
             {
-              "Line": 350,
+              "Line": 341,
               "Offset": 1514,
               "EndOffset": 1699,
               "Path": 1,
@@ -6687,7 +6683,7 @@
               "Hits": 2
             },
             {
-              "Line": 361,
+              "Line": 352,
               "Offset": 1711,
               "EndOffset": 1713,
               "Path": 0,
@@ -6695,7 +6691,7 @@
               "Hits": 0
             },
             {
-              "Line": 361,
+              "Line": 352,
               "Offset": 1711,
               "EndOffset": 1729,
               "Path": 1,
@@ -6703,7 +6699,7 @@
               "Hits": 2
             },
             {
-              "Line": 361,
+              "Line": 352,
               "Offset": 1734,
               "EndOffset": 1739,
               "Path": 0,
@@ -6711,7 +6707,7 @@
               "Hits": 0
             },
             {
-              "Line": 361,
+              "Line": 352,
               "Offset": 1734,
               "EndOffset": 1896,
               "Path": 1,
@@ -6719,7 +6715,7 @@
               "Hits": 2
             },
             {
-              "Line": 368,
+              "Line": 359,
               "Offset": 1914,
               "EndOffset": 1919,
               "Path": 0,
@@ -6727,7 +6723,7 @@
               "Hits": 2
             },
             {
-              "Line": 373,
+              "Line": 364,
               "Offset": 1951,
               "EndOffset": 1956,
               "Path": 0,
@@ -6735,7 +6731,7 @@
               "Hits": 2
             },
             {
-              "Line": 379,
+              "Line": 370,
               "Offset": 2547,
               "EndOffset": 2028,
               "Path": 1,
@@ -6743,7 +6739,7 @@
               "Hits": 8
             },
             {
-              "Line": 384,
+              "Line": 375,
               "Offset": 2080,
               "EndOffset": 2082,
               "Path": 0,
@@ -6751,7 +6747,7 @@
               "Hits": 6
             },
             {
-              "Line": 384,
+              "Line": 375,
               "Offset": 2080,
               "EndOffset": 2106,
               "Path": 1,
@@ -6759,7 +6755,7 @@
               "Hits": 2
             },
             {
-              "Line": 388,
+              "Line": 379,
               "Offset": 2131,
               "EndOffset": 2133,
               "Path": 0,
@@ -6767,7 +6763,7 @@
               "Hits": 0
             },
             {
-              "Line": 388,
+              "Line": 379,
               "Offset": 2131,
               "EndOffset": 2162,
               "Path": 1,
@@ -6775,7 +6771,7 @@
               "Hits": 2
             },
             {
-              "Line": 392,
+              "Line": 383,
               "Offset": 2187,
               "EndOffset": 2189,
               "Path": 0,
@@ -6783,7 +6779,7 @@
               "Hits": 0
             },
             {
-              "Line": 392,
+              "Line": 383,
               "Offset": 2187,
               "EndOffset": 2218,
               "Path": 1,
@@ -6791,7 +6787,7 @@
               "Hits": 2
             },
             {
-              "Line": 396,
+              "Line": 387,
               "Offset": 2243,
               "EndOffset": 2245,
               "Path": 0,
@@ -6799,7 +6795,7 @@
               "Hits": 0
             },
             {
-              "Line": 396,
+              "Line": 387,
               "Offset": 2243,
               "EndOffset": 2269,
               "Path": 1,
@@ -6807,7 +6803,7 @@
               "Hits": 2
             },
             {
-              "Line": 400,
+              "Line": 391,
               "Offset": 2287,
               "EndOffset": 2292,
               "Path": 0,
@@ -6815,7 +6811,7 @@
               "Hits": 2
             },
             {
-              "Line": 400,
+              "Line": 391,
               "Offset": 2287,
               "EndOffset": 2470,
               "Path": 1,
@@ -6823,7 +6819,7 @@
               "Hits": 8
             },
             {
-              "Line": 379,
+              "Line": 370,
               "Offset": 2547,
               "EndOffset": 2552,
               "Path": 0,
@@ -6831,7 +6827,7 @@
               "Hits": 2
             },
             {
-              "Line": 373,
+              "Line": 364,
               "Offset": 1951,
               "EndOffset": 2569,
               "Path": 1,
@@ -6839,7 +6835,7 @@
               "Hits": 0
             },
             {
-              "Line": 368,
+              "Line": 359,
               "Offset": 1914,
               "EndOffset": 2605,
               "Path": 1,
@@ -6942,38 +6938,38 @@
       "RedisKit.Services.RedisFunctionService/<EnsureSupportedAsync>d__15": {
         "System.Void RedisKit.Services.RedisFunctionService/<EnsureSupportedAsync>d__15::MoveNext()": {
           "Lines": {
-            "232": 94,
-            "233": 94,
-            "234": 64,
+            "223": 94,
+            "224": 94,
+            "225": 64,
+            "227": 30,
+            "229": 30,
+            "230": 30,
+            "231": 0,
+            "233": 30,
             "236": 30,
             "238": 30,
-            "239": 30,
-            "240": 0,
-            "242": 30,
-            "245": 30,
-            "247": 30,
-            "248": 29,
-            "249": 29,
-            "250": 29,
-            "251": 1,
-            "252": 1,
-            "253": 1,
-            "254": 1,
-            "255": 1,
-            "256": 0,
-            "257": 0,
-            "258": 0,
-            "259": 0,
-            "260": 0,
-            "262": 30,
-            "265": 30,
-            "266": 30,
-            "267": 30,
-            "268": 94
+            "239": 29,
+            "240": 29,
+            "241": 29,
+            "242": 1,
+            "243": 1,
+            "244": 1,
+            "245": 1,
+            "246": 1,
+            "247": 0,
+            "248": 0,
+            "249": 0,
+            "250": 0,
+            "251": 0,
+            "253": 30,
+            "256": 30,
+            "257": 30,
+            "258": 30,
+            "259": 94
           },
           "Branches": [
             {
-              "Line": 232,
+              "Line": 223,
               "Offset": 16,
               "EndOffset": 27,
               "Path": 0,
@@ -6981,7 +6977,7 @@
               "Hits": 94
             },
             {
-              "Line": 233,
+              "Line": 224,
               "Offset": 46,
               "EndOffset": 48,
               "Path": 0,
@@ -6989,7 +6985,7 @@
               "Hits": 64
             },
             {
-              "Line": 233,
+              "Line": 224,
               "Offset": 46,
               "EndOffset": 70,
               "Path": 1,
@@ -6997,7 +6993,7 @@
               "Hits": 30
             },
             {
-              "Line": 232,
+              "Line": 223,
               "Offset": 16,
               "EndOffset": 183,
               "Path": 1,
@@ -7005,7 +7001,7 @@
               "Hits": 55
             },
             {
-              "Line": 239,
+              "Line": 230,
               "Offset": 224,
               "EndOffset": 226,
               "Path": 0,
@@ -7013,7 +7009,7 @@
               "Hits": 0
             },
             {
-              "Line": 239,
+              "Line": 230,
               "Offset": 224,
               "EndOffset": 248,
               "Path": 1,
@@ -7028,88 +7024,67 @@
           "Lines": {
             "172": 2,
             "173": 2,
+            "175": 2,
             "176": 2,
             "177": 2,
-            "179": 2,
             "180": 2,
+            "181": 2,
+            "182": 2,
             "183": 2,
-            "184": 2,
             "185": 2,
-            "186": 2,
+            "187": 2,
             "188": 2,
-            "190": 2,
-            "191": 2,
-            "193": 0,
-            "195": 2,
-            "197": 0,
-            "198": 0,
-            "199": 0,
-            "200": 0,
-            "202": 2
+            "190": 0,
+            "192": 2,
+            "193": 2
           },
           "Branches": [
             {
-              "Line": 172,
-              "Offset": 16,
-              "EndOffset": 27,
+              "Line": 173,
+              "Offset": 164,
+              "EndOffset": 166,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 2
-            },
-            {
-              "Line": 173,
-              "Offset": 152,
-              "EndOffset": 154,
-              "Path": 0,
-              "Ordinal": 2,
               "Hits": 0
             },
             {
-              "Line": 172,
-              "Offset": 16,
-              "EndOffset": 165,
+              "Line": 173,
+              "Offset": 164,
+              "EndOffset": 177,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 3
-            },
-            {
-              "Line": 173,
-              "Offset": 152,
-              "EndOffset": 165,
-              "Path": 1,
-              "Ordinal": 3,
-              "Hits": 3
-            },
-            {
-              "Line": 180,
-              "Offset": 369,
-              "EndOffset": 371,
-              "Path": 0,
-              "Ordinal": 4,
-              "Hits": 1
-            },
-            {
-              "Line": 180,
-              "Offset": 369,
-              "EndOffset": 378,
-              "Path": 1,
-              "Ordinal": 5,
-              "Hits": 1
-            },
-            {
-              "Line": 190,
-              "Offset": 592,
-              "EndOffset": 594,
-              "Path": 0,
-              "Ordinal": 6,
               "Hits": 2
             },
             {
-              "Line": 190,
-              "Offset": 592,
-              "EndOffset": 623,
+              "Line": 177,
+              "Offset": 360,
+              "EndOffset": 362,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1
+            },
+            {
+              "Line": 177,
+              "Offset": 360,
+              "EndOffset": 369,
               "Path": 1,
-              "Ordinal": 7,
+              "Ordinal": 3,
+              "Hits": 1
+            },
+            {
+              "Line": 187,
+              "Offset": 583,
+              "EndOffset": 585,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 2
+            },
+            {
+              "Line": 187,
+              "Offset": 583,
+              "EndOffset": 614,
+              "Path": 1,
+              "Ordinal": 5,
               "Hits": 0
             }
           ]
@@ -7118,22 +7093,22 @@
       "RedisKit.Services.RedisFunctionService/<GetStatsAsync>d__13": {
         "System.Void RedisKit.Services.RedisFunctionService/<GetStatsAsync>d__13::MoveNext()": {
           "Lines": {
-            "205": 1,
+            "196": 1,
+            "197": 1,
+            "200": 1,
+            "201": 1,
+            "203": 1,
             "206": 1,
-            "209": 1,
-            "210": 1,
-            "212": 1,
-            "215": 1,
-            "217": 1,
-            "219": 0,
-            "220": 0,
-            "221": 0,
-            "222": 0,
-            "224": 1
+            "208": 1,
+            "210": 0,
+            "211": 0,
+            "212": 0,
+            "213": 0,
+            "215": 1
           },
           "Branches": [
             {
-              "Line": 205,
+              "Line": 196,
               "Offset": 16,
               "EndOffset": 27,
               "Path": 0,
@@ -7141,7 +7116,7 @@
               "Hits": 1
             },
             {
-              "Line": 206,
+              "Line": 197,
               "Offset": 152,
               "EndOffset": 154,
               "Path": 0,
@@ -7149,7 +7124,7 @@
               "Hits": 0
             },
             {
-              "Line": 205,
+              "Line": 196,
               "Offset": 16,
               "EndOffset": 165,
               "Path": 1,
@@ -7157,7 +7132,7 @@
               "Hits": 2
             },
             {
-              "Line": 206,
+              "Line": 197,
               "Offset": 152,
               "EndOffset": 165,
               "Path": 1,
@@ -7170,9 +7145,9 @@
       "RedisKit.Services.RedisFunctionService/<IsSupportedAsync>d__14": {
         "System.Void RedisKit.Services.RedisFunctionService/<IsSupportedAsync>d__14::MoveNext()": {
           "Lines": {
-            "227": 49,
-            "228": 49,
-            "229": 49
+            "218": 49,
+            "219": 49,
+            "220": 49
           },
           "Branches": []
         }
@@ -8076,81 +8051,47 @@
         },
         "System.Collections.Generic.List`1<RedisKit.Services.RedisPubSubService/SubscriptionHandler> RedisKit.Services.RedisPubSubService::GetHandlersForKey(System.String,RedisKit.Models.SubscriptionType)": {
           "Lines": {
-            "469": 0,
-            "470": 0,
-            "471": 0,
+            "472": 0,
             "473": 0,
             "474": 0,
-            "478": 0,
-            "479": 0,
-            "480": 0,
+            "476": 0,
+            "477": 0,
             "481": 0,
+            "482": 0,
             "483": 0,
             "484": 0
           },
           "Branches": [
             {
-              "Line": 470,
-              "Offset": 7,
-              "EndOffset": 9,
+              "Line": 473,
+              "Offset": 20,
+              "EndOffset": 22,
               "Path": 0,
               "Ordinal": 0,
               "Hits": 0
             },
             {
-              "Line": 470,
-              "Offset": 7,
-              "EndOffset": 29,
+              "Line": 473,
+              "Offset": 20,
+              "EndOffset": 48,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 0
             },
             {
-              "Line": 479,
-              "Offset": 100,
-              "EndOffset": 51,
-              "Path": 1,
-              "Ordinal": 5,
-              "Hits": 0
-            },
-            {
-              "Line": 480,
-              "Offset": 77,
-              "EndOffset": 79,
+              "Line": 483,
+              "Offset": 127,
+              "EndOffset": 129,
               "Path": 0,
               "Ordinal": 2,
               "Hits": 0
             },
             {
-              "Line": 480,
-              "Offset": 77,
-              "EndOffset": 93,
+              "Line": 483,
+              "Offset": 127,
+              "EndOffset": 132,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 0
-            },
-            {
-              "Line": 479,
-              "Offset": 100,
-              "EndOffset": 102,
-              "Path": 0,
-              "Ordinal": 4,
-              "Hits": 0
-            },
-            {
-              "Line": 483,
-              "Offset": 124,
-              "EndOffset": 126,
-              "Path": 0,
-              "Ordinal": 6,
-              "Hits": 0
-            },
-            {
-              "Line": 483,
-              "Offset": 124,
-              "EndOffset": 129,
-              "Path": 1,
-              "Ordinal": 7,
               "Hits": 0
             }
           ]
@@ -8719,10 +8660,12 @@
           "Branches": []
         }
       },
-      "RedisKit.Services.RedisPubSubService/<>c__DisplayClass19_0`1/<<SubscribeWithMetadataAsync>b__0>d": {
-        "System.Void RedisKit.Services.RedisPubSubService/<>c__DisplayClass19_0`1/<<SubscribeWithMetadataAsync>b__0>d::MoveNext()": {
+      "RedisKit.Services.RedisPubSubService/<>c__DisplayClass19_0`1/<<SubscribeWithMetadataAsync>g__MetadataHandler|0>d": {
+        "System.Void RedisKit.Services.RedisPubSubService/<>c__DisplayClass19_0`1/<<SubscribeWithMetadataAsync>g__MetadataHandler|0>d::MoveNext()": {
           "Lines": {
-            "388": 0
+            "389": 0,
+            "390": 0,
+            "391": 0
           },
           "Branches": []
         }
@@ -8730,7 +8673,7 @@
       "RedisKit.Services.RedisPubSubService/<>c__DisplayClass21_0`1/<<SubscribePatternWithMetadataAsync>b__0>d": {
         "System.Void RedisKit.Services.RedisPubSubService/<>c__DisplayClass21_0`1/<<SubscribePatternWithMetadataAsync>b__0>d::MoveNext()": {
           "Lines": {
-            "411": 0
+            "414": 0
           },
           "Branches": []
         }
@@ -8980,27 +8923,24 @@
       "RedisKit.Services.RedisPubSubService/<ProcessMessage>d__22": {
         "System.Void RedisKit.Services.RedisPubSubService/<ProcessMessage>d__22::MoveNext()": {
           "Lines": {
-            "424": 0,
-            "425": 0,
-            "426": 0,
+            "427": 0,
             "428": 0,
             "429": 0,
+            "431": 0,
             "432": 0,
-            "433": 0,
-            "434": 0,
             "435": 0,
             "436": 0,
             "437": 0,
+            "438": 0,
+            "439": 0,
             "440": 0,
-            "441": 0,
-            "442": 0,
+            "443": 0,
+            "444": 0,
             "445": 0,
-            "446": 0,
-            "447": 0,
+            "448": 0,
             "449": 0,
-            "451": 0,
+            "450": 0,
             "452": 0,
-            "453": 0,
             "454": 0,
             "455": 0,
             "456": 0,
@@ -9010,11 +8950,14 @@
             "460": 0,
             "461": 0,
             "462": 0,
-            "463": 0
+            "463": 0,
+            "464": 0,
+            "465": 0,
+            "466": 0
           },
           "Branches": [
             {
-              "Line": 425,
+              "Line": 428,
               "Offset": 28,
               "EndOffset": 30,
               "Path": 0,
@@ -9022,7 +8965,7 @@
               "Hits": 0
             },
             {
-              "Line": 425,
+              "Line": 428,
               "Offset": 28,
               "EndOffset": 35,
               "Path": 1,
@@ -9030,7 +8973,7 @@
               "Hits": 0
             },
             {
-              "Line": 433,
+              "Line": 436,
               "Offset": 97,
               "EndOffset": 99,
               "Path": 0,
@@ -9038,7 +8981,7 @@
               "Hits": 0
             },
             {
-              "Line": 433,
+              "Line": 436,
               "Offset": 97,
               "EndOffset": 135,
               "Path": 1,
@@ -9046,7 +8989,7 @@
               "Hits": 0
             },
             {
-              "Line": 441,
+              "Line": 444,
               "Offset": 170,
               "EndOffset": 172,
               "Path": 0,
@@ -9054,7 +8997,7 @@
               "Hits": 0
             },
             {
-              "Line": 441,
+              "Line": 444,
               "Offset": 170,
               "EndOffset": 188,
               "Path": 1,
@@ -9062,7 +9005,7 @@
               "Hits": 0
             },
             {
-              "Line": 441,
+              "Line": 444,
               "Offset": 191,
               "EndOffset": 193,
               "Path": 0,
@@ -9070,7 +9013,7 @@
               "Hits": 0
             },
             {
-              "Line": 441,
+              "Line": 444,
               "Offset": 191,
               "EndOffset": 198,
               "Path": 1,
@@ -9078,7 +9021,7 @@
               "Hits": 0
             },
             {
-              "Line": 446,
+              "Line": 449,
               "Offset": 316,
               "EndOffset": 234,
               "Path": 1,
@@ -9086,7 +9029,7 @@
               "Hits": 0
             },
             {
-              "Line": 446,
+              "Line": 449,
               "Offset": 316,
               "EndOffset": 318,
               "Path": 0,
@@ -9094,7 +9037,7 @@
               "Hits": 0
             },
             {
-              "Line": 451,
+              "Line": 454,
               "Offset": 473,
               "EndOffset": 475,
               "Path": 0,
@@ -9102,7 +9045,7 @@
               "Hits": 0
             },
             {
-              "Line": 451,
+              "Line": 454,
               "Offset": 473,
               "EndOffset": 512,
               "Path": 1,
@@ -9110,7 +9053,7 @@
               "Hits": 0
             },
             {
-              "Line": 460,
+              "Line": 463,
               "Offset": 610,
               "EndOffset": 612,
               "Path": 0,
@@ -9118,7 +9061,7 @@
               "Hits": 0
             },
             {
-              "Line": 460,
+              "Line": 463,
               "Offset": 610,
               "EndOffset": 624,
               "Path": 1,
@@ -9466,9 +9409,9 @@
       "RedisKit.Services.RedisPubSubService/<SubscribePatternAsync>d__20`1": {
         "System.Void RedisKit.Services.RedisPubSubService/<SubscribePatternAsync>d__20`1::MoveNext()": {
           "Lines": {
-            "401": 5,
-            "402": 5,
-            "403": 2
+            "404": 5,
+            "405": 5,
+            "406": 2
           },
           "Branches": []
         }
@@ -9486,9 +9429,9 @@
       "RedisKit.Services.RedisPubSubService/<SubscribePatternWithMetadataAsync>d__21`1": {
         "System.Void RedisKit.Services.RedisPubSubService/<SubscribePatternWithMetadataAsync>d__21`1::MoveNext()": {
           "Lines": {
-            "409": 0,
-            "413": 0,
-            "414": 0
+            "412": 0,
+            "416": 0,
+            "417": 0
           },
           "Branches": []
         }
@@ -9529,8 +9472,8 @@
         "System.Void RedisKit.Services.RedisPubSubService/<SubscribeWithMetadataAsync>d__19`1::MoveNext()": {
           "Lines": {
             "386": 0,
-            "390": 0,
-            "391": 0
+            "393": 0,
+            "394": 0
           },
           "Branches": []
         }
@@ -10679,7 +10622,7 @@
               "EndOffset": 204,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 308
+              "Hits": 311
             },
             {
               "Line": 66,
@@ -10687,7 +10630,7 @@
               "EndOffset": 204,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 308
+              "Hits": 311
             }
           ]
         }
@@ -14603,28 +14546,28 @@
       "RedisKit.Serialization.MessagePackRedisSerializer": {
         "System.String RedisKit.Serialization.MessagePackRedisSerializer::get_Name()": {
           "Lines": {
-            "131": 2
+            "129": 2
           },
           "Branches": []
         },
         "System.Byte[] RedisKit.Serialization.MessagePackRedisSerializer::Serialize(T)": {
           "Lines": {
+            "153": 5,
             "155": 5,
+            "156": 5,
             "157": 5,
-            "158": 5,
             "159": 5,
-            "161": 5,
-            "162": 0,
-            "164": 5,
+            "160": 0,
+            "162": 5,
+            "164": 0,
+            "165": 0,
             "166": 0,
             "167": 0,
-            "168": 0,
-            "169": 0,
-            "171": 5
+            "169": 5
           },
           "Branches": [
             {
-              "Line": 158,
+              "Line": 156,
               "Offset": 9,
               "EndOffset": 11,
               "Path": 0,
@@ -14632,7 +14575,7 @@
               "Hits": 4
             },
             {
-              "Line": 158,
+              "Line": 156,
               "Offset": 9,
               "EndOffset": 14,
               "Path": 1,
@@ -14640,7 +14583,7 @@
               "Hits": 1
             },
             {
-              "Line": 161,
+              "Line": 159,
               "Offset": 70,
               "EndOffset": 72,
               "Path": 0,
@@ -14648,7 +14591,7 @@
               "Hits": 0
             },
             {
-              "Line": 162,
+              "Line": 160,
               "Offset": 79,
               "EndOffset": 81,
               "Path": 0,
@@ -14656,7 +14599,7 @@
               "Hits": 0
             },
             {
-              "Line": 162,
+              "Line": 160,
               "Offset": 79,
               "EndOffset": 84,
               "Path": 1,
@@ -14664,7 +14607,7 @@
               "Hits": 0
             },
             {
-              "Line": 161,
+              "Line": 159,
               "Offset": 70,
               "EndOffset": 108,
               "Path": 1,
@@ -14672,7 +14615,7 @@
               "Hits": 5
             },
             {
-              "Line": 168,
+              "Line": 166,
               "Offset": 122,
               "EndOffset": 124,
               "Path": 0,
@@ -14680,7 +14623,7 @@
               "Hits": 0
             },
             {
-              "Line": 168,
+              "Line": 166,
               "Offset": 122,
               "EndOffset": 127,
               "Path": 1,
@@ -14689,105 +14632,24 @@
             }
           ]
         },
-        "T RedisKit.Serialization.MessagePackRedisSerializer::Deserialize(System.Byte[])": {
-          "Lines": {
-            "194": 5,
-            "195": 5,
-            "196": 2,
-            "199": 3,
-            "200": 3,
-            "201": 3,
-            "203": 2,
-            "204": 2,
-            "205": 2,
-            "206": 2,
-            "208": 3
-          },
-          "Branches": [
-            {
-              "Line": 195,
-              "Offset": 2,
-              "EndOffset": 4,
-              "Path": 0,
-              "Ordinal": 0,
-              "Hits": 4
-            },
-            {
-              "Line": 195,
-              "Offset": 2,
-              "EndOffset": 11,
-              "Path": 1,
-              "Ordinal": 1,
-              "Hits": 1
-            },
-            {
-              "Line": 195,
-              "Offset": 14,
-              "EndOffset": 16,
-              "Path": 0,
-              "Ordinal": 2,
-              "Hits": 2
-            },
-            {
-              "Line": 195,
-              "Offset": 14,
-              "EndOffset": 31,
-              "Path": 1,
-              "Ordinal": 3,
-              "Hits": 3
-            },
-            {
-              "Line": 200,
-              "Offset": 40,
-              "EndOffset": 42,
-              "Path": 0,
-              "Ordinal": 4,
-              "Hits": 3
-            },
-            {
-              "Line": 200,
-              "Offset": 40,
-              "EndOffset": 45,
-              "Path": 1,
-              "Ordinal": 5,
-              "Hits": 0
-            },
-            {
-              "Line": 205,
-              "Offset": 108,
-              "EndOffset": 110,
-              "Path": 0,
-              "Ordinal": 6,
-              "Hits": 2
-            },
-            {
-              "Line": 205,
-              "Offset": 108,
-              "EndOffset": 113,
-              "Path": 1,
-              "Ordinal": 7,
-              "Hits": 0
-            }
-          ]
-        },
         "System.Threading.Tasks.Task`1<System.Byte[]> RedisKit.Serialization.MessagePackRedisSerializer::SerializeAsync(T,System.Threading.CancellationToken)": {
           "Lines": {
-            "231": 3,
-            "233": 3,
-            "236": 3,
-            "237": 3,
-            "239": 3,
-            "240": 0,
-            "242": 3,
-            "244": 0,
-            "245": 0,
-            "246": 0,
-            "247": 0,
-            "249": 3
+            "192": 3,
+            "194": 3,
+            "197": 3,
+            "198": 3,
+            "200": 3,
+            "201": 0,
+            "203": 3,
+            "205": 0,
+            "206": 0,
+            "207": 0,
+            "208": 0,
+            "210": 3
           },
           "Branches": [
             {
-              "Line": 236,
+              "Line": 197,
               "Offset": 9,
               "EndOffset": 11,
               "Path": 0,
@@ -14795,7 +14657,7 @@
               "Hits": 3
             },
             {
-              "Line": 236,
+              "Line": 197,
               "Offset": 9,
               "EndOffset": 14,
               "Path": 1,
@@ -14803,7 +14665,7 @@
               "Hits": 0
             },
             {
-              "Line": 239,
+              "Line": 200,
               "Offset": 70,
               "EndOffset": 72,
               "Path": 0,
@@ -14811,7 +14673,7 @@
               "Hits": 0
             },
             {
-              "Line": 240,
+              "Line": 201,
               "Offset": 79,
               "EndOffset": 81,
               "Path": 0,
@@ -14819,7 +14681,7 @@
               "Hits": 0
             },
             {
-              "Line": 240,
+              "Line": 201,
               "Offset": 79,
               "EndOffset": 84,
               "Path": 1,
@@ -14827,7 +14689,7 @@
               "Hits": 0
             },
             {
-              "Line": 239,
+              "Line": 200,
               "Offset": 70,
               "EndOffset": 108,
               "Path": 1,
@@ -14835,7 +14697,7 @@
               "Hits": 3
             },
             {
-              "Line": 246,
+              "Line": 207,
               "Offset": 127,
               "EndOffset": 129,
               "Path": 0,
@@ -14843,7 +14705,7 @@
               "Hits": 0
             },
             {
-              "Line": 246,
+              "Line": 207,
               "Offset": 127,
               "EndOffset": 132,
               "Path": 1,
@@ -14852,32 +14714,31 @@
             }
           ]
         },
-        "System.Threading.Tasks.Task`1<T> RedisKit.Serialization.MessagePackRedisSerializer::DeserializeAsync(System.Byte[],System.Threading.CancellationToken)": {
+        "T RedisKit.Serialization.MessagePackRedisSerializer::Deserialize(System.Byte[])": {
           "Lines": {
-            "270": 2,
-            "271": 2,
-            "272": 1,
-            "275": 1,
-            "278": 1,
-            "279": 1,
-            "280": 1,
-            "282": 0,
-            "283": 0,
-            "284": 0,
-            "285": 0,
-            "287": 2
+            "243": 5,
+            "244": 5,
+            "245": 2,
+            "248": 3,
+            "249": 3,
+            "250": 3,
+            "252": 2,
+            "253": 2,
+            "254": 2,
+            "255": 2,
+            "257": 3
           },
           "Branches": [
             {
-              "Line": 271,
+              "Line": 244,
               "Offset": 2,
               "EndOffset": 4,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 1
+              "Hits": 4
             },
             {
-              "Line": 271,
+              "Line": 244,
               "Offset": 2,
               "EndOffset": 11,
               "Path": 1,
@@ -14885,7 +14746,89 @@
               "Hits": 1
             },
             {
-              "Line": 271,
+              "Line": 244,
+              "Offset": 14,
+              "EndOffset": 16,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 2
+            },
+            {
+              "Line": 244,
+              "Offset": 14,
+              "EndOffset": 31,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 3
+            },
+            {
+              "Line": 249,
+              "Offset": 40,
+              "EndOffset": 42,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 3
+            },
+            {
+              "Line": 249,
+              "Offset": 40,
+              "EndOffset": 45,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 0
+            },
+            {
+              "Line": 254,
+              "Offset": 108,
+              "EndOffset": 110,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 2
+            },
+            {
+              "Line": 254,
+              "Offset": 108,
+              "EndOffset": 113,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 0
+            }
+          ]
+        },
+        "System.Threading.Tasks.Task`1<T> RedisKit.Serialization.MessagePackRedisSerializer::DeserializeAsync(System.Byte[],System.Threading.CancellationToken)": {
+          "Lines": {
+            "279": 2,
+            "280": 2,
+            "281": 1,
+            "284": 1,
+            "287": 1,
+            "288": 1,
+            "289": 1,
+            "291": 0,
+            "292": 0,
+            "293": 0,
+            "294": 0,
+            "296": 2
+          },
+          "Branches": [
+            {
+              "Line": 280,
+              "Offset": 2,
+              "EndOffset": 4,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1
+            },
+            {
+              "Line": 280,
+              "Offset": 2,
+              "EndOffset": 11,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1
+            },
+            {
+              "Line": 280,
               "Offset": 14,
               "EndOffset": 16,
               "Path": 0,
@@ -14893,7 +14836,7 @@
               "Hits": 1
             },
             {
-              "Line": 271,
+              "Line": 280,
               "Offset": 14,
               "EndOffset": 36,
               "Path": 1,
@@ -14901,7 +14844,7 @@
               "Hits": 1
             },
             {
-              "Line": 278,
+              "Line": 287,
               "Offset": 45,
               "EndOffset": 47,
               "Path": 0,
@@ -14909,7 +14852,7 @@
               "Hits": 1
             },
             {
-              "Line": 278,
+              "Line": 287,
               "Offset": 45,
               "EndOffset": 50,
               "Path": 1,
@@ -14917,7 +14860,7 @@
               "Hits": 0
             },
             {
-              "Line": 284,
+              "Line": 293,
               "Offset": 112,
               "EndOffset": 114,
               "Path": 0,
@@ -14925,7 +14868,7 @@
               "Hits": 0
             },
             {
-              "Line": 284,
+              "Line": 293,
               "Offset": 112,
               "EndOffset": 117,
               "Path": 1,
@@ -14936,24 +14879,24 @@
         },
         "System.Threading.Tasks.Task`1<System.Object> RedisKit.Serialization.MessagePackRedisSerializer::DeserializeAsync(System.Byte[],System.Type,System.Threading.CancellationToken)": {
           "Lines": {
-            "310": 0,
-            "311": 0,
-            "312": 0,
-            "314": 0,
-            "315": 0,
-            "318": 0,
+            "319": 0,
+            "320": 0,
             "321": 0,
-            "322": 0,
             "323": 0,
-            "325": 0,
-            "326": 0,
+            "324": 0,
             "327": 0,
-            "328": 0,
-            "330": 0
+            "330": 0,
+            "331": 0,
+            "332": 0,
+            "334": 0,
+            "335": 0,
+            "336": 0,
+            "337": 0,
+            "339": 0
           },
           "Branches": [
             {
-              "Line": 311,
+              "Line": 320,
               "Offset": 2,
               "EndOffset": 4,
               "Path": 0,
@@ -14961,7 +14904,7 @@
               "Hits": 0
             },
             {
-              "Line": 311,
+              "Line": 320,
               "Offset": 2,
               "EndOffset": 11,
               "Path": 1,
@@ -14969,7 +14912,7 @@
               "Hits": 0
             },
             {
-              "Line": 311,
+              "Line": 320,
               "Offset": 14,
               "EndOffset": 16,
               "Path": 0,
@@ -14977,7 +14920,7 @@
               "Hits": 0
             },
             {
-              "Line": 311,
+              "Line": 320,
               "Offset": 14,
               "EndOffset": 28,
               "Path": 1,
@@ -14985,7 +14928,7 @@
               "Hits": 0
             },
             {
-              "Line": 314,
+              "Line": 323,
               "Offset": 37,
               "EndOffset": 39,
               "Path": 0,
@@ -14993,7 +14936,7 @@
               "Hits": 0
             },
             {
-              "Line": 314,
+              "Line": 323,
               "Offset": 37,
               "EndOffset": 50,
               "Path": 1,
@@ -15001,7 +14944,7 @@
               "Hits": 0
             },
             {
-              "Line": 321,
+              "Line": 330,
               "Offset": 59,
               "EndOffset": 61,
               "Path": 0,
@@ -15009,7 +14952,7 @@
               "Hits": 0
             },
             {
-              "Line": 321,
+              "Line": 330,
               "Offset": 59,
               "EndOffset": 64,
               "Path": 1,
@@ -15017,7 +14960,7 @@
               "Hits": 0
             },
             {
-              "Line": 327,
+              "Line": 336,
               "Offset": 118,
               "EndOffset": 120,
               "Path": 0,
@@ -15025,7 +14968,7 @@
               "Hits": 0
             },
             {
-              "Line": 327,
+              "Line": 336,
               "Offset": 118,
               "EndOffset": 123,
               "Path": 1,
@@ -15036,14 +14979,14 @@
         },
         "System.Threading.Tasks.ValueTask`1<T> RedisKit.Serialization.MessagePackRedisSerializer::DeserializeAsync(System.ReadOnlyMemory`1<System.Byte>,System.Threading.CancellationToken)": {
           "Lines": {
-            "341": 0,
             "342": 0,
             "343": 0,
-            "344": 0
+            "344": 0,
+            "345": 0
           },
           "Branches": [
             {
-              "Line": 342,
+              "Line": 343,
               "Offset": 10,
               "EndOffset": 12,
               "Path": 0,
@@ -15051,7 +14994,7 @@
               "Hits": 0
             },
             {
-              "Line": 342,
+              "Line": 343,
               "Offset": 10,
               "EndOffset": 29,
               "Path": 1,
@@ -15062,14 +15005,14 @@
         },
         "System.Threading.Tasks.ValueTask`1<System.Object> RedisKit.Serialization.MessagePackRedisSerializer::DeserializeAsync(System.ReadOnlyMemory`1<System.Byte>,System.Type,System.Threading.CancellationToken)": {
           "Lines": {
-            "347": 0,
             "348": 0,
             "349": 0,
-            "350": 0
+            "350": 0,
+            "351": 0
           },
           "Branches": [
             {
-              "Line": 348,
+              "Line": 349,
               "Offset": 10,
               "EndOffset": 12,
               "Path": 0,
@@ -15077,7 +15020,7 @@
               "Hits": 0
             },
             {
-              "Line": 348,
+              "Line": 349,
               "Offset": 10,
               "EndOffset": 21,
               "Path": 1,
@@ -15088,31 +15031,31 @@
         },
         "System.Void RedisKit.Serialization.MessagePackRedisSerializer::.ctor()": {
           "Lines": {
+            "81": 13,
             "82": 13,
-            "83": 13,
-            "84": 13
+            "83": 13
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.MessagePackRedisSerializer::.ctor(MessagePack.MessagePackSerializerOptions)": {
           "Lines": {
-            "107": 1,
-            "108": 1,
-            "109": 1
+            "105": 1,
+            "106": 1,
+            "107": 1
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.MessagePackRedisSerializer::.ctor(Microsoft.Extensions.Logging.ILogger`1<RedisKit.Serialization.MessagePackRedisSerializer>,MessagePack.MessagePackSerializerOptions)": {
           "Lines": {
+            "119": 20,
+            "120": 20,
             "121": 20,
             "122": 20,
-            "123": 20,
-            "124": 20,
-            "125": 20
+            "123": 20
           },
           "Branches": [
             {
-              "Line": 124,
+              "Line": 122,
               "Offset": 18,
               "EndOffset": 20,
               "Path": 0,
@@ -15120,7 +15063,7 @@
               "Hits": 17
             },
             {
-              "Line": 124,
+              "Line": 122,
               "Offset": 18,
               "EndOffset": 26,
               "Path": 1,
@@ -15136,19 +15079,19 @@
           "Branches": []
         }
       },
-      "RedisKit.Serialization.MessagePackRedisSerializer/<SerializeAsync>d__13`1": {
-        "System.Void RedisKit.Serialization.MessagePackRedisSerializer/<SerializeAsync>d__13`1::MoveNext()": {
+      "RedisKit.Serialization.MessagePackRedisSerializer/<SerializeAsync>d__10`1": {
+        "System.Void RedisKit.Serialization.MessagePackRedisSerializer/<SerializeAsync>d__10`1::MoveNext()": {
           "Lines": {
-            "333": 0,
-            "334": 0,
-            "335": 0,
-            "336": 0,
-            "337": 0,
-            "338": 0
+            "214": 0,
+            "215": 0,
+            "216": 0,
+            "217": 0,
+            "218": 0,
+            "219": 0
           },
           "Branches": [
             {
-              "Line": 337,
+              "Line": 218,
               "Offset": 280,
               "EndOffset": 282,
               "Path": 0,
@@ -15156,7 +15099,7 @@
               "Hits": 0
             },
             {
-              "Line": 337,
+              "Line": 218,
               "Offset": 280,
               "EndOffset": 390,
               "Path": 1,
@@ -15183,10 +15126,10 @@
         },
         "RedisKit.Serialization.IRedisSerializer RedisKit.Serialization.RedisSerializerFactory::Create(RedisKit.Models.SerializerType,Microsoft.Extensions.Logging.ILoggerFactory)": {
           "Lines": {
-            "34": 195,
-            "35": 195,
-            "36": 203,
-            "37": 192
+            "34": 211,
+            "35": 211,
+            "36": 219,
+            "37": 208
           },
           "Branches": []
         },
@@ -15240,31 +15183,30 @@
           "Lines": {
             "90": 1,
             "91": 1,
-            "92": 1,
-            "93": 2,
-            "94": 1
+            "92": 2,
+            "93": 1
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.RedisSerializerFactory::RegisterCustomSerializer(System.Type)": {
           "Lines": {
+            "100": 1,
             "101": 1,
             "102": 1,
             "103": 1,
-            "104": 1,
-            "105": 1
+            "104": 1
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.RedisSerializerFactory::RegisterCustomSerializer(TSerializer)": {
           "Lines": {
+            "112": 3,
             "113": 3,
-            "114": 3,
-            "115": 2
+            "114": 2
           },
           "Branches": [
             {
-              "Line": 114,
+              "Line": 113,
               "Offset": 24,
               "EndOffset": 26,
               "Path": 0,
@@ -15272,7 +15214,7 @@
               "Hits": 1
             },
             {
-              "Line": 114,
+              "Line": 113,
               "Offset": 24,
               "EndOffset": 37,
               "Path": 1,
@@ -15283,18 +15225,21 @@
         },
         "System.Boolean RedisKit.Serialization.RedisSerializerFactory::TryGetCustomSerializer(TSerializer&)": {
           "Lines": {
+            "123": 3,
             "124": 3,
-            "125": 3,
+            "125": 2,
             "126": 2,
             "127": 2,
             "128": 2,
-            "131": 1,
-            "132": 1,
-            "133": 3
+            "129": 2,
+            "132": 0,
+            "134": 1,
+            "135": 1,
+            "136": 3
           },
           "Branches": [
             {
-              "Line": 125,
+              "Line": 124,
               "Offset": 25,
               "EndOffset": 27,
               "Path": 0,
@@ -15302,7 +15247,7 @@
               "Hits": 2
             },
             {
-              "Line": 127,
+              "Line": 126,
               "Offset": 35,
               "EndOffset": 37,
               "Path": 0,
@@ -15310,7 +15255,7 @@
               "Hits": 2
             },
             {
-              "Line": 127,
+              "Line": 126,
               "Offset": 35,
               "EndOffset": 46,
               "Path": 1,
@@ -15318,9 +15263,25 @@
               "Hits": 0
             },
             {
-              "Line": 125,
+              "Line": 127,
+              "Offset": 84,
+              "EndOffset": 86,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 2
+            },
+            {
+              "Line": 127,
+              "Offset": 84,
+              "EndOffset": 92,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 0
+            },
+            {
+              "Line": 124,
               "Offset": 25,
-              "EndOffset": 81,
+              "EndOffset": 93,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 1
@@ -15329,30 +15290,30 @@
         },
         "System.Void RedisKit.Serialization.RedisSerializerFactory::ClearCache()": {
           "Lines": {
-            "139": 3,
-            "140": 3,
-            "141": 3,
-            "142": 3
+            "142": 3,
+            "143": 3,
+            "144": 3,
+            "145": 3
           },
           "Branches": []
         },
         "RedisKit.Serialization.IRedisSerializer RedisKit.Serialization.RedisSerializerFactory::CreateSerializerInstance(RedisKit.Models.SerializerType,System.Object,Microsoft.Extensions.Logging.ILoggerFactory)": {
           "Lines": {
-            "150": 11,
-            "151": 11,
-            "152": 11,
-            "153": 5,
-            "154": 3,
-            "155": 1,
-            "156": 1,
-            "157": 2,
-            "158": 2,
-            "159": 11,
-            "160": 7
+            "153": 11,
+            "154": 11,
+            "155": 11,
+            "156": 5,
+            "157": 3,
+            "158": 1,
+            "159": 1,
+            "160": 2,
+            "161": 2,
+            "162": 11,
+            "163": 7
           },
           "Branches": [
             {
-              "Line": 151,
+              "Line": 154,
               "Offset": 6,
               "EndOffset": 25,
               "Path": 1,
@@ -15360,7 +15321,7 @@
               "Hits": 5
             },
             {
-              "Line": 151,
+              "Line": 154,
               "Offset": 6,
               "EndOffset": 35,
               "Path": 2,
@@ -15368,7 +15329,7 @@
               "Hits": 3
             },
             {
-              "Line": 151,
+              "Line": 154,
               "Offset": 6,
               "EndOffset": 45,
               "Path": 3,
@@ -15376,7 +15337,7 @@
               "Hits": 1
             },
             {
-              "Line": 151,
+              "Line": 154,
               "Offset": 6,
               "EndOffset": 61,
               "Path": 0,
@@ -15387,36 +15348,36 @@
         },
         "RedisKit.Serialization.IRedisSerializer RedisKit.Serialization.RedisSerializerFactory::CreateSerializerWithTypedOptions(RedisKit.Models.SerializerType,TOptions,Microsoft.Extensions.Logging.ILoggerFactory)": {
           "Lines": {
-            "166": 4,
-            "167": 4,
-            "168": 4,
             "169": 4,
-            "170": 1,
-            "171": 1,
-            "172": 1,
-            "173": 4,
-            "174": 4,
-            "175": 2,
-            "176": 2,
-            "177": 2,
-            "178": 4,
-            "179": 4,
-            "180": 1,
+            "170": 4,
+            "171": 4,
+            "172": 4,
+            "173": 1,
+            "174": 1,
+            "175": 1,
+            "176": 4,
+            "177": 4,
+            "178": 2,
+            "179": 2,
+            "180": 2,
             "181": 4,
             "182": 4,
-            "183": 0,
+            "183": 1,
             "184": 4,
             "185": 4,
             "186": 0,
             "187": 4,
-            "188": 0,
+            "188": 4,
             "189": 0,
             "190": 4,
-            "191": 3
+            "191": 0,
+            "192": 0,
+            "193": 4,
+            "194": 3
           },
           "Branches": [
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 6,
               "EndOffset": 28,
               "Path": 1,
@@ -15424,7 +15385,7 @@
               "Hits": 2
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 6,
               "EndOffset": 45,
               "Path": 2,
@@ -15432,7 +15393,7 @@
               "Hits": 2
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 41,
               "EndOffset": 64,
               "Path": 1,
@@ -15440,7 +15401,7 @@
               "Hits": 1
             },
             {
-              "Line": 170,
+              "Line": 173,
               "Offset": 65,
               "EndOffset": 67,
               "Path": 0,
@@ -15448,7 +15409,7 @@
               "Hits": 1
             },
             {
-              "Line": 170,
+              "Line": 173,
               "Offset": 65,
               "EndOffset": 70,
               "Path": 1,
@@ -15456,7 +15417,7 @@
               "Hits": 0
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 58,
               "EndOffset": 90,
               "Path": 1,
@@ -15464,7 +15425,7 @@
               "Hits": 2
             },
             {
-              "Line": 175,
+              "Line": 178,
               "Offset": 91,
               "EndOffset": 93,
               "Path": 0,
@@ -15472,7 +15433,7 @@
               "Hits": 1
             },
             {
-              "Line": 175,
+              "Line": 178,
               "Offset": 91,
               "EndOffset": 96,
               "Path": 1,
@@ -15480,7 +15441,7 @@
               "Hits": 1
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 41,
               "EndOffset": 111,
               "Path": 0,
@@ -15488,7 +15449,7 @@
               "Hits": 1
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 58,
               "EndOffset": 139,
               "Path": 0,
@@ -15496,7 +15457,7 @@
               "Hits": 0
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 6,
               "EndOffset": 167,
               "Path": 3,
@@ -15504,7 +15465,7 @@
               "Hits": 0
             },
             {
-              "Line": 167,
+              "Line": 170,
               "Offset": 6,
               "EndOffset": 183,
               "Path": 0,
@@ -15515,22 +15476,22 @@
         },
         "RedisKit.Serialization.IRedisSerializer RedisKit.Serialization.RedisSerializerFactory::CreateMessagePackSerializer(System.Object,Microsoft.Extensions.Logging.ILoggerFactory)": {
           "Lines": {
-            "194": 5,
-            "195": 5,
-            "196": 5,
-            "197": 3,
-            "198": 1,
-            "199": 1,
-            "200": 1,
-            "201": 5,
-            "203": 4,
-            "204": 4,
-            "205": 4,
-            "206": 4
+            "197": 5,
+            "198": 5,
+            "199": 5,
+            "200": 3,
+            "201": 1,
+            "202": 1,
+            "203": 1,
+            "204": 5,
+            "206": 4,
+            "207": 4,
+            "208": 4,
+            "209": 4
           },
           "Branches": [
             {
-              "Line": 195,
+              "Line": 198,
               "Offset": 6,
               "EndOffset": 8,
               "Path": 0,
@@ -15538,7 +15499,7 @@
               "Hits": 2
             },
             {
-              "Line": 195,
+              "Line": 198,
               "Offset": 6,
               "EndOffset": 20,
               "Path": 1,
@@ -15546,7 +15507,7 @@
               "Hits": 3
             },
             {
-              "Line": 195,
+              "Line": 198,
               "Offset": 16,
               "EndOffset": 26,
               "Path": 1,
@@ -15554,7 +15515,7 @@
               "Hits": 1
             },
             {
-              "Line": 195,
+              "Line": 198,
               "Offset": 16,
               "EndOffset": 30,
               "Path": 0,
@@ -15562,7 +15523,7 @@
               "Hits": 1
             },
             {
-              "Line": 203,
+              "Line": 206,
               "Offset": 60,
               "EndOffset": 62,
               "Path": 0,
@@ -15570,7 +15531,7 @@
               "Hits": 1
             },
             {
-              "Line": 203,
+              "Line": 206,
               "Offset": 60,
               "EndOffset": 65,
               "Path": 1,
@@ -15581,22 +15542,22 @@
         },
         "RedisKit.Serialization.IRedisSerializer RedisKit.Serialization.RedisSerializerFactory::CreateSystemTextJsonSerializer(System.Object,Microsoft.Extensions.Logging.ILoggerFactory)": {
           "Lines": {
-            "209": 3,
-            "210": 3,
-            "211": 3,
-            "212": 2,
-            "213": 1,
-            "214": 0,
-            "215": 0,
-            "216": 3,
-            "218": 3,
+            "212": 3,
+            "213": 3,
+            "214": 3,
+            "215": 2,
+            "216": 1,
+            "217": 0,
+            "218": 0,
             "219": 3,
-            "220": 3,
-            "221": 3
+            "221": 3,
+            "222": 3,
+            "223": 3,
+            "224": 3
           },
           "Branches": [
             {
-              "Line": 210,
+              "Line": 213,
               "Offset": 6,
               "EndOffset": 8,
               "Path": 0,
@@ -15604,7 +15565,7 @@
               "Hits": 1
             },
             {
-              "Line": 210,
+              "Line": 213,
               "Offset": 6,
               "EndOffset": 20,
               "Path": 1,
@@ -15612,7 +15573,7 @@
               "Hits": 2
             },
             {
-              "Line": 210,
+              "Line": 213,
               "Offset": 16,
               "EndOffset": 26,
               "Path": 1,
@@ -15620,7 +15581,7 @@
               "Hits": 1
             },
             {
-              "Line": 210,
+              "Line": 213,
               "Offset": 16,
               "EndOffset": 30,
               "Path": 0,
@@ -15628,7 +15589,7 @@
               "Hits": 0
             },
             {
-              "Line": 218,
+              "Line": 221,
               "Offset": 60,
               "EndOffset": 62,
               "Path": 0,
@@ -15636,7 +15597,7 @@
               "Hits": 2
             },
             {
-              "Line": 218,
+              "Line": 221,
               "Offset": 60,
               "EndOffset": 65,
               "Path": 1,
@@ -15647,29 +15608,29 @@
         },
         "System.Object RedisKit.Serialization.RedisSerializerFactory::CreateCustomSerializerInstance(System.Type,System.Object)": {
           "Lines": {
-            "224": 3,
-            "226": 3,
             "227": 3,
-            "228": 3,
             "229": 3,
+            "230": 3,
             "231": 3,
             "232": 3,
-            "233": 0,
-            "234": 0,
+            "234": 3,
             "235": 3,
             "236": 0,
             "237": 0,
             "238": 3,
+            "239": 0,
             "240": 0,
-            "241": 0,
-            "242": 0,
+            "241": 3,
             "243": 0,
             "244": 0,
-            "246": 3
+            "245": 0,
+            "246": 0,
+            "247": 0,
+            "249": 3
           },
           "Branches": [
             {
-              "Line": 227,
+              "Line": 230,
               "Offset": 3,
               "EndOffset": 5,
               "Path": 0,
@@ -15677,7 +15638,7 @@
               "Hits": 1
             },
             {
-              "Line": 227,
+              "Line": 230,
               "Offset": 3,
               "EndOffset": 23,
               "Path": 1,
@@ -15685,7 +15646,7 @@
               "Hits": 2
             },
             {
-              "Line": 231,
+              "Line": 234,
               "Offset": 35,
               "EndOffset": 37,
               "Path": 0,
@@ -15693,7 +15654,7 @@
               "Hits": 3
             },
             {
-              "Line": 231,
+              "Line": 234,
               "Offset": 35,
               "EndOffset": 49,
               "Path": 1,
@@ -15701,7 +15662,7 @@
               "Hits": 0
             },
             {
-              "Line": 231,
+              "Line": 234,
               "Offset": 45,
               "EndOffset": 73,
               "Path": 1,
@@ -15709,7 +15670,7 @@
               "Hits": 3
             },
             {
-              "Line": 231,
+              "Line": 234,
               "Offset": 45,
               "EndOffset": 77,
               "Path": 0,
@@ -15717,7 +15678,7 @@
               "Hits": 0
             },
             {
-              "Line": 242,
+              "Line": 245,
               "Offset": 151,
               "EndOffset": 153,
               "Path": 0,
@@ -15725,7 +15686,7 @@
               "Hits": 0
             },
             {
-              "Line": 242,
+              "Line": 245,
               "Offset": 151,
               "EndOffset": 160,
               "Path": 1,
@@ -15736,16 +15697,16 @@
         },
         "System.Void RedisKit.Serialization.RedisSerializerFactory::ValidateCustomSerializerType(System.Type)": {
           "Lines": {
-            "249": 4,
-            "250": 4,
-            "251": 1,
-            "252": 1,
-            "253": 1,
-            "254": 3
+            "252": 4,
+            "253": 4,
+            "254": 1,
+            "255": 1,
+            "256": 1,
+            "257": 3
           },
           "Branches": [
             {
-              "Line": 250,
+              "Line": 253,
               "Offset": 22,
               "EndOffset": 24,
               "Path": 0,
@@ -15753,7 +15714,7 @@
               "Hits": 1
             },
             {
-              "Line": 250,
+              "Line": 253,
               "Offset": 22,
               "EndOffset": 56,
               "Path": 1,
@@ -15764,11 +15725,10 @@
         },
         "System.ArgumentException RedisKit.Serialization.RedisSerializerFactory::CreateInvalidOptionsException(RedisKit.Models.SerializerType,System.Type,System.Type)": {
           "Lines": {
-            "260": 2,
-            "261": 2,
-            "262": 2,
             "263": 2,
-            "264": 2
+            "264": 2,
+            "265": 2,
+            "266": 2
           },
           "Branches": []
         },
@@ -15785,54 +15745,54 @@
       "RedisKit.Serialization.SystemTextJsonRedisSerializer": {
         "System.Text.Json.JsonSerializerOptions RedisKit.Serialization.SystemTextJsonRedisSerializer::get_Options()": {
           "Lines": {
-            "128": 254
+            "126": 254
           },
           "Branches": []
         },
         "System.String RedisKit.Serialization.SystemTextJsonRedisSerializer::get_Name()": {
           "Lines": {
-            "134": 2
+            "132": 2
           },
           "Branches": []
         },
         "System.Byte[] RedisKit.Serialization.SystemTextJsonRedisSerializer::Serialize(T)": {
           "Lines": {
-            "158": 6,
+            "157": 6,
+            "159": 6,
             "160": 6,
-            "161": 6,
-            "165": 6,
-            "167": 6,
-            "168": 1,
-            "170": 6,
+            "164": 6,
+            "166": 6,
+            "167": 1,
+            "169": 6,
+            "171": 0,
             "172": 0,
             "173": 0,
             "174": 0,
             "175": 0,
             "176": 0,
-            "177": 0,
+            "178": 0,
             "179": 0,
             "180": 0,
             "181": 0,
             "182": 0,
             "183": 0,
-            "184": 0,
+            "185": 0,
             "186": 0,
             "187": 0,
             "188": 0,
             "189": 0,
             "190": 0,
-            "191": 0,
+            "192": 0,
             "193": 0,
             "194": 0,
             "195": 0,
             "196": 0,
             "197": 0,
-            "198": 0,
-            "200": 6
+            "199": 6
           },
           "Branches": [
             {
-              "Line": 161,
+              "Line": 160,
               "Offset": 9,
               "EndOffset": 11,
               "Path": 0,
@@ -15840,7 +15800,7 @@
               "Hits": 5
             },
             {
-              "Line": 161,
+              "Line": 160,
               "Offset": 9,
               "EndOffset": 14,
               "Path": 1,
@@ -15848,7 +15808,7 @@
               "Hits": 1
             },
             {
-              "Line": 167,
+              "Line": 166,
               "Offset": 60,
               "EndOffset": 62,
               "Path": 0,
@@ -15856,7 +15816,7 @@
               "Hits": 1
             },
             {
-              "Line": 168,
+              "Line": 167,
               "Offset": 69,
               "EndOffset": 71,
               "Path": 0,
@@ -15864,7 +15824,7 @@
               "Hits": 0
             },
             {
-              "Line": 168,
+              "Line": 167,
               "Offset": 69,
               "EndOffset": 74,
               "Path": 1,
@@ -15872,7 +15832,7 @@
               "Hits": 1
             },
             {
-              "Line": 167,
+              "Line": 166,
               "Offset": 60,
               "EndOffset": 98,
               "Path": 1,
@@ -15880,7 +15840,7 @@
               "Hits": 6
             },
             {
-              "Line": 174,
+              "Line": 173,
               "Offset": 114,
               "EndOffset": 116,
               "Path": 0,
@@ -15888,7 +15848,7 @@
               "Hits": 0
             },
             {
-              "Line": 174,
+              "Line": 173,
               "Offset": 114,
               "EndOffset": 119,
               "Path": 1,
@@ -15896,7 +15856,7 @@
               "Hits": 0
             },
             {
-              "Line": 181,
+              "Line": 180,
               "Offset": 257,
               "EndOffset": 259,
               "Path": 0,
@@ -15904,7 +15864,7 @@
               "Hits": 0
             },
             {
-              "Line": 181,
+              "Line": 180,
               "Offset": 257,
               "EndOffset": 262,
               "Path": 1,
@@ -15912,7 +15872,7 @@
               "Hits": 0
             },
             {
-              "Line": 188,
+              "Line": 187,
               "Offset": 333,
               "EndOffset": 335,
               "Path": 0,
@@ -15920,7 +15880,7 @@
               "Hits": 0
             },
             {
-              "Line": 188,
+              "Line": 187,
               "Offset": 333,
               "EndOffset": 338,
               "Path": 1,
@@ -15928,7 +15888,7 @@
               "Hits": 0
             },
             {
-              "Line": 195,
+              "Line": 194,
               "Offset": 409,
               "EndOffset": 411,
               "Path": 0,
@@ -15936,7 +15896,7 @@
               "Hits": 0
             },
             {
-              "Line": 195,
+              "Line": 194,
               "Offset": 409,
               "EndOffset": 414,
               "Path": 1,
@@ -15945,176 +15905,36 @@
             }
           ]
         },
-        "T RedisKit.Serialization.SystemTextJsonRedisSerializer::Deserialize(System.Byte[])": {
+        "System.Threading.Tasks.Task`1<System.Byte[]> RedisKit.Serialization.SystemTextJsonRedisSerializer::SerializeAsync(T,System.Threading.CancellationToken)": {
           "Lines": {
-            "224": 5,
-            "225": 5,
-            "226": 1,
-            "228": 4,
-            "229": 1,
-            "232": 3,
-            "233": 0,
-            "236": 3,
-            "237": 3,
-            "239": 3,
-            "241": 2,
-            "242": 2,
-            "243": 2,
-            "244": 2,
-            "245": 2,
+            "223": 121,
+            "225": 121,
+            "228": 121,
+            "231": 121,
+            "233": 121,
+            "236": 121,
+            "237": 0,
+            "239": 121,
+            "241": 0,
+            "242": 0,
+            "243": 0,
+            "244": 0,
+            "245": 0,
             "247": 0,
             "248": 0,
             "249": 0,
             "250": 0,
             "251": 0,
-            "252": 0,
-            "254": 2
+            "253": 0,
+            "254": 0,
+            "255": 0,
+            "256": 0,
+            "257": 0,
+            "259": 121
           },
           "Branches": [
             {
               "Line": 225,
-              "Offset": 7,
-              "EndOffset": 9,
-              "Path": 0,
-              "Ordinal": 0,
-              "Hits": 1
-            },
-            {
-              "Line": 225,
-              "Offset": 7,
-              "EndOffset": 20,
-              "Path": 1,
-              "Ordinal": 1,
-              "Hits": 4
-            },
-            {
-              "Line": 228,
-              "Offset": 27,
-              "EndOffset": 29,
-              "Path": 0,
-              "Ordinal": 2,
-              "Hits": 1
-            },
-            {
-              "Line": 228,
-              "Offset": 27,
-              "EndOffset": 44,
-              "Path": 1,
-              "Ordinal": 3,
-              "Hits": 3
-            },
-            {
-              "Line": 232,
-              "Offset": 58,
-              "EndOffset": 60,
-              "Path": 0,
-              "Ordinal": 4,
-              "Hits": 0
-            },
-            {
-              "Line": 233,
-              "Offset": 67,
-              "EndOffset": 69,
-              "Path": 0,
-              "Ordinal": 6,
-              "Hits": 0
-            },
-            {
-              "Line": 233,
-              "Offset": 67,
-              "EndOffset": 72,
-              "Path": 1,
-              "Ordinal": 7,
-              "Hits": 0
-            },
-            {
-              "Line": 232,
-              "Offset": 58,
-              "EndOffset": 96,
-              "Path": 1,
-              "Ordinal": 5,
-              "Hits": 3
-            },
-            {
-              "Line": 237,
-              "Offset": 105,
-              "EndOffset": 107,
-              "Path": 0,
-              "Ordinal": 8,
-              "Hits": 3
-            },
-            {
-              "Line": 237,
-              "Offset": 105,
-              "EndOffset": 110,
-              "Path": 1,
-              "Ordinal": 9,
-              "Hits": 0
-            },
-            {
-              "Line": 243,
-              "Offset": 167,
-              "EndOffset": 169,
-              "Path": 0,
-              "Ordinal": 10,
-              "Hits": 2
-            },
-            {
-              "Line": 243,
-              "Offset": 167,
-              "EndOffset": 172,
-              "Path": 1,
-              "Ordinal": 11,
-              "Hits": 0
-            },
-            {
-              "Line": 249,
-              "Offset": 260,
-              "EndOffset": 262,
-              "Path": 0,
-              "Ordinal": 12,
-              "Hits": 0
-            },
-            {
-              "Line": 249,
-              "Offset": 260,
-              "EndOffset": 265,
-              "Path": 1,
-              "Ordinal": 13,
-              "Hits": 0
-            }
-          ]
-        },
-        "System.Threading.Tasks.Task`1<System.Byte[]> RedisKit.Serialization.SystemTextJsonRedisSerializer::SerializeAsync(T,System.Threading.CancellationToken)": {
-          "Lines": {
-            "277": 121,
-            "279": 121,
-            "282": 121,
-            "285": 121,
-            "287": 121,
-            "290": 121,
-            "291": 0,
-            "293": 121,
-            "295": 0,
-            "296": 0,
-            "297": 0,
-            "298": 0,
-            "299": 0,
-            "301": 0,
-            "302": 0,
-            "303": 0,
-            "304": 0,
-            "305": 0,
-            "307": 0,
-            "308": 0,
-            "309": 0,
-            "310": 0,
-            "311": 0,
-            "313": 121
-          },
-          "Branches": [
-            {
-              "Line": 279,
               "Offset": 8,
               "EndOffset": 10,
               "Path": 0,
@@ -16122,7 +15942,7 @@
               "Hits": 121
             },
             {
-              "Line": 279,
+              "Line": 225,
               "Offset": 8,
               "EndOffset": 14,
               "Path": 1,
@@ -16130,7 +15950,7 @@
               "Hits": 0
             },
             {
-              "Line": 279,
+              "Line": 225,
               "Offset": 22,
               "EndOffset": 24,
               "Path": 0,
@@ -16138,7 +15958,7 @@
               "Hits": 0
             },
             {
-              "Line": 279,
+              "Line": 225,
               "Offset": 22,
               "EndOffset": 32,
               "Path": 1,
@@ -16146,7 +15966,7 @@
               "Hits": 121
             },
             {
-              "Line": 285,
+              "Line": 231,
               "Offset": 41,
               "EndOffset": 43,
               "Path": 0,
@@ -16154,7 +15974,7 @@
               "Hits": 121
             },
             {
-              "Line": 285,
+              "Line": 231,
               "Offset": 41,
               "EndOffset": 46,
               "Path": 1,
@@ -16162,7 +15982,7 @@
               "Hits": 0
             },
             {
-              "Line": 290,
+              "Line": 236,
               "Offset": 92,
               "EndOffset": 94,
               "Path": 0,
@@ -16170,7 +15990,7 @@
               "Hits": 0
             },
             {
-              "Line": 291,
+              "Line": 237,
               "Offset": 101,
               "EndOffset": 103,
               "Path": 0,
@@ -16178,7 +15998,7 @@
               "Hits": 0
             },
             {
-              "Line": 291,
+              "Line": 237,
               "Offset": 101,
               "EndOffset": 106,
               "Path": 1,
@@ -16186,7 +16006,7 @@
               "Hits": 0
             },
             {
-              "Line": 290,
+              "Line": 236,
               "Offset": 92,
               "EndOffset": 130,
               "Path": 1,
@@ -16194,7 +16014,7 @@
               "Hits": 121
             },
             {
-              "Line": 297,
+              "Line": 243,
               "Offset": 152,
               "EndOffset": 154,
               "Path": 0,
@@ -16202,7 +16022,7 @@
               "Hits": 0
             },
             {
-              "Line": 297,
+              "Line": 243,
               "Offset": 152,
               "EndOffset": 157,
               "Path": 1,
@@ -16210,7 +16030,7 @@
               "Hits": 0
             },
             {
-              "Line": 303,
+              "Line": 249,
               "Offset": 242,
               "EndOffset": 244,
               "Path": 0,
@@ -16218,7 +16038,7 @@
               "Hits": 0
             },
             {
-              "Line": 303,
+              "Line": 249,
               "Offset": 242,
               "EndOffset": 247,
               "Path": 1,
@@ -16226,7 +16046,7 @@
               "Hits": 0
             },
             {
-              "Line": 309,
+              "Line": 255,
               "Offset": 318,
               "EndOffset": 320,
               "Path": 0,
@@ -16234,7 +16054,7 @@
               "Hits": 0
             },
             {
-              "Line": 309,
+              "Line": 255,
               "Offset": 318,
               "EndOffset": 323,
               "Path": 1,
@@ -16243,27 +16063,167 @@
             }
           ]
         },
-        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer::ValidateObjectSize(T)": {
+        "T RedisKit.Serialization.SystemTextJsonRedisSerializer::Deserialize(System.Byte[])": {
           "Lines": {
-            "448": 0,
-            "454": 0,
-            "456": 0,
-            "457": 0,
-            "458": 0,
-            "460": 0,
-            "461": 0,
-            "462": 0,
-            "464": 0,
-            "465": 0,
-            "466": 0,
-            "468": 0,
-            "469": 0,
-            "470": 0,
-            "472": 0
+            "292": 5,
+            "293": 5,
+            "294": 1,
+            "296": 4,
+            "297": 1,
+            "300": 3,
+            "301": 0,
+            "304": 3,
+            "305": 3,
+            "307": 3,
+            "309": 2,
+            "310": 2,
+            "311": 2,
+            "312": 2,
+            "313": 2,
+            "315": 0,
+            "316": 0,
+            "317": 0,
+            "318": 0,
+            "319": 0,
+            "320": 0,
+            "322": 2
           },
           "Branches": [
             {
-              "Line": 454,
+              "Line": 293,
+              "Offset": 7,
+              "EndOffset": 9,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1
+            },
+            {
+              "Line": 293,
+              "Offset": 7,
+              "EndOffset": 20,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 4
+            },
+            {
+              "Line": 296,
+              "Offset": 27,
+              "EndOffset": 29,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1
+            },
+            {
+              "Line": 296,
+              "Offset": 27,
+              "EndOffset": 44,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 3
+            },
+            {
+              "Line": 300,
+              "Offset": 58,
+              "EndOffset": 60,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 0
+            },
+            {
+              "Line": 301,
+              "Offset": 67,
+              "EndOffset": 69,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 0
+            },
+            {
+              "Line": 301,
+              "Offset": 67,
+              "EndOffset": 72,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 0
+            },
+            {
+              "Line": 300,
+              "Offset": 58,
+              "EndOffset": 96,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 3
+            },
+            {
+              "Line": 305,
+              "Offset": 105,
+              "EndOffset": 107,
+              "Path": 0,
+              "Ordinal": 8,
+              "Hits": 3
+            },
+            {
+              "Line": 305,
+              "Offset": 105,
+              "EndOffset": 110,
+              "Path": 1,
+              "Ordinal": 9,
+              "Hits": 0
+            },
+            {
+              "Line": 311,
+              "Offset": 167,
+              "EndOffset": 169,
+              "Path": 0,
+              "Ordinal": 10,
+              "Hits": 2
+            },
+            {
+              "Line": 311,
+              "Offset": 167,
+              "EndOffset": 172,
+              "Path": 1,
+              "Ordinal": 11,
+              "Hits": 0
+            },
+            {
+              "Line": 317,
+              "Offset": 260,
+              "EndOffset": 262,
+              "Path": 0,
+              "Ordinal": 12,
+              "Hits": 0
+            },
+            {
+              "Line": 317,
+              "Offset": 260,
+              "EndOffset": 265,
+              "Path": 1,
+              "Ordinal": 13,
+              "Hits": 0
+            }
+          ]
+        },
+        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer::ValidateObjectSize(T)": {
+          "Lines": {
+            "449": 0,
+            "455": 0,
+            "457": 0,
+            "458": 0,
+            "459": 0,
+            "461": 0,
+            "462": 0,
+            "463": 0,
+            "465": 0,
+            "466": 0,
+            "467": 0,
+            "469": 0,
+            "470": 0,
+            "471": 0,
+            "473": 0
+          },
+          "Branches": [
+            {
+              "Line": 455,
               "Offset": 22,
               "EndOffset": 24,
               "Path": 0,
@@ -16271,7 +16231,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 38,
               "EndOffset": 40,
               "Path": 0,
@@ -16279,7 +16239,7 @@
               "Hits": 0
             },
             {
-              "Line": 460,
+              "Line": 461,
               "Offset": 166,
               "EndOffset": 64,
               "Path": 0,
@@ -16287,7 +16247,7 @@
               "Hits": 0
             },
             {
-              "Line": 464,
+              "Line": 465,
               "Offset": 212,
               "EndOffset": 79,
               "Path": 0,
@@ -16295,7 +16255,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 22,
               "EndOffset": 103,
               "Path": 1,
@@ -16303,7 +16263,7 @@
               "Hits": 0
             },
             {
-              "Line": 456,
+              "Line": 457,
               "Offset": 114,
               "EndOffset": 121,
               "Path": 1,
@@ -16311,7 +16271,7 @@
               "Hits": 0
             },
             {
-              "Line": 457,
+              "Line": 458,
               "Offset": 128,
               "EndOffset": 130,
               "Path": 0,
@@ -16319,7 +16279,7 @@
               "Hits": 0
             },
             {
-              "Line": 457,
+              "Line": 458,
               "Offset": 128,
               "EndOffset": 133,
               "Path": 1,
@@ -16327,7 +16287,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 38,
               "EndOffset": 155,
               "Path": 1,
@@ -16335,7 +16295,7 @@
               "Hits": 0
             },
             {
-              "Line": 460,
+              "Line": 461,
               "Offset": 166,
               "EndOffset": 170,
               "Path": 1,
@@ -16343,7 +16303,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 462,
               "Offset": 177,
               "EndOffset": 179,
               "Path": 0,
@@ -16351,7 +16311,7 @@
               "Hits": 0
             },
             {
-              "Line": 461,
+              "Line": 462,
               "Offset": 177,
               "EndOffset": 182,
               "Path": 1,
@@ -16359,7 +16319,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 54,
               "EndOffset": 201,
               "Path": 1,
@@ -16367,7 +16327,7 @@
               "Hits": 0
             },
             {
-              "Line": 464,
+              "Line": 465,
               "Offset": 212,
               "EndOffset": 219,
               "Path": 1,
@@ -16375,7 +16335,7 @@
               "Hits": 0
             },
             {
-              "Line": 465,
+              "Line": 466,
               "Offset": 226,
               "EndOffset": 228,
               "Path": 0,
@@ -16383,7 +16343,7 @@
               "Hits": 0
             },
             {
-              "Line": 465,
+              "Line": 466,
               "Offset": 226,
               "EndOffset": 231,
               "Path": 1,
@@ -16391,7 +16351,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 93,
               "EndOffset": 250,
               "Path": 1,
@@ -16399,7 +16359,7 @@
               "Hits": 0
             },
             {
-              "Line": 468,
+              "Line": 469,
               "Offset": 261,
               "EndOffset": 265,
               "Path": 1,
@@ -16407,7 +16367,7 @@
               "Hits": 0
             },
             {
-              "Line": 469,
+              "Line": 470,
               "Offset": 272,
               "EndOffset": 274,
               "Path": 0,
@@ -16415,7 +16375,7 @@
               "Hits": 0
             },
             {
-              "Line": 469,
+              "Line": 470,
               "Offset": 272,
               "EndOffset": 277,
               "Path": 1,
@@ -16423,7 +16383,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 54,
               "EndOffset": 296,
               "Path": 0,
@@ -16431,7 +16391,7 @@
               "Hits": 0
             },
             {
-              "Line": 454,
+              "Line": 455,
               "Offset": 93,
               "EndOffset": 296,
               "Path": 0,
@@ -16439,7 +16399,7 @@
               "Hits": 0
             },
             {
-              "Line": 456,
+              "Line": 457,
               "Offset": 114,
               "EndOffset": 296,
               "Path": 0,
@@ -16447,7 +16407,7 @@
               "Hits": 0
             },
             {
-              "Line": 468,
+              "Line": 469,
               "Offset": 261,
               "EndOffset": 296,
               "Path": 0,
@@ -16458,35 +16418,35 @@
         },
         "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer::.ctor()": {
           "Lines": {
+            "65": 15,
             "66": 15,
-            "67": 15,
-            "68": 15
+            "67": 15
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer::.ctor(System.Text.Json.JsonSerializerOptions)": {
           "Lines": {
-            "93": 2,
-            "94": 2,
-            "95": 2
+            "91": 2,
+            "92": 2,
+            "93": 2
           },
           "Branches": []
         },
         "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer::.ctor(Microsoft.Extensions.Logging.ILogger`1<RedisKit.Serialization.SystemTextJsonRedisSerializer>,System.Text.Json.JsonSerializerOptions)": {
           "Lines": {
+            "104": 24,
+            "105": 24,
             "106": 24,
-            "107": 24,
-            "108": 24,
+            "109": 24,
+            "110": 24,
             "111": 24,
             "112": 24,
             "113": 24,
-            "114": 24,
-            "115": 24,
-            "116": 24
+            "114": 24
           },
           "Branches": [
             {
-              "Line": 111,
+              "Line": 109,
               "Offset": 18,
               "EndOffset": 20,
               "Path": 0,
@@ -16494,7 +16454,7 @@
               "Hits": 19
             },
             {
-              "Line": 111,
+              "Line": 109,
               "Offset": 18,
               "EndOffset": 46,
               "Path": 1,
@@ -16510,30 +16470,30 @@
           "Branches": []
         }
       },
-      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__13`1": {
-        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__13`1::MoveNext()": {
+      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__14`1": {
+        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__14`1::MoveNext()": {
           "Lines": {
-            "337": 119,
-            "338": 119,
-            "339": 2,
-            "342": 117,
-            "343": 117,
-            "346": 117,
-            "347": 117,
-            "348": 117,
-            "350": 1,
-            "351": 1,
-            "352": 1,
-            "353": 1,
-            "355": 0,
-            "356": 0,
-            "357": 0,
-            "358": 0,
-            "360": 118
+            "346": 119,
+            "347": 119,
+            "348": 2,
+            "351": 117,
+            "352": 117,
+            "355": 117,
+            "356": 117,
+            "357": 117,
+            "359": 1,
+            "360": 1,
+            "361": 1,
+            "362": 1,
+            "364": 0,
+            "365": 0,
+            "366": 0,
+            "367": 0,
+            "369": 118
           },
           "Branches": [
             {
-              "Line": 338,
+              "Line": 347,
               "Offset": 21,
               "EndOffset": 23,
               "Path": 0,
@@ -16541,7 +16501,7 @@
               "Hits": 118
             },
             {
-              "Line": 338,
+              "Line": 347,
               "Offset": 21,
               "EndOffset": 35,
               "Path": 1,
@@ -16549,7 +16509,7 @@
               "Hits": 1
             },
             {
-              "Line": 338,
+              "Line": 347,
               "Offset": 38,
               "EndOffset": 40,
               "Path": 0,
@@ -16557,7 +16517,7 @@
               "Hits": 2
             },
             {
-              "Line": 338,
+              "Line": 347,
               "Offset": 38,
               "EndOffset": 53,
               "Path": 1,
@@ -16565,7 +16525,7 @@
               "Hits": 117
             },
             {
-              "Line": 343,
+              "Line": 352,
               "Offset": 74,
               "EndOffset": 76,
               "Path": 0,
@@ -16573,7 +16533,7 @@
               "Hits": 117
             },
             {
-              "Line": 343,
+              "Line": 352,
               "Offset": 74,
               "EndOffset": 79,
               "Path": 1,
@@ -16581,7 +16541,7 @@
               "Hits": 0
             },
             {
-              "Line": 352,
+              "Line": 361,
               "Offset": 323,
               "EndOffset": 325,
               "Path": 0,
@@ -16589,7 +16549,7 @@
               "Hits": 1
             },
             {
-              "Line": 352,
+              "Line": 361,
               "Offset": 323,
               "EndOffset": 328,
               "Path": 1,
@@ -16597,7 +16557,7 @@
               "Hits": 0
             },
             {
-              "Line": 357,
+              "Line": 366,
               "Offset": 439,
               "EndOffset": 441,
               "Path": 0,
@@ -16605,7 +16565,7 @@
               "Hits": 0
             },
             {
-              "Line": 357,
+              "Line": 366,
               "Offset": 439,
               "EndOffset": 444,
               "Path": 1,
@@ -16615,32 +16575,32 @@
           ]
         }
       },
-      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__14": {
-        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__14::MoveNext()": {
+      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__15": {
+        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__15::MoveNext()": {
           "Lines": {
-            "385": 2,
-            "386": 2,
-            "387": 0,
-            "389": 2,
-            "390": 0,
-            "393": 2,
             "394": 2,
-            "397": 2,
+            "395": 2,
+            "396": 0,
             "398": 2,
-            "399": 2,
-            "401": 0,
-            "402": 0,
-            "403": 0,
-            "404": 0,
-            "406": 0,
-            "407": 0,
-            "408": 0,
-            "409": 0,
-            "411": 2
+            "399": 0,
+            "402": 2,
+            "403": 2,
+            "406": 2,
+            "407": 2,
+            "408": 2,
+            "410": 0,
+            "411": 0,
+            "412": 0,
+            "413": 0,
+            "415": 0,
+            "416": 0,
+            "417": 0,
+            "418": 0,
+            "420": 2
           },
           "Branches": [
             {
-              "Line": 386,
+              "Line": 395,
               "Offset": 21,
               "EndOffset": 23,
               "Path": 0,
@@ -16648,7 +16608,7 @@
               "Hits": 2
             },
             {
-              "Line": 386,
+              "Line": 395,
               "Offset": 21,
               "EndOffset": 35,
               "Path": 1,
@@ -16656,7 +16616,7 @@
               "Hits": 0
             },
             {
-              "Line": 386,
+              "Line": 395,
               "Offset": 38,
               "EndOffset": 40,
               "Path": 0,
@@ -16664,7 +16624,7 @@
               "Hits": 0
             },
             {
-              "Line": 386,
+              "Line": 395,
               "Offset": 38,
               "EndOffset": 47,
               "Path": 1,
@@ -16672,7 +16632,7 @@
               "Hits": 2
             },
             {
-              "Line": 389,
+              "Line": 398,
               "Offset": 61,
               "EndOffset": 63,
               "Path": 0,
@@ -16680,7 +16640,7 @@
               "Hits": 0
             },
             {
-              "Line": 389,
+              "Line": 398,
               "Offset": 61,
               "EndOffset": 74,
               "Path": 1,
@@ -16688,7 +16648,7 @@
               "Hits": 2
             },
             {
-              "Line": 394,
+              "Line": 403,
               "Offset": 95,
               "EndOffset": 97,
               "Path": 0,
@@ -16696,7 +16656,7 @@
               "Hits": 2
             },
             {
-              "Line": 394,
+              "Line": 403,
               "Offset": 95,
               "EndOffset": 100,
               "Path": 1,
@@ -16704,7 +16664,7 @@
               "Hits": 0
             },
             {
-              "Line": 403,
+              "Line": 412,
               "Offset": 349,
               "EndOffset": 351,
               "Path": 0,
@@ -16712,7 +16672,7 @@
               "Hits": 0
             },
             {
-              "Line": 403,
+              "Line": 412,
               "Offset": 349,
               "EndOffset": 354,
               "Path": 1,
@@ -16720,7 +16680,7 @@
               "Hits": 0
             },
             {
-              "Line": 408,
+              "Line": 417,
               "Offset": 457,
               "EndOffset": 459,
               "Path": 0,
@@ -16728,7 +16688,7 @@
               "Hits": 0
             },
             {
-              "Line": 408,
+              "Line": 417,
               "Offset": 457,
               "EndOffset": 462,
               "Path": 1,
@@ -16741,15 +16701,15 @@
       "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__16`1": {
         "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__16`1::MoveNext()": {
           "Lines": {
-            "422": 0,
             "423": 0,
             "424": 0,
             "425": 0,
-            "426": 0
+            "426": 0,
+            "427": 0
           },
           "Branches": [
             {
-              "Line": 423,
+              "Line": 424,
               "Offset": 39,
               "EndOffset": 41,
               "Path": 0,
@@ -16757,7 +16717,7 @@
               "Hits": 0
             },
             {
-              "Line": 423,
+              "Line": 424,
               "Offset": 39,
               "EndOffset": 54,
               "Path": 1,
@@ -16765,7 +16725,7 @@
               "Hits": 0
             },
             {
-              "Line": 425,
+              "Line": 426,
               "Offset": 289,
               "EndOffset": 291,
               "Path": 0,
@@ -16773,7 +16733,7 @@
               "Hits": 0
             },
             {
-              "Line": 425,
+              "Line": 426,
               "Offset": 289,
               "EndOffset": 400,
               "Path": 1,
@@ -16786,15 +16746,15 @@
       "RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__17": {
         "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<DeserializeAsync>d__17::MoveNext()": {
           "Lines": {
-            "429": 0,
             "430": 0,
             "431": 0,
             "432": 0,
-            "433": 0
+            "433": 0,
+            "434": 0
           },
           "Branches": [
             {
-              "Line": 430,
+              "Line": 431,
               "Offset": 39,
               "EndOffset": 41,
               "Path": 0,
@@ -16802,7 +16762,7 @@
               "Hits": 0
             },
             {
-              "Line": 430,
+              "Line": 431,
               "Offset": 39,
               "EndOffset": 48,
               "Path": 1,
@@ -16810,7 +16770,7 @@
               "Hits": 0
             },
             {
-              "Line": 432,
+              "Line": 433,
               "Offset": 289,
               "EndOffset": 291,
               "Path": 0,
@@ -16818,7 +16778,7 @@
               "Hits": 0
             },
             {
-              "Line": 432,
+              "Line": 433,
               "Offset": 289,
               "EndOffset": 400,
               "Path": 1,
@@ -16828,19 +16788,19 @@
           ]
         }
       },
-      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<SerializeAsync>d__15`1": {
-        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<SerializeAsync>d__15`1::MoveNext()": {
+      "RedisKit.Serialization.SystemTextJsonRedisSerializer/<SerializeAsync>d__12`1": {
+        "System.Void RedisKit.Serialization.SystemTextJsonRedisSerializer/<SerializeAsync>d__12`1::MoveNext()": {
           "Lines": {
-            "414": 0,
-            "415": 0,
-            "416": 0,
-            "417": 0,
-            "418": 0,
-            "419": 0
+            "262": 0,
+            "263": 0,
+            "264": 0,
+            "265": 0,
+            "266": 0,
+            "267": 0
           },
           "Branches": [
             {
-              "Line": 418,
+              "Line": 266,
               "Offset": 280,
               "EndOffset": 282,
               "Path": 0,
@@ -16848,7 +16808,7 @@
               "Hits": 0
             },
             {
-              "Line": 418,
+              "Line": 266,
               "Offset": 280,
               "EndOffset": 390,
               "Path": 1,
@@ -16869,10 +16829,10 @@
         },
         "System.Void RedisKit.Models.BatchResult::.ctor(System.Boolean)": {
           "Lines": {
-            "12": 3,
-            "13": 3,
-            "14": 3,
-            "15": 3
+            "12": 5,
+            "13": 5,
+            "14": 5,
+            "15": 5
           },
           "Branches": []
         }
@@ -16882,31 +16842,31 @@
       "RedisKit.Models.CircuitBreakerSettings": {
         "System.Boolean RedisKit.Models.CircuitBreakerSettings::get_Enabled()": {
           "Lines": {
-            "11": 813
+            "11": 829
           },
           "Branches": []
         },
         "System.Int32 RedisKit.Models.CircuitBreakerSettings::get_FailureThreshold()": {
           "Lines": {
-            "16": 231
+            "16": 247
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.CircuitBreakerSettings::get_FailureWindow()": {
           "Lines": {
-            "21": 175
+            "21": 191
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.CircuitBreakerSettings::get_BreakDuration()": {
           "Lines": {
-            "26": 198
+            "26": 214
           },
           "Branches": []
         },
         "System.Int32 RedisKit.Models.CircuitBreakerSettings::get_SuccessThreshold()": {
           "Lines": {
-            "31": 182
+            "31": 198
           },
           "Branches": []
         }
@@ -16997,31 +16957,31 @@
       "RedisKit.Models.ConnectionTimeoutSettings": {
         "System.TimeSpan RedisKit.Models.ConnectionTimeoutSettings::get_ConnectTimeout()": {
           "Lines": {
-            "11": 208
+            "11": 224
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.ConnectionTimeoutSettings::get_SyncTimeout()": {
           "Lines": {
-            "16": 208
+            "16": 224
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.ConnectionTimeoutSettings::get_AsyncTimeout()": {
           "Lines": {
-            "21": 208
+            "21": 224
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.ConnectionTimeoutSettings::get_KeepAlive()": {
           "Lines": {
-            "26": 142
+            "26": 158
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.ConnectionTimeoutSettings::get_ConfigCheckSeconds()": {
           "Lines": {
-            "32": 142
+            "32": 158
           },
           "Branches": []
         }
@@ -17237,31 +17197,31 @@
       "RedisKit.Models.HealthMonitoringSettings": {
         "System.Boolean RedisKit.Models.HealthMonitoringSettings::get_Enabled()": {
           "Lines": {
-            "11": 190
+            "11": 206
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.HealthMonitoringSettings::get_CheckInterval()": {
           "Lines": {
-            "16": 189
+            "16": 205
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.HealthMonitoringSettings::get_CheckTimeout()": {
           "Lines": {
-            "21": 133
+            "21": 149
           },
           "Branches": []
         },
         "System.Boolean RedisKit.Models.HealthMonitoringSettings::get_AutoReconnect()": {
           "Lines": {
-            "26": 133
+            "26": 149
           },
           "Branches": []
         },
         "System.Int32 RedisKit.Models.HealthMonitoringSettings::get_ConsecutiveFailuresThreshold()": {
           "Lines": {
-            "31": 133
+            "31": 149
           },
           "Branches": []
         }
@@ -17271,13 +17231,13 @@
       "RedisKit.Models.PoolingOptions": {
         "System.Boolean RedisKit.Models.PoolingOptions::get_Enabled()": {
           "Lines": {
-            "12": 196
+            "12": 260
           },
           "Branches": []
         },
         "System.Int32 RedisKit.Models.PoolingOptions::get_MaxPoolSize()": {
           "Lines": {
-            "18": 196
+            "18": 244
           },
           "Branches": []
         }
@@ -17287,43 +17247,43 @@
       "RedisKit.Models.RedisOptions": {
         "System.String RedisKit.Models.RedisOptions::get_ConnectionString()": {
           "Lines": {
-            "14": 350
+            "14": 382
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.RedisOptions::get_DefaultTtl()": {
           "Lines": {
-            "19": 204
+            "19": 236
           },
           "Branches": []
         },
         "System.String RedisKit.Models.RedisOptions::get_CacheKeyPrefix()": {
           "Lines": {
-            "24": 154
+            "24": 170
           },
           "Branches": []
         },
         "System.Int32 RedisKit.Models.RedisOptions::get_RetryAttempts()": {
           "Lines": {
-            "29": 160
+            "29": 176
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.RedisOptions::get_RetryDelay()": {
           "Lines": {
-            "34": 160
+            "34": 176
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.RedisOptions::get_OperationTimeout()": {
           "Lines": {
-            "39": 261
+            "39": 277
           },
           "Branches": []
         },
         "RedisKit.Models.SerializerType RedisKit.Models.RedisOptions::get_Serializer()": {
           "Lines": {
-            "44": 392
+            "44": 440
           },
           "Branches": []
         },
@@ -17341,31 +17301,31 @@
         },
         "RedisKit.Models.ConnectionTimeoutSettings RedisKit.Models.RedisOptions::get_TimeoutSettings()": {
           "Lines": {
-            "59": 265
+            "59": 281
           },
           "Branches": []
         },
         "RedisKit.Models.RetryConfiguration RedisKit.Models.RedisOptions::get_RetryConfiguration()": {
           "Lines": {
-            "64": 192
+            "64": 208
           },
           "Branches": []
         },
         "RedisKit.Models.CircuitBreakerSettings RedisKit.Models.RedisOptions::get_CircuitBreaker()": {
           "Lines": {
-            "69": 177
+            "69": 193
           },
           "Branches": []
         },
         "RedisKit.Models.HealthMonitoringSettings RedisKit.Models.RedisOptions::get_HealthMonitoring()": {
           "Lines": {
-            "74": 230
+            "74": 246
           },
           "Branches": []
         },
         "RedisKit.Models.PoolingOptions RedisKit.Models.RedisOptions::get_Pooling()": {
           "Lines": {
-            "79": 275
+            "79": 323
           },
           "Branches": []
         }
@@ -17375,43 +17335,43 @@
       "RedisKit.Models.RetryConfiguration": {
         "System.Int32 RedisKit.Models.RetryConfiguration::get_MaxAttempts()": {
           "Lines": {
-            "11": 214
+            "11": 230
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.RetryConfiguration::get_InitialDelay()": {
           "Lines": {
-            "16": 218
+            "16": 234
           },
           "Branches": []
         },
         "System.TimeSpan RedisKit.Models.RetryConfiguration::get_MaxDelay()": {
           "Lines": {
-            "21": 196
+            "21": 212
           },
           "Branches": []
         },
         "RedisKit.Models.BackoffStrategy RedisKit.Models.RetryConfiguration::get_Strategy()": {
           "Lines": {
-            "26": 229
+            "26": 245
           },
           "Branches": []
         },
         "System.Double RedisKit.Models.RetryConfiguration::get_BackoffMultiplier()": {
           "Lines": {
-            "31": 151
+            "31": 167
           },
           "Branches": []
         },
         "System.Double RedisKit.Models.RetryConfiguration::get_JitterFactor()": {
           "Lines": {
-            "36": 151
+            "36": 167
           },
           "Branches": []
         },
         "System.Boolean RedisKit.Models.RetryConfiguration::get_EnableJitter()": {
           "Lines": {
-            "41": 191
+            "41": 207
           },
           "Branches": []
         },
@@ -17441,7 +17401,7 @@
         },
         "System.TimeSpan RedisKit.Models.RetryConfiguration::get_IdleTimeout()": {
           "Lines": {
-            "66": 128
+            "66": 144
           },
           "Branches": []
         },
@@ -17493,13 +17453,13 @@
         },
         "System.Boolean RedisKit.Models.RetryConfiguration::get_MoveToDeadLetterQueue()": {
           "Lines": {
-            "80": 128
+            "80": 144
           },
           "Branches": []
         },
         "System.String RedisKit.Models.RetryConfiguration::get_DeadLetterSuffix()": {
           "Lines": {
-            "85": 128
+            "85": 144
           },
           "Branches": []
         }

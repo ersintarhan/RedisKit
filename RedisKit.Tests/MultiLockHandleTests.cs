@@ -8,7 +8,7 @@ using Xunit;
 namespace RedisKit.Tests;
 
 /// <summary>
-/// Tests for MultiLockHandle class
+///     Tests for MultiLockHandle class
 /// </summary>
 public class MultiLockHandleTests
 {
@@ -23,7 +23,7 @@ public class MultiLockHandleTests
             Substitute.For<ILockHandle>(),
             Substitute.For<ILockHandle>()
         };
-        
+
         _multiLockHandle = new MultiLockHandle(_lockHandles);
     }
 
@@ -72,19 +72,14 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         await _multiLockHandle.ReleaseAllAsync();
 
         // Assert
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.Received(1).ReleaseAsync(default);
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -93,19 +88,14 @@ public class MultiLockHandleTests
         // Arrange
         var cts = new CancellationTokenSource();
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(cts.Token)
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         await _multiLockHandle.ReleaseAllAsync(cts.Token);
 
         // Assert
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.Received(1).ReleaseAsync(cts.Token);
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.Received(1).ReleaseAsync(cts.Token);
     }
 
     [Fact]
@@ -113,27 +103,19 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
-        
+
         await _multiLockHandle.DisposeAsync();
-        
+
         // Clear received calls
-        foreach (var lockHandle in _lockHandles)
-        {
-            lockHandle.ClearReceivedCalls();
-        }
+        foreach (var lockHandle in _lockHandles) lockHandle.ClearReceivedCalls();
 
         // Act
         await _multiLockHandle.ReleaseAllAsync();
 
         // Assert
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.DidNotReceive().ReleaseAsync(Arg.Any<CancellationToken>());
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.DidNotReceive().ReleaseAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -151,10 +133,7 @@ public class MultiLockHandleTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => _multiLockHandle.ReleaseAllAsync());
 
         // All locks should have been attempted to release
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.Received(1).ReleaseAsync(default);
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -162,19 +141,14 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         await _multiLockHandle.DisposeAsync();
 
         // Assert
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.Received(1).ReleaseAsync(default);
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -182,10 +156,8 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         await _multiLockHandle.DisposeAsync();
@@ -193,10 +165,7 @@ public class MultiLockHandleTests
         await _multiLockHandle.DisposeAsync();
 
         // Assert
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.Received(1).ReleaseAsync(default);
-        }
+        foreach (var lockHandle in _lockHandles) await lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -204,21 +173,16 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         _multiLockHandle.Dispose();
 
         // Assert - Wait a bit for the async operation to complete
         await Task.Delay(100);
-        
-        foreach (var lockHandle in _lockHandles)
-        {
-            lockHandle.Received().ReleaseAsync(default);
-        }
+
+        foreach (var lockHandle in _lockHandles) lockHandle.Received().ReleaseAsync();
     }
 
     [Fact]
@@ -226,10 +190,8 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         _multiLockHandle.Dispose();
@@ -238,11 +200,8 @@ public class MultiLockHandleTests
 
         // Assert - Wait a bit for the async operation to complete
         await Task.Delay(100);
-        
-        foreach (var lockHandle in _lockHandles)
-        {
-            lockHandle.Received(1).ReleaseAsync(default);
-        }
+
+        foreach (var lockHandle in _lockHandles) lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -250,29 +209,21 @@ public class MultiLockHandleTests
     {
         // Arrange
         foreach (var lockHandle in _lockHandles)
-        {
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
-        }
 
         // Act
         await _multiLockHandle.DisposeAsync();
-        
+
         // Clear received calls
-        foreach (var lockHandle in _lockHandles)
-        {
-            lockHandle.ClearReceivedCalls();
-        }
-        
+        foreach (var lockHandle in _lockHandles) lockHandle.ClearReceivedCalls();
+
         _multiLockHandle.Dispose();
 
         // Assert - Wait a bit to ensure no async operation happens
         await Task.Delay(100);
-        
-        foreach (var lockHandle in _lockHandles)
-        {
-            await lockHandle.DidNotReceive().ReleaseAsync(Arg.Any<CancellationToken>());
-        }
+
+        foreach (var lockHandle in _lockHandles) await lockHandle.DidNotReceive().ReleaseAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -284,11 +235,11 @@ public class MultiLockHandleTests
 
         // Act & Assert
         multiLock.Locks.Should().BeEmpty();
-        
+
         // Should not throw
-        Func<Task> act = async () => await multiLock.ReleaseAllAsync();
+        var act = async () => await multiLock.ReleaseAllAsync();
         act.Should().NotThrowAsync();
-        
+
         multiLock.Dispose();
     }
 
@@ -299,7 +250,7 @@ public class MultiLockHandleTests
         var singleLock = Substitute.For<ILockHandle>();
         singleLock.ReleaseAsync(Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
-        
+
         var multiLock = new MultiLockHandle(new List<ILockHandle> { singleLock });
 
         // Act
@@ -308,7 +259,7 @@ public class MultiLockHandleTests
         // Assert
         multiLock.Locks.Should().HaveCount(1);
         multiLock.Locks[0].Should().BeSameAs(singleLock);
-        await singleLock.Received(1).ReleaseAsync(default);
+        await singleLock.Received(1).ReleaseAsync();
     }
 
     [Fact]
@@ -316,14 +267,14 @@ public class MultiLockHandleTests
     {
         // Arrange
         var largeLockList = new List<ILockHandle>();
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             var lockHandle = Substitute.For<ILockHandle>();
             lockHandle.ReleaseAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
             largeLockList.Add(lockHandle);
         }
-        
+
         var multiLock = new MultiLockHandle(largeLockList);
 
         // Act
@@ -331,9 +282,6 @@ public class MultiLockHandleTests
 
         // Assert
         multiLock.Locks.Should().HaveCount(100);
-        foreach (var lockHandle in largeLockList)
-        {
-            await lockHandle.Received(1).ReleaseAsync(default);
-        }
+        foreach (var lockHandle in largeLockList) await lockHandle.Received(1).ReleaseAsync();
     }
 }

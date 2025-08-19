@@ -59,10 +59,7 @@ public class RedisShardedPubSubServiceTests
     {
         // Arrange
         const string channel = "test-channel";
-        Func<ShardedChannelMessage<TestMessage>, CancellationToken, Task> handler = (_, _) =>
-        {
-            return Task.CompletedTask;
-        };
+        Func<ShardedChannelMessage<TestMessage>, CancellationToken, Task> handler = (_, _) => { return Task.CompletedTask; };
 
         // Act
         var token = await _service.SubscribeAsync(channel, handler);

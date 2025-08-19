@@ -44,7 +44,7 @@ public class RedisDistributedLock : IDistributedLock
         // Add bounds validation for lock expiry
         if (expiry < TimeSpan.FromSeconds(1))
             throw new ArgumentException("Lock expiry must be at least 1 second", nameof(expiry));
-        
+
         if (expiry > TimeSpan.FromHours(1))
             throw new ArgumentException("Lock expiry cannot exceed 1 hour", nameof(expiry));
 
@@ -153,7 +153,7 @@ public class RedisDistributedLock : IDistributedLock
         // Add bounds validation for lock expiry
         if (expiry < TimeSpan.FromSeconds(1))
             throw new ArgumentException("Lock expiry must be at least 1 second", nameof(expiry));
-        
+
         if (expiry > TimeSpan.FromHours(1))
             throw new ArgumentException("Lock expiry cannot exceed 1 hour", nameof(expiry));
 

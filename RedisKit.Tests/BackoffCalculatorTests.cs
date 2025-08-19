@@ -81,14 +81,11 @@ public class BackoffCalculatorTests
 
         // Act
         var delays = new List<TimeSpan>();
-        for (var i = 0; i < 10; i++)
-        {
-            delays.Add(BackoffCalculator.CalculateDelay(2, config)); // Same attempt number
-        }
+        for (var i = 0; i < 10; i++) delays.Add(BackoffCalculator.CalculateDelay(2, config)); // Same attempt number
 
         // Assert - with jitter, delays should vary
         delays.Distinct().Count().Should().BeGreaterThan(1);
-        
+
         // Base delay for attempt 2 is 4 seconds
         // With 50% jitter, it should be between roughly 2 and 6 seconds
         delays.All(d => d.TotalSeconds >= 2 && d.TotalSeconds <= 6).Should().BeTrue();
@@ -109,14 +106,11 @@ public class BackoffCalculatorTests
 
         // Act
         var delays = new List<TimeSpan>();
-        for (var i = 0; i < 10; i++)
-        {
-            delays.Add(BackoffCalculator.CalculateDelay(1, config)); // Same attempt number
-        }
+        for (var i = 0; i < 10; i++) delays.Add(BackoffCalculator.CalculateDelay(1, config)); // Same attempt number
 
         // Assert - with jitter enabled, delays should vary
         delays.Distinct().Count().Should().BeGreaterThan(1);
-        
+
         // Base delay for attempt 1 with linear is 4 seconds
         // With 20% jitter, it should be between roughly 3.6 and 4.4 seconds
         delays.All(d => d.TotalSeconds >= 3.6 && d.TotalSeconds <= 4.4).Should().BeTrue();
@@ -137,10 +131,7 @@ public class BackoffCalculatorTests
 
         // Act
         var delays = new List<TimeSpan>();
-        for (var i = 0; i < 10; i++)
-        {
-            delays.Add(BackoffCalculator.CalculateDelay(1, config));
-        }
+        for (var i = 0; i < 10; i++) delays.Add(BackoffCalculator.CalculateDelay(1, config));
 
         // Assert - without jitter, all delays should be identical
         delays.Distinct().Count().Should().Be(1);
@@ -167,7 +158,7 @@ public class BackoffCalculatorTests
         delay1.Should().BeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
         delay2.Should().BeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
         delay3.Should().BeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
-        
+
         // All should be within max delay
         delay1.Should().BeLessThanOrEqualTo(TimeSpan.FromSeconds(30));
         delay2.Should().BeLessThanOrEqualTo(TimeSpan.FromSeconds(30));
