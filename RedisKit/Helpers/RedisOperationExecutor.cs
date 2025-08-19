@@ -18,7 +18,8 @@ internal static class RedisOperationExecutor
         ILogger? logger,
         string? key = null,
         CancellationToken cancellationToken = default,
-        [CallerMemberName] string operationName = "") where T : class
+        [CallerMemberName] string operationName = "",
+        Func<Exception, T?>? handleSpecificExceptions = null) where T : class
     {
         try
         {
@@ -36,11 +37,27 @@ internal static class RedisOperationExecutor
         }
         catch (RedisServerException ex)
         {
+            // Allow custom handling of specific server exceptions
+            if (handleSpecificExceptions != null)
+            {
+                var result = handleSpecificExceptions(ex);
+                if (result != null || handleSpecificExceptions(ex) is not null)
+                    return result;
+            }
+            
             logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
             throw new RedisKitServerException($"Redis server error during {operationName}", ex);
         }
         catch (Exception ex) when (ex is not RedisKitException)
         {
+            // Allow custom handling of specific exceptions
+            if (handleSpecificExceptions != null)
+            {
+                var result = handleSpecificExceptions(ex);
+                if (result != null || handleSpecificExceptions(ex) is not null)
+                    return result;
+            }
+            
             logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }
