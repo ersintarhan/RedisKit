@@ -19,11 +19,8 @@ public class AsyncLazyTests
 
         // Act
         var tasks = new Task<int>[10];
-        for (var i = 0; i < 10; i++)
-        {
-            tasks[i] = lazy.Value;
-        }
-        
+        for (var i = 0; i < 10; i++) tasks[i] = lazy.Value;
+
         var results = await Task.WhenAll(tasks);
 
         // Assert
@@ -129,7 +126,7 @@ public class AsyncLazyTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await lazy.Value);
-        
+
         // Should throw the same exception on subsequent calls
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await lazy.Value);
     }

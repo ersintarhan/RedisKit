@@ -44,7 +44,7 @@ internal static class RedisOperationExecutor
                 if (result != null || handleSpecificExceptions(ex) is not null)
                     return result;
             }
-            
+
             logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
             throw new RedisKitServerException($"Redis server error during {operationName}", ex);
         }
@@ -57,7 +57,7 @@ internal static class RedisOperationExecutor
                 if (result != null || handleSpecificExceptions(ex) is not null)
                     return result;
             }
-            
+
             logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }

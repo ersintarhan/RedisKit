@@ -1,7 +1,5 @@
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using RedisKit.Exceptions;
 using RedisKit.Helpers;
 using StackExchange.Redis;
@@ -16,11 +14,6 @@ public class RedisOperationExecutorTests
     public RedisOperationExecutorTests()
     {
         _logger = Substitute.For<ILogger<RedisOperationExecutorTests>>();
-    }
-
-    public class TestResult
-    {
-        public string Value { get; set; } = string.Empty;
     }
 
     [Fact]
@@ -185,8 +178,8 @@ public class RedisOperationExecutorTests
                 return result;
             },
             _logger,
-            maxRetries: 3,
-            key: "test-key"
+            3,
+            "test-key"
         );
 
         // Assert
@@ -213,8 +206,8 @@ public class RedisOperationExecutorTests
                 return result;
             },
             _logger,
-            maxRetries: 3,
-            key: "test-key"
+            3,
+            "test-key"
         );
 
         // Assert
@@ -241,8 +234,8 @@ public class RedisOperationExecutorTests
                 return result;
             },
             _logger,
-            maxRetries: 2,
-            key: "test-key"
+            2,
+            "test-key"
         );
 
         // Assert
@@ -269,8 +262,8 @@ public class RedisOperationExecutorTests
                 return result;
             },
             _logger,
-            maxRetries: 2,
-            key: "test-key"
+            2,
+            "test-key"
         );
 
         // Assert
@@ -294,8 +287,8 @@ public class RedisOperationExecutorTests
                     throw new InvalidOperationException("Non-transient error");
                 },
                 _logger,
-                maxRetries: 3,
-                key: "test-key"
+                3,
+                "test-key"
             )
         );
 
@@ -319,9 +312,9 @@ public class RedisOperationExecutorTests
                     return new TestResult();
                 },
                 _logger,
-                maxRetries: 3,
-                key: "test-key",
-                cancellationToken: cts.Token
+                3,
+                "test-key",
+                cts.Token
             )
         );
     }
@@ -344,8 +337,8 @@ public class RedisOperationExecutorTests
                 return Task.FromResult<TestResult?>(result);
             },
             _logger,
-            maxRetries: 2,
-            key: "test-key"
+            2,
+            "test-key"
         );
 
         // Assert
@@ -364,8 +357,8 @@ public class RedisOperationExecutorTests
         // Act
         var actualResult = await RedisOperationExecutor.ExecuteAsync(
             () => Task.FromResult<TestResult?>(result),
-            logger: null,
-            key: "test-key"
+            null,
+            "test-key"
         );
 
         // Assert
@@ -389,5 +382,10 @@ public class RedisOperationExecutorTests
         );
 
         Assert.Same(originalException, exception);
+    }
+
+    public class TestResult
+    {
+        public string Value { get; set; } = string.Empty;
     }
 }

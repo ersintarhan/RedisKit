@@ -14,10 +14,10 @@ namespace RedisKit.Services;
 public class RedisFunctionService : IRedisFunction
 {
     private readonly IRedisConnection _connection;
+    private readonly AsyncLazy<bool> _functionSupport;
     private readonly ILogger<RedisFunctionService> _logger;
     private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
-    private readonly AsyncLazy<bool> _functionSupport;
 
     public RedisFunctionService(
         IRedisConnection connection,
@@ -29,7 +29,7 @@ public class RedisFunctionService : IRedisFunction
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _serializer = serializer ?? RedisSerializerFactory.Create(_options.Serializer);
-        
+
         // Initialize Redis Functions support detection lazily
         _functionSupport = new AsyncLazy<bool>(async () =>
         {
@@ -57,7 +57,7 @@ public class RedisFunctionService : IRedisFunction
     {
         ArgumentException.ThrowIfNullOrEmpty(libraryCode);
 
-        if (!await EnsureSupportedAsync(cancellationToken)) 
+        if (!await EnsureSupportedAsync(cancellationToken))
             throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
 
         try
@@ -96,7 +96,7 @@ public class RedisFunctionService : IRedisFunction
     {
         ArgumentException.ThrowIfNullOrEmpty(libraryName);
 
-        if (!await EnsureSupportedAsync(cancellationToken)) 
+        if (!await EnsureSupportedAsync(cancellationToken))
             throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
 
         try
@@ -268,7 +268,6 @@ public class RedisFunctionService : IRedisFunction
 
             // Add arguments - simplified serialization
             if (args != null)
-            {
                 foreach (var arg in args)
                 {
                     RedisValue redisValue;
@@ -280,10 +279,9 @@ public class RedisFunctionService : IRedisFunction
                         redisValue = bytes;
                     else
                         redisValue = await _serializer.SerializeAsync(arg, cancellationToken);
-                    
+
                     commandArgs.Add(redisValue);
                 }
-            }
 
             // Execute function with simplified parameter passing
             var result = await database.ExecuteAsync(command, commandArgs.ToArray()).ConfigureAwait(false);
@@ -433,7 +431,9 @@ public class RedisFunctionService : IRedisFunction
                 var value = funcArray[i + 1];
 
                 if (key == "name")
+                {
                     function.Name = value.ToString() ?? string.Empty;
+                }
                 else if (key == "flags" && value.Resp3Type == ResultType.Array)
                 {
                     var flags = (RedisResult[])value!;
@@ -468,7 +468,7 @@ public class RedisFunctionService : IRedisFunction
                 case "running_script":
                     stats.RunningFunctions = value.IsNull ? 0 : 1;
                     break;
-                    
+
                 case "engines" when value.Resp3Type == ResultType.Array:
                     ParseEngineStats((RedisResult[])value!, stats);
                     break;
@@ -477,7 +477,7 @@ public class RedisFunctionService : IRedisFunction
 
         return stats;
     }
-    
+
     private static void ParseEngineStats(RedisResult[] enginesArray, FunctionStats stats)
     {
         var enginesList = new List<string>();

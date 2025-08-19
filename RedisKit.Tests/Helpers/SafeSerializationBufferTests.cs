@@ -1,4 +1,3 @@
-using System.Buffers;
 using RedisKit.Helpers;
 using Xunit;
 
@@ -84,7 +83,7 @@ public class SafeSerializationBufferTests
     public void Dispose_ShouldReturnBufferToPool()
     {
         // Arrange
-        var buffer = new SafeSerializationBuffer(1024);
+        var buffer = new SafeSerializationBuffer();
         var arrayRef = buffer.Buffer;
 
         // Act
@@ -100,7 +99,7 @@ public class SafeSerializationBufferTests
     public void Dispose_CalledMultipleTimes_ShouldNotThrow()
     {
         // Arrange
-        var buffer = new SafeSerializationBuffer(1024);
+        var buffer = new SafeSerializationBuffer();
 
         // Act & Assert - Should not throw
         buffer.Dispose();
@@ -112,7 +111,7 @@ public class SafeSerializationBufferTests
     public void Buffer_AfterDispose_ShouldThrowObjectDisposedException()
     {
         // Arrange
-        var buffer = new SafeSerializationBuffer(1024);
+        var buffer = new SafeSerializationBuffer();
         buffer.Dispose();
 
         // Act & Assert
@@ -123,7 +122,7 @@ public class SafeSerializationBufferTests
     public void Memory_AfterDispose_ShouldThrowObjectDisposedException()
     {
         // Arrange
-        var buffer = new SafeSerializationBuffer(1024);
+        var buffer = new SafeSerializationBuffer();
         buffer.Dispose();
 
         // Act & Assert
@@ -188,14 +187,11 @@ public class SafeSerializationBufferTests
     public async Task Buffer_ShouldBeThreadSafe_ForDisposal()
     {
         // Arrange
-        var buffer = new SafeSerializationBuffer(1024);
+        var buffer = new SafeSerializationBuffer();
         var tasks = new Task[10];
 
         // Act - Multiple threads trying to dispose
-        for (var i = 0; i < 10; i++)
-        {
-            tasks[i] = Task.Run(() => buffer.Dispose());
-        }
+        for (var i = 0; i < 10; i++) tasks[i] = Task.Run(() => buffer.Dispose());
 
         await Task.WhenAll(tasks);
 
