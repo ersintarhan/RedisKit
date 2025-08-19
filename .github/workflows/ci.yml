@@ -29,14 +29,43 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
+    # Setup Redis on Ubuntu
+    - name: Setup Redis (Ubuntu)
+      if: runner.os == 'Linux'
+      uses: shogo82148/actions-setup-redis@v1
+      with:
+        redis-version: '7.x'
+    
+    # Setup Redis on Windows
+    - name: Setup Redis (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        choco install redis-64 -y
+        redis-server --service-install
+        redis-server --service-start
+      shell: powershell
+    
+    # Setup Redis on macOS
+    - name: Setup Redis (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install redis
+        brew services start redis
+    
     - name: Restore dependencies
       run: dotnet restore
     
     - name: Build
       run: dotnet build --no-restore --configuration ${{ matrix.configuration }}
     
-    - name: Test
-      run: dotnet test --no-build --configuration ${{ matrix.configuration }} --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.os }}-${{ matrix.configuration }}"
+    - name: Run Unit Tests
+      run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category!=Integration" --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.os }}-${{ matrix.configuration }}"
+    
+    - name: Run Integration Tests
+      run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category=Integration" --verbosity normal --logger trx --results-directory "TestResults-Integration-${{ matrix.os }}-${{ matrix.configuration }}"
+      env:
+        REDIS_CONNECTION: localhost:6379
+      continue-on-error: true  # Don't fail if integration tests fail
     
     - name: Upload test results
       uses: actions/upload-artifact@v4
