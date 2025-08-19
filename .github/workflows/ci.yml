@@ -60,8 +60,8 @@ jobs:
     - name: Run Unit Tests
       run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category!=Integration" --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.os }}-${{ matrix.configuration }}"
     
-    - name: Run Integration Tests
-      if: runner.os != 'Windows'  # Skip integration tests on Windows
+    - name: Run Integration Tests (Linux/macOS)
+      if: runner.os != 'Windows'
       run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category=Integration" --verbosity normal --logger trx --results-directory "TestResults-Integration-${{ matrix.os }}-${{ matrix.configuration }}"
       env:
         REDIS_CONNECTION: localhost:6379

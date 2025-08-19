@@ -11,6 +11,8 @@ namespace RedisKit.Tests.Integration;
 /// <summary>
 ///     Base class for integration tests with real Redis instance
 /// </summary>
+[Trait("Category", "Integration")]
+[Collection("Integration")]
 public abstract class IntegrationTestBase : IAsyncLifetime
 {
     private readonly List<string> _functionsToClean = new();
