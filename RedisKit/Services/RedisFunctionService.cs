@@ -96,7 +96,7 @@ public class RedisFunctionService : IRedisFunction
             // Execute FUNCTION DELETE command
             var result = await database.ExecuteAsync(
                 "FUNCTION",
-                new[] { (RedisValue)"DELETE", (RedisValue)libraryName }
+                "DELETE", libraryName
             ).ConfigureAwait(false);
 
             var success = result.ToString() == "OK";
@@ -194,7 +194,7 @@ public class RedisFunctionService : IRedisFunction
             // Execute FUNCTION FLUSH command
             var result = await database.ExecuteAsync(
                 "FUNCTION",
-                new[] { (RedisValue)"FLUSH", (RedisValue)modeStr }
+                "FLUSH", modeStr
             ).ConfigureAwait(false);
 
             var success = result.ToString() == "OK";
@@ -429,7 +429,7 @@ public class RedisFunctionService : IRedisFunction
 
             return default;
         }
-        catch (RedisServerException ex) when (ex.Message.Contains("ERR"))
+        catch (RedisServerException ex)
         {
             _logger.LogError(ex, "Function execution error: {Message}", ex.Message);
             throw new InvalidOperationException($"Function execution failed: {ex.Message}", ex);
