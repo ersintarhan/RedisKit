@@ -219,6 +219,27 @@ internal class RedisCircuitBreaker : IRedisCircuitBreaker
         {
             var oldState = State;
             State = newState;
+            
+            // Add detailed logging for state transitions
+            _logger.LogDebug("Circuit breaker transitioning from {OldState} to {NewState}", oldState, newState);
+            
+            switch (newState)
+            {
+                case CircuitState.Open:
+                    _logger.LogWarning("Circuit breaker opened due to {FailureCount} consecutive failures. Will retry in {BreakDuration}ms", 
+                        _failureCount, _settings.BreakDuration.TotalMilliseconds);
+                    break;
+                    
+                case CircuitState.HalfOpen:
+                    _logger.LogInformation("Circuit breaker entering half-open state for testing. Need {SuccessThreshold} successes to close", 
+                        _settings.SuccessThreshold);
+                    break;
+                    
+                case CircuitState.Closed:
+                    _logger.LogInformation("Circuit breaker closed - service recovered");
+                    break;
+            }
+            
             _logger.LogCircuitBreakerTransition(oldState, newState);
         }
     }

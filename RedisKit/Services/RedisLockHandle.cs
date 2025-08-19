@@ -139,8 +139,19 @@ internal sealed class RedisLockHandle : ILockHandle
         // Stop renewal timer
         _renewalTimer?.Dispose();
 
-        // Release the lock synchronously
-        if (_isAcquired) Task.Run(async () => await ReleaseAsync()).Wait(TimeSpan.FromSeconds(5));
+        // Release the lock synchronously with timeout to prevent hanging
+        if (_isAcquired)
+        {
+            try
+            {
+                Task.Run(async () => await ReleaseAsync().ConfigureAwait(false))
+                    .Wait(TimeSpan.FromSeconds(5));
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to release lock {Resource} during synchronous disposal", Resource);
+            }
+        }
     }
 
     private async Task TryRenewAsync()

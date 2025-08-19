@@ -25,7 +25,7 @@ internal static class BackoffCalculator
         if (config == null)
             throw new ArgumentNullException(nameof(config));
 
-        var delay = config.Strategy switch
+        var baseDelay = config.Strategy switch
         {
             BackoffStrategy.Fixed => CalculateFixed(config),
             BackoffStrategy.Linear => CalculateLinear(attempt, config),
@@ -35,11 +35,25 @@ internal static class BackoffCalculator
             _ => config.InitialDelay
         };
 
-        // Ensure delay doesn't exceed max delay
-        if (delay > config.MaxDelay)
-            delay = config.MaxDelay;
+        // Add jitter to all strategies (except ExponentialWithJitter and DecorrelatedJitter which already have it)
+        if (config.EnableJitter && 
+            config.Strategy != BackoffStrategy.ExponentialWithJitter && 
+            config.Strategy != BackoffStrategy.DecorrelatedJitter)
+        {
+            var jitterRange = baseDelay.TotalMilliseconds * config.JitterFactor;
+            double jitter;
+            lock (_randomLock)
+            {
+                jitter = (_random.NextDouble() * 2 - 1) * jitterRange / 2; // ±jitterFactor/2
+            }
+            baseDelay = TimeSpan.FromMilliseconds(Math.Max(0, baseDelay.TotalMilliseconds + jitter));
+        }
 
-        return delay;
+        // Ensure delay doesn't exceed max delay
+        if (baseDelay > config.MaxDelay)
+            baseDelay = config.MaxDelay;
+
+        return baseDelay;
     }
 
     private static TimeSpan CalculateFixed(RetryConfiguration config)

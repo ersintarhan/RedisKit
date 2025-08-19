@@ -41,6 +41,13 @@ public class RedisDistributedLock : IDistributedLock
         if (expiry <= TimeSpan.Zero)
             throw new ArgumentException("Expiry must be positive", nameof(expiry));
 
+        // Add bounds validation for lock expiry
+        if (expiry < TimeSpan.FromSeconds(1))
+            throw new ArgumentException("Lock expiry must be at least 1 second", nameof(expiry));
+        
+        if (expiry > TimeSpan.FromHours(1))
+            throw new ArgumentException("Lock expiry cannot exceed 1 hour", nameof(expiry));
+
         // Validate resource length to prevent Redis key size issues
         if (resource.Length > 512)
             throw new ArgumentException("Resource name exceeds Redis key limit of 512 characters", nameof(resource));
@@ -142,6 +149,13 @@ public class RedisDistributedLock : IDistributedLock
 
         if (expiry <= TimeSpan.Zero)
             throw new ArgumentException("Expiry must be positive", nameof(expiry));
+
+        // Add bounds validation for lock expiry
+        if (expiry < TimeSpan.FromSeconds(1))
+            throw new ArgumentException("Lock expiry must be at least 1 second", nameof(expiry));
+        
+        if (expiry > TimeSpan.FromHours(1))
+            throw new ArgumentException("Lock expiry cannot exceed 1 hour", nameof(expiry));
 
         return await handle.ExtendAsync(expiry, cancellationToken).ConfigureAwait(false);
     }

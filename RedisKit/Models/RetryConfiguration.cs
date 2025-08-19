@@ -35,6 +35,11 @@ public class RetryConfiguration
     /// </summary>
     public double JitterFactor { get; set; } = 0.2;
 
+    /// <summary>
+    ///     Enable jitter for all strategies (except ExponentialWithJitter which already has it)
+    /// </summary>
+    public bool EnableJitter { get; set; } = true;
+
     // Stream-specific retry settings (compatibility)
 
     /// <summary>
