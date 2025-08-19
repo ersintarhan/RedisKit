@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using RedisKit.Builders;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
@@ -41,7 +42,7 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
+        _connection.GetDatabaseAsync().Returns(Task.FromResult((IDatabaseAsync)mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
@@ -49,7 +50,7 @@ public class RedisFunctionServiceTests
         mockDatabase.ExecuteAsync("FUNCTION LIST")
             .Returns(Task.FromResult(RedisResult.Create(new RedisValue[] { })));
 
-        mockDatabase.ExecuteAsync(Arg.Is<string>(s => s.Contains("FUNCTION LOAD")), Arg.Any<object[]>())
+        mockDatabase.ExecuteAsync("FUNCTION LOAD", Arg.Any<object[]>())
             .Returns(Task.FromResult(RedisResult.Create(new RedisValue("mylib"))));
 
         // Act
@@ -67,7 +68,7 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
+        _connection.GetDatabaseAsync().Returns(Task.FromResult((IDatabaseAsync)mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
@@ -94,7 +95,7 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
+        _connection.GetDatabaseAsync().Returns(Task.FromResult((IDatabaseAsync)mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
@@ -119,7 +120,7 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
+        _connection.GetDatabaseAsync().Returns(Task.FromResult((IDatabaseAsync)mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 
@@ -130,8 +131,12 @@ public class RedisFunctionServiceTests
         // Act
         var result = await _service.IsSupportedAsync();
 
-        // Assert
+        // Assert  
         Assert.False(result);
+        
+        // Second call should use cached result
+        var result2 = await _service.IsSupportedAsync();
+        Assert.False(result2);
     }
 
     [Fact]
@@ -183,7 +188,7 @@ public class RedisFunctionServiceTests
         var mockDatabase = Substitute.For<IDatabase>();
         var multiplexer = Substitute.For<IConnectionMultiplexer>();
 
-        _connection.GetDatabaseAsync().Returns(Task.FromResult(mockDatabase));
+        _connection.GetDatabaseAsync().Returns(Task.FromResult((IDatabaseAsync)mockDatabase));
         _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
         multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(mockDatabase);
 

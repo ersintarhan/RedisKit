@@ -19,6 +19,11 @@ public class ShardedChannelMessage<T> where T : class
     /// <summary>
     ///     Shard ID where the message was received
     /// </summary>
+    /// <remarks>
+    ///     Currently returns a placeholder value (machine name) as StackExchange.Redis
+    ///     doesn't expose actual shard metadata in pub/sub callbacks.
+    ///     Proper implementation would require access to Redis cluster topology.
+    /// </remarks>
     public string ShardId { get; set; } = string.Empty;
 
     /// <summary>
@@ -34,5 +39,9 @@ public class ShardedChannelMessage<T> where T : class
     /// <summary>
     ///     Pattern that matched (for pattern subscriptions)
     /// </summary>
+    /// <remarks>
+    ///     Note: Sharded Pub/Sub does not support pattern subscriptions in Redis.
+    ///     This field is included for API consistency but will always be null for sharded channels.
+    /// </remarks>
     public string? Pattern { get; set; }
 }

@@ -344,9 +344,54 @@ public class RedisFunctionService : IRedisFunction
 
             // Handle arrays
             if (result.Resp3Type == ResultType.Array)
-                // This would need more complex handling for T[] types
-                // For now, throw a meaningful exception
-                throw new NotSupportedException($"Array return types are not yet supported for type {typeof(T).Name}");
+            {
+                var arrayType = typeof(T);
+                
+                // Check if T is an array type
+                if (arrayType.IsArray)
+                {
+                    var elementType = arrayType.GetElementType()!;
+                    var arrayResult = (RedisResult[])result!;
+                    var typedArray = Array.CreateInstance(elementType, arrayResult.Length);
+                    
+                    for (int i = 0; i < arrayResult.Length; i++)
+                    {
+                        object? element = null;
+                        var item = arrayResult[i];
+                        
+                        if (elementType == typeof(string))
+                        {
+                            element = item.ToString();
+                        }
+                        else if (elementType == typeof(long))
+                        {
+                            element = (long)item;
+                        }
+                        else if (elementType == typeof(int))
+                        {
+                            element = (int)item;
+                        }
+                        else if (elementType == typeof(byte[]))
+                        {
+                            element = (byte[]?)item;
+                        }
+                        else if (!item.IsNull)
+                        {
+                            // Try to deserialize complex types
+                            var bytes = (byte[])item!;
+                            element = await _serializer.DeserializeAsync(bytes, elementType, cancellationToken);
+                        }
+                        
+                        typedArray.SetValue(element, i);
+                    }
+                    
+                    return (T)(object)typedArray;
+                }
+                
+                // If T is a List<> or IEnumerable<>, we could handle those too
+                // For now, throw exception for non-array collection types
+                throw new NotSupportedException($"Collection type {typeof(T).Name} is not yet supported. Use array types (T[]) instead.");
+            }
 
             return default;
         }

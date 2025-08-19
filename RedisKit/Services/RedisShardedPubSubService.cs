@@ -409,8 +409,13 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
 
     private static string GetShardId()
     {
-        // In a real implementation, this would get the actual shard ID
-        // For now, return a placeholder
+        // TODO: Extract actual shard ID from Redis cluster metadata
+        // Current implementation returns a placeholder value (machine name)
+        // Proper implementation requires:
+        // 1. Access to Redis cluster topology
+        // 2. Extraction of shard/slot information from message metadata
+        // 3. Mapping of channel hash to appropriate shard
+        // This is a limitation of StackExchange.Redis which doesn't expose shard info in pub/sub callbacks
         return Environment.MachineName;
     }
 }
