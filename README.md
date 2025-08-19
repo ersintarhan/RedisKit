@@ -16,6 +16,14 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 - **High Performance Logging**: Source generator based logging with EventId support
 - **Async/Await**: Full async/await support with CancellationToken
 
+### Redis 7.x Features (NEW!)
+
+- **🚀 Redis Functions**: Server-side scripting with Lua (replacement for Redis Scripts)
+- **📡 Sharded Pub/Sub**: Scalable pub/sub across cluster shards
+- **🔧 Function Library Builder**: Fluent API for creating Redis function libraries
+- **📊 Array Return Types**: Full support for array results from Redis functions
+- **🎯 Native Sharded Channel Support**: Using StackExchange.Redis's RedisChannel.Sharded() API
+
 ### Enterprise Features
 
 - **🔒 Distributed Locking**: Redlock algorithm implementation with auto-renewal
@@ -1304,16 +1312,85 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For more detailed documentation, please visit our [Wiki](https://github.com/ersintarhan/RedisKit/wiki).
 
+## 🆕 Redis 7.x Usage Examples
+
+### Redis Functions
+
+```csharp
+// Create and load a function library
+var functionService = app.Services.GetRequiredService<IRedisFunction>();
+
+// Build a function library with FunctionLibraryBuilder
+var library = new FunctionLibraryBuilder()
+    .WithName("mylib")
+    .WithEngine("LUA")
+    .WithDescription("My custom functions")
+    .AddFunction("greet", @"
+        function(keys, args)
+            return 'Hello, ' .. args[1]
+        end
+    ")
+    .AddFunction("sum", @"
+        function(keys, args)
+            return tonumber(args[1]) + tonumber(args[2])
+        end
+    ")
+    .Build();
+
+// Load the library
+await functionService.LoadAsync(library);
+
+// Call functions
+var greeting = await functionService.CallAsync<string>("greet", args: new[] { "World" });
+// Result: "Hello, World"
+
+var sum = await functionService.CallAsync<long>("sum", args: new[] { "10", "20" });
+// Result: 30
+
+// Call with array return type
+var results = await functionService.CallAsync<string[]>("get_users");
+// Result: ["user1", "user2", "user3"]
+```
+
+### Sharded Pub/Sub
+
+```csharp
+// Sharded Pub/Sub for better scalability in cluster mode
+var shardedPubSub = app.Services.GetRequiredService<IRedisShardedPubSub>();
+
+// Subscribe to a sharded channel (distributed across shards)
+var token = await shardedPubSub.SubscribeAsync<OrderMessage>(
+    "orders:new",
+    async (message, ct) =>
+    {
+        Console.WriteLine($"Order received on shard: {message.ShardId}");
+        await ProcessOrder(message.Data);
+    });
+
+// Publish to sharded channel (automatically routed to correct shard)
+var subscribers = await shardedPubSub.PublishAsync(
+    "orders:new", 
+    new OrderMessage { OrderId = 123, Amount = 99.99m });
+
+// Note: Pattern subscriptions are NOT supported in sharded pub/sub
+// Use regular pub/sub for patterns
+```
+
 ## 🐛 Known Issues
 
 - Stream service tests are currently skipped as they require a real Redis instance
 - PUBSUB NUMSUB command returns local handler count only (StackExchange.Redis limitation)
+- Sharded Pub/Sub does not support pattern subscriptions (Redis limitation)
 
 ## 🚦 Roadmap
 
+- [x] Redis Functions support (Redis 7.x) - ✅ Completed
+- [x] Sharded Pub/Sub (Redis 7.x) - ✅ Completed
+- [x] Distributed locking primitives - ✅ Completed
 - [ ] Redis Sentinel support
-- [ ] Redis Cluster support
-- [x] Distributed locking primitives (Completed)
+- [ ] Redis Cluster native support
+- [ ] ACL v2 improvements (Redis 7.x)
+- [ ] Client-side caching support
 - [ ] Geo-spatial operations
 - [ ] Time-series data support
 - [ ] OpenTelemetry integration

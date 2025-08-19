@@ -256,10 +256,91 @@ builder.Services.AddRedisKit(options =>
 });
 ```
 
+## Redis 7.x Features
+
+### Using Redis Functions
+
+Redis Functions are a new way to extend Redis with server-side scripts. They replace the older EVAL/EVALSHA commands with a more structured approach.
+
+```csharp
+using RedisKit.Builders;
+using RedisKit.Interfaces;
+
+// Get the Redis Functions service
+var functionService = services.GetRequiredService<IRedisFunction>();
+
+// Check if Redis 7.x is supported
+if (await functionService.IsSupportedAsync())
+{
+    // Create a function library
+    var library = new FunctionLibraryBuilder()
+        .WithName("myapp")
+        .WithDescription("My application functions")
+        .AddFunction("get_user_score", @"
+            function(keys, args)
+                local user_id = args[1]
+                local score = redis.call('GET', 'user:' .. user_id .. ':score')
+                return score or 0
+            end
+        ")
+        .AddReadOnlyFunction("count_users", @"
+            function(keys, args)
+                return redis.call('DBSIZE')
+            end
+        ")
+        .Build();
+    
+    // Load the library
+    await functionService.LoadAsync(library);
+    
+    // Call functions
+    var score = await functionService.CallAsync<long>("get_user_score", args: new[] { "123" });
+    var userCount = await functionService.CallReadOnlyAsync<long>("count_users");
+}
+```
+
+### Using Sharded Pub/Sub
+
+Sharded Pub/Sub distributes messages across cluster shards for better scalability:
+
+```csharp
+using RedisKit.Interfaces;
+
+// Get the Sharded Pub/Sub service
+var shardedPubSub = services.GetRequiredService<IRedisShardedPubSub>();
+
+// Check if Sharded Pub/Sub is supported (Redis 7.0+)
+if (await shardedPubSub.IsSupportedAsync())
+{
+    // Subscribe to a sharded channel
+    var subscription = await shardedPubSub.SubscribeAsync<NotificationMessage>(
+        "notifications:user:123",
+        async (message, ct) =>
+        {
+            Console.WriteLine($"Received on shard {message.ShardId}: {message.Data.Text}");
+            await ProcessNotification(message.Data);
+        });
+    
+    // Publish to sharded channel
+    var subscribers = await shardedPubSub.PublishAsync(
+        "notifications:user:123",
+        new NotificationMessage { Text = "Hello from shard!" });
+    
+    // Unsubscribe when done
+    await shardedPubSub.UnsubscribeAsync(subscription);
+}
+
+// Note: Sharded Pub/Sub does NOT support pattern subscriptions
+// This will throw NotSupportedException:
+// await shardedPubSub.SubscribePatternAsync<T>("pattern:*", handler);
+```
+
 ## Next Steps
 
 - [Advanced Caching Patterns](caching-patterns.md)
 - [Pub/Sub Patterns](pubsub-patterns.md)
 - [Stream Processing](stream-processing.md)
+- [Redis Functions Guide](redis-functions.md)
+- [Sharded Pub/Sub Guide](sharded-pubsub.md)
 - [Performance Tuning](performance-tuning.md)
 - [API Reference](/api/RedisKit.html)

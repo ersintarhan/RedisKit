@@ -1,12 +1,22 @@
 - name: Getting Started
   href: getting-started.md
-- name: Caching Patterns
-  href: caching-patterns.md
-- name: Pub/Sub Patterns
-  href: pubsub-patterns.md
-- name: Stream Processing
-  href: stream-processing.md
-- name: Distributed Locking
-  href: distributed-locking.md
-- name: Performance Tuning
-  href: performance-tuning.md
+- name: Redis 7.x Features
+  items:
+    - name: Redis Functions
+      href: redis-functions.md
+    - name: Sharded Pub/Sub
+      href: sharded-pubsub.md
+- name: Core Features
+  items:
+    - name: Caching Patterns
+      href: caching-patterns.md
+    - name: Pub/Sub Patterns
+      href: pubsub-patterns.md
+    - name: Stream Processing
+      href: stream-processing.md
+    - name: Distributed Locking
+      href: distributed-locking.md
+- name: Advanced Topics
+  items:
+    - name: Performance Tuning
+      href: performance-tuning.md
