@@ -153,15 +153,13 @@ public class RedisStreamService : IRedisStreamService
     private readonly IRedisConnection _connection;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly RedisOptions _options;
-    private readonly ObjectPool<List<(int index, string id)>>? _resultListPool;
     private readonly IRedisSerializer _serializer;
     private string _keyPrefix = string.Empty;
 
     public RedisStreamService(
         IRedisConnection connection,
         ILogger<RedisStreamService> logger,
-        IOptions<RedisOptions> options,
-        ObjectPoolProvider? poolProvider = null)
+        IOptions<RedisOptions> options)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -173,10 +171,6 @@ public class RedisStreamService : IRedisStreamService
 
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(_options.Serializer);
-
-        // Initialize object pool for result lists
-        var provider = poolProvider ?? new DefaultObjectPoolProvider();
-        _resultListPool = provider.Create<List<(int index, string id)>>();
     }
 
     public async Task<string> AddAsync<T>(string stream, T message, CancellationToken cancellationToken = default) where T : class
@@ -1203,6 +1197,7 @@ public class RedisStreamService : IRedisStreamService
 
             for (var j = 0; j < serializedEntries.Length; j++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var task = batch.StreamAddAsync(prefixedStream, serializedEntries[j], null, maxLength, true);
                 tasks.Add(task);
             }

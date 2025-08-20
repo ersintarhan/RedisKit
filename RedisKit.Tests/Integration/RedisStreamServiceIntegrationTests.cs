@@ -3,6 +3,7 @@ using Xunit;
 
 namespace RedisKit.Tests.Integration;
 
+[Collection("StreamTests")] // Sequential execution to avoid connection issues
 public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 {
     #region Basic Stream Operations
