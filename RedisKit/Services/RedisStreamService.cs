@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
@@ -152,9 +151,6 @@ namespace RedisKit.Services;
 /// </remarks>
 public class RedisStreamService : IRedisStreamService
 {
-// ArrayPool for memory optimization
-    private static readonly ArrayPool<string> StringArrayPool = ArrayPool<string>.Shared;
-
     private readonly IRedisConnection _connection;
     private readonly ILogger<RedisStreamService> _logger;
     private readonly RedisOptions _options;

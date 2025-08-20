@@ -10,21 +10,32 @@ internal static class PatternMatcher
     /// <summary>
     ///     Checks if a channel matches a Redis glob pattern
     /// </summary>
+    /// <param name="input">Input string to match</param>
     /// <param name="pattern">Redis glob pattern</param>
-    /// <param name="channel">Channel name to match</param>
-    /// <returns>True if channel matches pattern, false otherwise</returns>
-    public static bool IsMatch(string pattern, string channel)
+    /// <returns>True if input matches pattern, false otherwise</returns>
+    public static bool IsMatch(string input, string pattern)
     {
-        if (string.IsNullOrEmpty(pattern) || string.IsNullOrEmpty(channel))
-            return false;
+        if (string.IsNullOrEmpty(pattern))
+            return string.IsNullOrEmpty(input);
+            
+        if (string.IsNullOrEmpty(input))
+            return pattern == "*"; // Only * pattern matches empty input
 
         // Exact match
-        if (pattern == channel)
+        if (pattern == input)
             return true;
 
-        // Convert Redis glob pattern to regex
-        var regexPattern = ConvertGlobToRegex(pattern);
-        return Regex.IsMatch(channel, regexPattern, RegexOptions.Compiled);
+        try
+        {
+            // Convert Redis glob pattern to regex
+            var regexPattern = ConvertGlobToRegex(pattern);
+            return Regex.IsMatch(input, regexPattern, RegexOptions.Compiled);
+        }
+        catch (RegexParseException)
+        {
+            // Invalid patterns return false instead of throwing
+            return false;
+        }
     }
 
     /// <summary>

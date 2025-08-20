@@ -260,4 +260,148 @@ public class BackoffCalculatorTests
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("config");
     }
+
+    [Fact]
+    public void CalculateDelay_WithZeroInitialDelay_ReturnsZero()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.Fixed,
+            InitialDelay = TimeSpan.Zero,
+            MaxDelay = TimeSpan.FromSeconds(10),
+            EnableJitter = false
+        };
+
+        // Act
+        var delay = BackoffCalculator.CalculateDelay(5, config);
+
+        // Assert
+        delay.Should().Be(TimeSpan.Zero);
+    }
+
+    [Fact]
+    public void CalculateDelay_WithVeryLargeAttempt_ReturnsMaxDelay()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.Exponential,
+            InitialDelay = TimeSpan.FromSeconds(1),
+            BackoffMultiplier = 2.0,
+            MaxDelay = TimeSpan.FromSeconds(10),
+            EnableJitter = false
+        };
+
+        // Act
+        var delay = BackoffCalculator.CalculateDelay(100, config);
+
+        // Assert
+        delay.Should().Be(TimeSpan.FromSeconds(10));
+    }
+
+    [Fact]
+    public void CalculateDelay_WithCustomMultiplier_ReturnsCorrectDelay()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.Exponential,
+            InitialDelay = TimeSpan.FromSeconds(1),
+            BackoffMultiplier = 3.0,
+            MaxDelay = TimeSpan.FromSeconds(100),
+            EnableJitter = false
+        };
+
+        // Act & Assert
+        BackoffCalculator.CalculateDelay(0, config).Should().Be(TimeSpan.FromSeconds(1));
+        BackoffCalculator.CalculateDelay(1, config).Should().Be(TimeSpan.FromSeconds(3));
+        BackoffCalculator.CalculateDelay(2, config).Should().Be(TimeSpan.FromSeconds(9));
+    }
+
+    [Fact]
+    public void CalculateDelay_WithDecorrelatedJitter_WithoutPreviousDelay_UsesSeedDelay()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.DecorrelatedJitter,
+            InitialDelay = TimeSpan.FromSeconds(2),
+            MaxDelay = TimeSpan.FromSeconds(30)
+        };
+
+        // Act - Don't provide previous delay (should use initial delay as seed)
+        var delay = BackoffCalculator.CalculateDelay(0, config);
+
+        // Assert
+        delay.Should().BeGreaterThanOrEqualTo(TimeSpan.FromSeconds(2));
+        delay.Should().BeLessThanOrEqualTo(TimeSpan.FromSeconds(30));
+    }
+
+    [Fact]
+    public void CalculateTotalMaxDelay_WithZeroMaxAttempts_ReturnsZero()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.Fixed,
+            InitialDelay = TimeSpan.FromSeconds(5),
+            MaxAttempts = 0,
+            MaxDelay = TimeSpan.FromSeconds(10),
+            EnableJitter = false
+        };
+
+        // Act
+        var totalDelay = BackoffCalculator.CalculateTotalMaxDelay(config);
+
+        // Assert
+        totalDelay.Should().Be(TimeSpan.Zero);
+    }
+
+    [Fact]
+    public void CalculateTotalMaxDelay_WithLinearStrategy_ReturnsCorrectTotal()
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = BackoffStrategy.Linear,
+            InitialDelay = TimeSpan.FromSeconds(1),
+            MaxAttempts = 4,
+            MaxDelay = TimeSpan.FromSeconds(100),
+            EnableJitter = false
+        };
+
+        // Act
+        var totalDelay = BackoffCalculator.CalculateTotalMaxDelay(config);
+
+        // Assert
+        totalDelay.Should().Be(TimeSpan.FromSeconds(10)); // 1 + 2 + 3 + 4
+    }
+
+    [Theory]
+    [InlineData(BackoffStrategy.Fixed)]
+    [InlineData(BackoffStrategy.Linear)]
+    [InlineData(BackoffStrategy.Exponential)]
+    [InlineData(BackoffStrategy.ExponentialWithJitter)]
+    [InlineData(BackoffStrategy.DecorrelatedJitter)]
+    public void CalculateDelay_WithAllStrategies_ReturnsValidDelay(BackoffStrategy strategy)
+    {
+        // Arrange
+        var config = new RetryConfiguration
+        {
+            Strategy = strategy,
+            InitialDelay = TimeSpan.FromSeconds(1),
+            BackoffMultiplier = 2.0,
+            JitterFactor = 0.1,
+            MaxDelay = TimeSpan.FromSeconds(60),
+            EnableJitter = strategy == BackoffStrategy.ExponentialWithJitter
+        };
+
+        // Act
+        var delay = BackoffCalculator.CalculateDelay(2, config);
+
+        // Assert
+        delay.Should().BeGreaterThan(TimeSpan.Zero);
+        delay.Should().BeLessThanOrEqualTo(TimeSpan.FromSeconds(60));
+    }
 }

@@ -385,6 +385,166 @@ public class RedisOperationExecutorTests
         Assert.Same(originalException, exception);
     }
 
+    [Fact]
+    public async Task ExecuteWithSilentErrorHandlingAsync_Should_Return_Default_On_Pattern_Match()
+    {
+        // Arrange
+        var defaultValue = new TestResult { Value = "Default" };
+
+        // Act
+        var result = await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+            () => throw new RedisServerException("NOSCRIPT test error"),
+            _logger,
+            "NOSCRIPT",
+            defaultValue,
+            "test-key"
+        );
+
+        // Assert
+        Assert.Equal(defaultValue, result);
+    }
+
+    [Fact]
+    public async Task ExecuteWithSilentErrorHandlingAsync_Should_Throw_On_Non_Pattern_Match()
+    {
+        // Arrange & Act & Assert
+        await Assert.ThrowsAsync<RedisKitException>(async () =>
+            await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync<TestResult>(
+                () => throw new RedisServerException("Different error"),
+                _logger,
+                "NOSCRIPT",
+                defaultValue: null,
+                "test-key"
+            )
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteWithFallbackAsync_Should_Execute_Fallback_On_Pattern_Match()
+    {
+        // Arrange
+        var fallbackResult = new TestResult { Value = "Fallback" };
+        var fallbackExecuted = false;
+
+        // Act
+        var result = await RedisOperationExecutor.ExecuteWithFallbackAsync(
+            () => throw new RedisServerException("NOSCRIPT cache miss"),
+            () =>
+            {
+                fallbackExecuted = true;
+                return Task.FromResult<TestResult?>(fallbackResult);
+            },
+            _logger,
+            "NOSCRIPT",
+            "test-key"
+        );
+
+        // Assert
+        Assert.True(fallbackExecuted);
+        Assert.Equal(fallbackResult, result);
+    }
+
+    [Fact]
+    public async Task ExecuteWithFallbackAsync_Should_Throw_On_Non_Pattern_Match()
+    {
+        // Arrange
+        var fallbackExecuted = false;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<RedisKitException>(async () =>
+            await RedisOperationExecutor.ExecuteWithFallbackAsync<TestResult>(
+                () => throw new RedisServerException("Different error"),
+                () =>
+                {
+                    fallbackExecuted = true;
+                    return Task.FromResult<TestResult?>(new TestResult());
+                },
+                _logger,
+                "NOSCRIPT",
+                "test-key"
+            )
+        );
+
+        Assert.False(fallbackExecuted);
+    }
+
+    [Fact]
+    public async Task ExecuteVoidAsync_Should_Complete_Successfully()
+    {
+        // Arrange
+        var executed = false;
+
+        // Act
+        await RedisOperationExecutor.ExecuteVoidAsync(
+            () =>
+            {
+                executed = true;
+                return Task.CompletedTask;
+            },
+            _logger,
+            "test-key"
+        );
+
+        // Assert
+        Assert.True(executed);
+    }
+
+    [Fact]
+    public async Task ExecuteVoidAsync_Should_Handle_RedisConnectionException()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<RedisKitConnectionException>(async () =>
+            await RedisOperationExecutor.ExecuteVoidAsync(
+                () => throw new RedisConnectionException(ConnectionFailureType.AuthenticationFailure, "Auth failed"),
+                _logger,
+                "test-key"
+            )
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteWithSilentErrorHandlingAsync_Should_Handle_Connection_Exceptions()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<RedisKitConnectionException>(async () =>
+            await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync<TestResult>(
+                () => throw new RedisConnectionException(ConnectionFailureType.SocketFailure, "Connection failed"),
+                _logger,
+                "NOSCRIPT",
+                defaultValue: null,
+                "test-key"
+            )
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteWithFallbackAsync_Should_Handle_Timeout_Exceptions()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<RedisKitTimeoutException>(async () =>
+            await RedisOperationExecutor.ExecuteWithFallbackAsync<TestResult>(
+                () => throw new RedisTimeoutException("Timeout occurred", CommandStatus.Unknown),
+                () => Task.FromResult<TestResult?>(new TestResult()),
+                _logger,
+                "NOSCRIPT",
+                "test-key"
+            )
+        );
+    }
+
+    [Fact]
+    public void RedisErrorPatterns_Should_Have_Correct_Constants()
+    {
+        // Assert
+        Assert.Equal("NOSCRIPT", RedisErrorPatterns.NoScript);
+        Assert.Equal("BUSYGROUP", RedisErrorPatterns.BusyGroup);
+        Assert.Equal("unknown command", RedisErrorPatterns.UnknownCommand);
+        Assert.Equal("ERR unknown command", RedisErrorPatterns.ErrUnknownCommand);
+        Assert.Equal("ERR no such library", RedisErrorPatterns.NoSuchLibrary);
+        Assert.Equal("LOADING", RedisErrorPatterns.Loading);
+        Assert.Equal("ERR", RedisErrorPatterns.Err);
+    }
+
     public class TestResult
     {
         public string Value { get; set; } = string.Empty;
