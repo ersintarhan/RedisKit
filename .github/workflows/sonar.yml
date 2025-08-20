@@ -75,8 +75,8 @@ jobs:
           /o:"ersintarhan" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.host.url="https://sonarcloud.io" \
-          /d:sonar.cs.opencover.reportsPaths="TestResults/**/coverage.opencover.xml" \
-          /d:sonar.cs.cobertura.reportsPaths="TestResults/**/coverage.cobertura.xml" \
+          /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" \
+          /d:sonar.cs.cobertura.reportsPaths="**/TestResults/**/coverage.cobertura.xml" \
           /d:sonar.coverage.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/Program.cs,**/*Tests.cs,**/*Test.cs" \
           /d:sonar.exclusions="**/bin/**,**/obj/**,**/*.xml,**/packages/**,**/_site/**,**/TestResults/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/*.md,**/*.yml,**/*.json,**/*.png,**/*.ico,**/*.svg,**/*.sh,**/*.html,**/*.css,**/*.js,**/*.map,**/*.woff,**/*.woff2" \
           /d:sonar.cpd.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**" \
@@ -96,9 +96,12 @@ jobs:
         # Run tests with coverage (including integration tests)
         dotnet test --no-build --configuration Release \
           --collect:"XPlat Code Coverage" \
-          --results-directory ./TestResults \
+          --results-directory "${{ github.workspace }}/TestResults" \
           --logger trx \
           --settings coverage.runsettings
+          
+        # Debug: List coverage files
+        find "${{ github.workspace }}/TestResults" -name "*.xml" -type f || echo "No coverage files found"
           
     - name: End SonarCloud analysis
       env:
