@@ -172,55 +172,40 @@ public class RedisCacheService : IRedisCacheService
         var deserializationTasks = pooledTasks.Value;
         var resultsByIndex = new ConcurrentDictionary<int, T?>();
 
-        try
-        {
-            _logger.LogGetManyAsync(string.Join(", ", originalKeys));
-            var database = await GetDatabaseAsync();
-
-            var values = await database.StringGetAsync(prefixedKeys).ConfigureAwait(false);
-
-            var result = new Dictionary<string, T?>(originalKeys.Count, StringComparer.Ordinal);
-
-            for (var i = 0; i < originalKeys.Count; i++)
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
             {
-                var index = i;
-                if (values[index].IsNullOrEmpty)
-                    resultsByIndex[index] = null;
-                else
-                    deserializationTasks.Add(Task.Run(async () =>
-                    {
-                        var deserialized = await _serializer.DeserializeAsync<T>(values[index]!, cancellationToken);
-                        resultsByIndex[index] = deserialized;
-                    }, cancellationToken));
-            }
+                _logger.LogGetManyAsync(string.Join(", ", originalKeys));
+                var database = await GetDatabaseAsync();
 
-            await Task.WhenAll(deserializationTasks);
+                var values = await database.StringGetAsync(prefixedKeys).ConfigureAwait(false);
 
-            for (var i = 0; i < originalKeys.Count; i++) result[originalKeys[i]] = resultsByIndex[i];
+                var result = new Dictionary<string, T?>(originalKeys.Count, StringComparer.Ordinal);
 
-            _logger.LogGetManyAsyncSuccess(result.Count);
-            return result;
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogGetManyAsyncError(ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogGetManyAsyncError(ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogGetManyAsyncError(ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogGetManyAsyncError(ex);
-            throw;
-        }
+                for (var i = 0; i < originalKeys.Count; i++)
+                {
+                    var index = i;
+                    if (values[index].IsNullOrEmpty)
+                        resultsByIndex[index] = null;
+                    else
+                        deserializationTasks.Add(Task.Run(async () =>
+                        {
+                            var deserialized = await _serializer.DeserializeAsync<T>(values[index]!, cancellationToken);
+                            resultsByIndex[index] = deserialized;
+                        }, cancellationToken));
+                }
+
+                await Task.WhenAll(deserializationTasks);
+
+                for (var i = 0; i < originalKeys.Count; i++) result[originalKeys[i]] = resultsByIndex[i];
+
+                _logger.LogGetManyAsyncSuccess(result.Count);
+                return result;
+            },
+            _logger,
+            string.Join(", ", originalKeys),
+            cancellationToken
+        ).ConfigureAwait(false) as Dictionary<string, T?> ?? new Dictionary<string, T?>();
     }
 
     public async Task SetManyAsync<T>(IDictionary<string, T> values, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
@@ -276,36 +261,23 @@ public class RedisCacheService : IRedisCacheService
         ValidateRedisKey(key);
         var prefixedKey = $"{_keyPrefix}{key}";
 
-        try
-        {
-            _logger.LogExistsAsync(prefixedKey);
-            var database = await GetDatabaseAsync();
+        var result = await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogExistsAsync(prefixedKey);
+                var database = await GetDatabaseAsync();
 
-            var result = await database.KeyExistsAsync(prefixedKey).ConfigureAwait(false);
+                var exists = await database.KeyExistsAsync(prefixedKey).ConfigureAwait(false);
 
-            _logger.LogExistsAsyncSuccess(prefixedKey, result);
-            return result;
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogExistsAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogExistsAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogExistsAsyncError(prefixedKey, ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogExistsAsyncError(prefixedKey, ex);
-            throw;
-        }
+                _logger.LogExistsAsyncSuccess(prefixedKey, exists);
+                return (object?)exists;
+            },
+            _logger,
+            prefixedKey,
+            cancellationToken
+        ).ConfigureAwait(false);
+
+        return result != null && (bool)result;
     }
 
     public async ValueTask<byte[]?> GetBytesAsync(string key, CancellationToken cancellationToken = default)
@@ -442,35 +414,27 @@ public class RedisCacheService : IRedisCacheService
 
     private async Task SetManyWithLuaScript((RedisKey Key, RedisValue Value)[] pairs, TimeSpan expiry)
     {
-        try
-        {
-            var database = await GetDatabaseAsync();
-            var keys = pairs.Select(p => p.Key).ToArray();
-            var values = pairs.Select(p => p.Value).Concat(new RedisValue[] { expiry.TotalSeconds }).ToArray();
-            var result = await database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
-            var successCount = (int?)result ?? 0;
-            if (successCount != pairs.Length)
-                _logger.LogSetManyPartialSuccess(pairs.Length, successCount);
-        }
-        catch (RedisServerException ex) when (ex.Message.Contains("NOSCRIPT"))
-        {
-            _logger.LogLuaScriptNotInCache();
-            // Fallback to non-Lua implementation
-            await SetManyWithFallback(pairs, expiry);
-        }
-        catch (Exception ex) when (ex is RedisConnectionException ||
-                                   ex is RedisTimeoutException ||
-                                   ex is RedisServerException)
-        {
-            _logger.LogLuaScriptExecutionFailed(ex);
-            // Fallback to non-Lua implementation
-            await SetManyWithFallback(pairs, expiry);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogLuaScriptExecutionFailed(ex);
-            throw;
-        }
+        await RedisOperationExecutor.ExecuteWithFallbackAsync(
+            async () =>
+            {
+                var database = await GetDatabaseAsync();
+                var keys = pairs.Select(p => p.Key).ToArray();
+                var values = pairs.Select(p => p.Value).Concat(new RedisValue[] { expiry.TotalSeconds }).ToArray();
+                var result = await database.ScriptEvaluateAsync(SetWithExpireScript, keys, values).ConfigureAwait(false);
+                var successCount = (int?)result ?? 0;
+                if (successCount != pairs.Length)
+                    _logger.LogSetManyPartialSuccess(pairs.Length, successCount);
+                return (object?)true;
+            },
+            async () =>
+            {
+                _logger.LogLuaScriptNotInCache();
+                await SetManyWithFallback(pairs, expiry);
+                return (object?)true;
+            },
+            _logger,
+            RedisErrorPatterns.NoScript
+        ).ConfigureAwait(false);
     }
 
     private async Task SetManyWithFallback((RedisKey Key, RedisValue Value)[] pairs, TimeSpan? expiry)

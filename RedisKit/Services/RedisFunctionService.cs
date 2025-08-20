@@ -63,36 +63,38 @@ public class RedisFunctionService : IRedisFunction
         if (!await EnsureSupportedAsync())
             throw new NotSupportedException(NotSupportedMessage);
 
-        try
-        {
-            _logger.LogDebug("Loading function library, replace: {Replace}", replace);
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogDebug("Loading function library, replace: {Replace}", replace);
 
-            var database = await _connection.GetDatabaseAsync();
+                var database = await _connection.GetDatabaseAsync();
 
-            // Execute FUNCTION LOAD command
-            var result = replace
-                ? await database.ExecuteAsync(FunctionCommand, "LOAD", "REPLACE", libraryCode).ConfigureAwait(false)
-                : await database.ExecuteAsync(FunctionCommand, "LOAD", libraryCode).ConfigureAwait(false);
+                // Execute FUNCTION LOAD command
+                var result = replace
+                    ? await database.ExecuteAsync(FunctionCommand, "LOAD", "REPLACE", libraryCode).ConfigureAwait(false)
+                    : await database.ExecuteAsync(FunctionCommand, "LOAD", libraryCode).ConfigureAwait(false);
 
-            var success = result.ToString() == "OK" || !string.IsNullOrEmpty(result.ToString());
+                var success = result.ToString() == "OK" || !string.IsNullOrEmpty(result.ToString());
 
-            if (success)
-                _logger.LogInformation("Function library loaded successfully");
-            else
-                _logger.LogWarning("Failed to load function library");
+                if (success)
+                    _logger.LogInformation("Function library loaded successfully");
+                else
+                    _logger.LogWarning("Failed to load function library");
 
-            return success;
-        }
-        catch (RedisServerException ex) when (ex.Message.Contains("ERR"))
-        {
-            _logger.LogError(ex, "Error loading function library: {Message}", ex.Message);
-            throw new InvalidOperationException($"Failed to load function library: {ex.Message}", ex);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error loading function library");
-            throw;
-        }
+                return (object?)success;
+            },
+            _logger,
+            handleSpecificExceptions: ex =>
+            {
+                if (ex is RedisServerException rse && rse.Message.Contains(RedisErrorPatterns.Err))
+                {
+                    _logger.LogError(ex, "Error loading function library: {Message}", ex.Message);
+                    throw new InvalidOperationException($"Failed to load function library: {ex.Message}", ex);
+                }
+                return null;
+            }
+        ).ConfigureAwait(false) is true;
     }
 
     public async Task<bool> DeleteAsync(string libraryName, CancellationToken cancellationToken = default)
@@ -102,35 +104,29 @@ public class RedisFunctionService : IRedisFunction
         if (!await EnsureSupportedAsync())
             throw new NotSupportedException(NotSupportedMessage);
 
-        try
-        {
-            _logger.LogDebug("Deleting function library: {LibraryName}", libraryName);
+        return await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+            async () =>
+            {
+                _logger.LogDebug("Deleting function library: {LibraryName}", libraryName);
 
-            var database = await _connection.GetDatabaseAsync();
+                var database = await _connection.GetDatabaseAsync();
 
-            // Execute FUNCTION DELETE command
-            var result = await database.ExecuteAsync(FunctionCommand, "DELETE", libraryName).ConfigureAwait(false);
+                // Execute FUNCTION DELETE command
+                var result = await database.ExecuteAsync(FunctionCommand, "DELETE", libraryName).ConfigureAwait(false);
 
-            var success = result.ToString() == "OK";
+                var success = result.ToString() == "OK";
 
-            if (success)
-                _logger.LogInformation("Function library {LibraryName} deleted successfully", libraryName);
-            else
-                _logger.LogWarning("Failed to delete function library {LibraryName}", libraryName);
+                if (success)
+                    _logger.LogInformation("Function library {LibraryName} deleted successfully", libraryName);
+                else
+                    _logger.LogWarning("Failed to delete function library {LibraryName}", libraryName);
 
-            return success;
-        }
-        catch (RedisServerException ex) when (ex.Message.Contains("ERR no such library"))
-        {
-            _logger.LogWarning("Function library {LibraryName} not found", libraryName);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting function library {LibraryName}. Redis error: {RedisError}",
-                libraryName, ex.Message);
-            throw new InvalidOperationException($"Failed to delete function library '{libraryName}'", ex);
-        }
+                return (object?)success;
+            },
+            _logger,
+            RedisErrorPatterns.NoSuchLibrary,
+            defaultValue: (object?)false
+        ).ConfigureAwait(false) is true;
     }
 
     public async Task<IEnumerable<FunctionLibraryInfo>> ListAsync(

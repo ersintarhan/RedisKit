@@ -505,4 +505,48 @@ public interface IRedisStreamService
     /// </example>
     Task<int> ReadGroupWithAutoAckAsync<T>(string stream, string groupName, string consumerName,
         Func<T, Task<bool>> processor, int count = 10, CancellationToken cancellationToken = default) where T : class;
+
+    /// <summary>
+    ///     Continuously reads messages from a consumer group as an async stream.
+    /// </summary>
+    /// <typeparam name="T">The message type.</typeparam>
+    /// <param name="stream">The stream name.</param>
+    /// <param name="groupName">The consumer group name.</param>
+    /// <param name="consumerName">The consumer name.</param>
+    /// <param name="batchSize">Number of messages to fetch per batch.</param>
+    /// <param name="cancellationToken">Token to cancel the streaming operation.</param>
+    /// <returns>An async enumerable of message tuples containing ID, data, and acknowledgment function.</returns>
+    /// <remarks>
+    ///     This method provides a streaming interface for continuous message consumption.
+    ///     It's ideal for long-running consumers that process messages as they arrive.
+    ///     Each message includes an acknowledgment function that can be called after successful processing.
+    ///     The stream will automatically wait and retry when no messages are available.
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// await foreach (var (id, data, ackFunc) in streamService.ReadGroupStreamingAsync&lt;Order&gt;(
+    ///     "orders:stream",
+    ///     "order-processors", 
+    ///     "worker-1",
+    ///     batchSize: 10,
+    ///     cancellationToken))
+    /// {
+    ///     if (data != null)
+    ///     {
+    ///         try
+    ///         {
+    ///             await ProcessOrderAsync(data);
+    ///             await ackFunc(); // Acknowledge on success
+    ///         }
+    ///         catch (Exception ex)
+    ///         {
+    ///             LogError(ex); // Don't acknowledge - message remains pending
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
+    IAsyncEnumerable<(string Id, T? Data, Func<Task> AckFunc)> ReadGroupStreamingAsync<T>(
+        string stream, string groupName, string consumerName, int batchSize = 10,
+        CancellationToken cancellationToken = default) where T : class;
 }

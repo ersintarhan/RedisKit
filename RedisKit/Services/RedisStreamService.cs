@@ -199,31 +199,31 @@ public class RedisStreamService : IRedisStreamService
 
         var prefixedStream = $"{_keyPrefix}{stream}";
 
-        try
-        {
-            _logger.LogAddAsync(prefixedStream);
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                _logger.LogAddAsync(prefixedStream);
 
-            // Use serialization helper
-            var entry = new[] { StreamSerializationHelper.CreateDataField(message, _serializer) };
-            var database = await GetDatabaseAsync();
+                // Use serialization helper
+                var entry = new[] { StreamSerializationHelper.CreateDataField(message, _serializer) };
+                var database = await GetDatabaseAsync();
 
-            // Add to stream and get the message ID
-            // If maxLength is specified, the stream will be trimmed to approximately that length
-            var messageId = await database.StreamAddAsync(
-                prefixedStream,
-                entry,
-                null, // Auto-generate ID
-                maxLength,
-                true); // Use ~ for approximate trimming (more efficient)
+                // Add to stream and get the message ID
+                // If maxLength is specified, the stream will be trimmed to approximately that length
+                var messageId = await database.StreamAddAsync(
+                    prefixedStream,
+                    entry,
+                    null, // Auto-generate ID
+                    maxLength,
+                    true); // Use ~ for approximate trimming (more efficient)
 
-            _logger.LogAddAsyncSuccess(prefixedStream, messageId.ToString());
-            return messageId.ToString();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogAddAsyncError(prefixedStream, ex);
-            throw;
-        }
+                _logger.LogAddAsyncSuccess(prefixedStream, messageId.ToString());
+                return messageId.ToString();
+            },
+            _logger,
+            prefixedStream,
+            cancellationToken
+        ).ConfigureAwait(false) ?? string.Empty;
     }
 
     public async Task<Dictionary<string, T?>> ReadAsync<T>(string stream, string? start = null, string? end = null, int count = 10, CancellationToken cancellationToken = default) where T : class
@@ -270,32 +270,29 @@ public class RedisStreamService : IRedisStreamService
 
         var prefixedStream = $"{_keyPrefix}{stream}";
 
-        try
-        {
-            _logger.LogCreateConsumerGroupAsync(prefixedStream, groupName);
+        await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+            async () =>
+            {
+                _logger.LogCreateConsumerGroupAsync(prefixedStream, groupName);
 
-            var database = await GetDatabaseAsync();
+                var database = await GetDatabaseAsync();
 
-            // Create consumer group starting from the beginning of the stream
-            // The 'false' parameter means don't create the stream if it doesn't exist
-            await database.StreamCreateConsumerGroupAsync(
-                prefixedStream,
-                groupName,
-                StreamPosition.Beginning,
-                false);
+                // Create consumer group starting from the beginning of the stream
+                // The 'false' parameter means don't create the stream if it doesn't exist
+                await database.StreamCreateConsumerGroupAsync(
+                    prefixedStream,
+                    groupName,
+                    StreamPosition.Beginning,
+                    false);
 
-            _logger.LogCreateConsumerGroupAsyncSuccess(prefixedStream, groupName);
-        }
-        catch (RedisServerException ex) when (ex.Message.Contains("BUSYGROUP"))
-        {
-            // Consumer group already exists - this is not an error
-            _logger.LogInformation("Consumer group {GroupName} already exists for stream {Stream}", groupName, prefixedStream);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCreateConsumerGroupAsyncError(prefixedStream, groupName, ex);
-            throw;
-        }
+                _logger.LogCreateConsumerGroupAsyncSuccess(prefixedStream, groupName);
+                return (object?)true;
+            },
+            _logger,
+            RedisErrorPatterns.BusyGroup,
+            defaultValue: (object?)true, // Return true even if group exists
+            key: prefixedStream
+        ).ConfigureAwait(false);
     }
 
     public async Task<Dictionary<string, T?>> ReadGroupAsync<T>(string stream, string groupName, string consumerName, int count = 10, CancellationToken cancellationToken = default) where T : class

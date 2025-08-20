@@ -6,13 +6,33 @@ using StackExchange.Redis;
 namespace RedisKit.Helpers;
 
 /// <summary>
+///     Known Redis server error patterns
+/// </summary>
+internal static class RedisErrorPatterns
+{
+    public const string NoScript = "NOSCRIPT";
+    public const string BusyGroup = "BUSYGROUP";
+    public const string UnknownCommand = "unknown command";
+    public const string ErrUnknownCommand = "ERR unknown command";
+    public const string NoSuchLibrary = "ERR no such library";
+    public const string Loading = "LOADING";
+    public const string Err = "ERR";
+}
+
+/// <summary>
 ///     Provides centralized exception handling and retry logic for Redis operations
 /// </summary>
 internal static class RedisOperationExecutor
 {
     /// <summary>
-    ///     Executes a Redis operation with standardized exception handling
+    ///     Executes a Redis operation with standardized exception handling and custom error recovery
     /// </summary>
+    /// <param name="operation">The Redis operation to execute</param>
+    /// <param name="logger">Logger for error messages</param>
+    /// <param name="key">Optional Redis key for logging context</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="handleSpecificExceptions">Custom exception handler that can return a result or null to continue throwing</param>
+    /// <param name="operationName">Name of the calling method (auto-populated)</param>
     public static async Task<T?> ExecuteAsync<T>(
         Func<Task<T?>> operation,
         ILogger? logger,
@@ -64,10 +84,122 @@ internal static class RedisOperationExecutor
     }
 
     /// <summary>
+    ///     Executes a Redis operation that should silently handle specific server errors
+    /// </summary>
+    public static async Task<T?> ExecuteWithSilentErrorHandlingAsync<T>(
+        Func<Task<T?>> operation,
+        ILogger? logger,
+        string errorPattern,
+        T? defaultValue = default,
+        string? key = null,
+        [CallerMemberName] string operationName = "") where T : class
+    {
+        try
+        {
+            return await operation().ConfigureAwait(false);
+        }
+        catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
+        {
+            logger?.LogDebug("Expected error pattern '{Pattern}' encountered during {Operation}: {Message}", 
+                errorPattern, operationName, ex.Message);
+            return defaultValue;
+        }
+        catch (RedisConnectionException ex)
+        {
+            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
+        }
+        catch (RedisTimeoutException ex)
+        {
+            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
+        }
+        catch (Exception ex) when (ex is not RedisKitException)
+        {
+            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitException($"Unexpected error during {operationName}", ex);
+        }
+    }
+
+    /// <summary>
+    ///     Executes a Redis operation with fallback on specific errors
+    /// </summary>
+    public static async Task<T?> ExecuteWithFallbackAsync<T>(
+        Func<Task<T?>> operation,
+        Func<Task<T?>> fallbackOperation,
+        ILogger? logger,
+        string errorPattern,
+        string? key = null,
+        [CallerMemberName] string operationName = "") where T : class
+    {
+        try
+        {
+            return await operation().ConfigureAwait(false);
+        }
+        catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
+        {
+            logger?.LogDebug("Error pattern '{Pattern}' encountered, executing fallback for {Operation}", 
+                errorPattern, operationName);
+            return await fallbackOperation().ConfigureAwait(false);
+        }
+        catch (RedisConnectionException ex)
+        {
+            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
+        }
+        catch (RedisTimeoutException ex)
+        {
+            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
+        }
+        catch (Exception ex) when (ex is not RedisKitException)
+        {
+            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitException($"Unexpected error during {operationName}", ex);
+        }
+    }
+
+    /// <summary>
     ///     Executes a Redis operation with standardized exception handling (ValueTask version)
     /// </summary>
     public static async ValueTask ExecuteAsync(
         Func<ValueTask> operation,
+        ILogger? logger,
+        string? key = null,
+        CancellationToken cancellationToken = default,
+        [CallerMemberName] string operationName = "")
+    {
+        try
+        {
+            await operation().ConfigureAwait(false);
+        }
+        catch (RedisConnectionException ex)
+        {
+            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
+        }
+        catch (RedisTimeoutException ex)
+        {
+            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
+        }
+        catch (RedisServerException ex)
+        {
+            logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitServerException($"Redis server error during {operationName}", ex);
+        }
+        catch (Exception ex) when (ex is not RedisKitException)
+        {
+            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            throw new RedisKitException($"Unexpected error during {operationName}", ex);
+        }
+    }
+
+    /// <summary>
+    ///     Executes a Redis operation with standardized exception handling (void return)
+    /// </summary>
+    public static async Task ExecuteVoidAsync(
+        Func<Task> operation,
         ILogger? logger,
         string? key = null,
         CancellationToken cancellationToken = default,
