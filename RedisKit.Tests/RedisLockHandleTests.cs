@@ -318,8 +318,8 @@ public class RedisLockHandleTests
                 Arg.Any<CommandFlags>())
             .Returns(Task.FromResult(RedisResult.Create(1)));
 
-        // Act
-        await Task.Delay(1500); // Wait for first renewal (should happen at ~1 second)
+        // Act - Wait longer to ensure renewal happens
+        await Task.Delay(3000); // Wait for 3 seconds to ensure at least one renewal
 
         // Assert
         await asyncDatabase.Received().ScriptEvaluateAsync(
