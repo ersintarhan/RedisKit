@@ -33,7 +33,7 @@ public class RedisShardedPubSubServiceTests
         _service = new RedisShardedPubSubService(_connection, _logger, _options, _serializer);
     }
 
-    [Fact(Skip = "Serializer mock issue - needs investigation")]
+    [Fact]
     public async Task PublishAsync_Should_Use_Sharded_Channel()
     {
         // Arrange

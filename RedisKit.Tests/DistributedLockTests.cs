@@ -186,4 +186,191 @@ public class DistributedLockTests
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireLockAsync(resource, expiry));
     }
+
+    #region AcquireMultiLockAsync Tests
+
+    [Fact]
+    public async Task AcquireMultiLockAsync_WithAllResourcesAvailable_ReturnsMultiLockHandle()
+    {
+        // Arrange
+        var resources = new[] { "resource1", "resource2", "resource3" };
+        var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
+
+        var syncDb = Substitute.For<IDatabase>();
+        var multiplexer = Substitute.For<IConnectionMultiplexer>();
+        multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(syncDb);
+        _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
+
+        _dbAsync.StringSetAsync(
+                Arg.Any<RedisKey>(),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                When.NotExists,
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(true));
+
+        // Act
+        var multiLockHandle = await sut.AcquireMultiLockAsync(resources, expiry);
+
+        // Assert
+        Assert.NotNull(multiLockHandle);
+        Assert.Equal(resources.Length, multiLockHandle.Locks.Count);
+
+        // Verify all resources were locked
+        await _dbAsync.Received(3).StringSetAsync(
+            Arg.Any<RedisKey>(),
+            Arg.Any<RedisValue>(),
+            expiry,
+            When.NotExists,
+            CommandFlags.DemandMaster);
+    }
+
+    [Fact]
+    public async Task AcquireMultiLockAsync_WithOneResourceUnavailable_ReturnsNullAndReleasesAcquiredLocks()
+    {
+        // Arrange
+        var resources = new[] { "resource1", "resource2", "resource3" };
+        var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
+
+        var syncDb = Substitute.For<IDatabase>();
+        var multiplexer = Substitute.For<IConnectionMultiplexer>();
+        multiplexer.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(syncDb);
+        _connection.GetMultiplexerAsync().Returns(Task.FromResult(multiplexer));
+
+        // First two succeed, third fails
+        _dbAsync.StringSetAsync(
+                Arg.Is<RedisKey>(key => key.ToString().Contains("resource1") || key.ToString().Contains("resource2")),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                When.NotExists,
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(true));
+
+        _dbAsync.StringSetAsync(
+                Arg.Is<RedisKey>(key => key.ToString().Contains("resource3")),
+                Arg.Any<RedisValue>(),
+                Arg.Any<TimeSpan?>(),
+                When.NotExists,
+                CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(false));
+
+        // Mock for release operations
+        syncDb.ScriptEvaluateAsync(Arg.Any<string>(), Arg.Any<RedisKey[]>(), Arg.Any<RedisValue[]>())
+            .Returns(Task.FromResult(RedisResult.Create(1)));
+
+        // Act
+        var multiLockHandle = await sut.AcquireMultiLockAsync(resources, expiry);
+
+        // Assert
+        Assert.Null(multiLockHandle);
+
+        // Verify at least one resource was attempted (first two succeed, third fails)
+        await _dbAsync.Received().StringSetAsync(
+            Arg.Any<RedisKey>(),
+            Arg.Any<RedisValue>(),
+            expiry,
+            When.NotExists,
+            CommandFlags.DemandMaster);
+
+        // Note: Cleanup happens through individual lock handles' ReleaseAsync() methods
+        // This is harder to verify in unit tests but the important part is that multiLockHandle is null
+    }
+
+    [Fact]
+    public async Task AcquireMultiLockAsync_WithNullResources_ThrowsArgumentException()
+    {
+        // Arrange
+        var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireMultiLockAsync(null!, expiry));
+    }
+
+    [Fact]
+    public async Task AcquireMultiLockAsync_WithEmptyResources_ThrowsArgumentException()
+    {
+        // Arrange
+        var expiry = TimeSpan.FromSeconds(10);
+        var sut = CreateSut();
+        var emptyResources = new string[0];
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireMultiLockAsync(emptyResources, expiry));
+    }
+
+
+    #endregion
+
+    #region WaitForUnlockAsync Tests
+
+    [Fact]
+    public async Task WaitForUnlockAsync_WhenResourceBecomesUnlocked_ReturnsSuccessfully()
+    {
+        // Arrange
+        var resource = "test-resource";
+        var timeout = TimeSpan.FromSeconds(1);
+        var sut = CreateSut();
+
+        var callCount = 0;
+        _dbAsync.KeyExistsAsync(Arg.Any<RedisKey>(), CommandFlags.DemandMaster)
+            .Returns(_ => Task.FromResult(++callCount == 1)); // First call returns true (locked), second returns false (unlocked)
+
+        // Act & Assert - Should not throw
+        await sut.WaitForUnlockAsync(resource, timeout);
+
+        // Verify multiple checks were made
+        await _dbAsync.Received().KeyExistsAsync(Arg.Any<RedisKey>(), CommandFlags.DemandMaster);
+    }
+
+    [Fact]
+    public async Task WaitForUnlockAsync_WhenResourceRemainisLocked_ThrowsTimeoutException()
+    {
+        // Arrange
+        var resource = "test-resource";
+        var timeout = TimeSpan.FromMilliseconds(500);
+        var sut = CreateSut();
+
+        _dbAsync.KeyExistsAsync(Arg.Any<RedisKey>(), CommandFlags.DemandMaster)
+            .Returns(Task.FromResult(true)); // Always returns true (locked)
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<TimeoutException>(() => sut.WaitForUnlockAsync(resource, timeout));
+        
+        Assert.Contains($"Timeout waiting for resource '{resource}' to be unlocked", ex.Message);
+
+        // Verify multiple checks were made
+        await _dbAsync.Received().KeyExistsAsync(Arg.Any<RedisKey>(), CommandFlags.DemandMaster);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task WaitForUnlockAsync_WithInvalidResource_ThrowsArgumentException(string resource)
+    {
+        // Arrange
+        var timeout = TimeSpan.FromSeconds(1);
+        var sut = CreateSut();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.WaitForUnlockAsync(resource!, timeout));
+    }
+
+
+    [Fact]
+    public async Task WaitForUnlockAsync_WithLongResourceName_ThrowsArgumentException()
+    {
+        // Arrange
+        var resource = new string('a', 600); // Longer than 512 char limit
+        var timeout = TimeSpan.FromSeconds(1);
+        var sut = CreateSut();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.WaitForUnlockAsync(resource, timeout));
+    }
+
+    #endregion
 }

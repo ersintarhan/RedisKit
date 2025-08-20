@@ -93,7 +93,7 @@ public class CacheServiceTests
             cacheService.SetKeyPrefix(null!));
     }
 
-    [Fact(Skip = "Requires Redis instance for Lua script testing")]
+    [Fact(Skip = "Mock-based test - use Integration tests for real Redis testing")]
     public async Task SetManyAsync_WithLuaScriptSupport_UsesOptimizedPath()
     {
         // Arrange
@@ -134,7 +134,7 @@ public class CacheServiceTests
             Arg.Any<RedisValue[]>());
     }
 
-    [Fact(Skip = "Requires Redis instance for fallback testing")]
+    [Fact(Skip = "Mock-based test - use Integration tests for real Redis testing")]
     public async Task SetManyAsync_WithoutLuaScriptSupport_UsesFallback()
     {
         // Arrange
@@ -167,7 +167,7 @@ public class CacheServiceTests
         await syncDb.Received(2).KeyExpireAsync(Arg.Any<RedisKey>(), Arg.Any<TimeSpan?>());
     }
 
-    [Fact(Skip = "Requires Redis instance for chunking testing")]
+    [Fact(Skip = "Mock-based test - use Integration tests for real Redis testing")]
     public async Task SetManyAsync_WithLargeDataset_UsesChunking()
     {
         // Arrange
