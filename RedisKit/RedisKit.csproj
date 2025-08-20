@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>RedisKit</PackageId>
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
         <Authors>Ersin Tarhan</Authors>
         <Company>RedisKit</Company>
         <Product>RedisKit</Product>
@@ -18,7 +18,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>redis;cache;pubsub;streams;messagepack;performance;dotnet;csharp</PackageTags>
-        <PackageReleaseNotes>v1.1.0 - Added distributed locking support with Redlock algorithm, automatic renewal, multi-resource locking, and comprehensive documentation</PackageReleaseNotes>
+        <PackageReleaseNotes>v1.2.0 - Added distributed locking support with automatic renewal, multi-resource locking, and comprehensive documentation</PackageReleaseNotes>
         <LangVersion>latest</LangVersion>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

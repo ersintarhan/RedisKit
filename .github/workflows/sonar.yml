@@ -1,0 +1,79 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for better analysis
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+        
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v4
+      with:
+        path: ~/sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+        
+    - name: Cache SonarCloud scanner
+      id: cache-sonar-scanner
+      uses: actions/cache@v4
+      with:
+        path: ./.sonar/scanner
+        key: ${{ runner.os }}-sonar-scanner
+        restore-keys: ${{ runner.os }}-sonar-scanner
+        
+    - name: Install SonarCloud scanner
+      if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p ./.sonar/scanner
+        dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Begin SonarCloud analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      shell: bash
+      run: |
+        ./.sonar/scanner/dotnet-sonarscanner begin \
+          /k:"ersintarhan_RedisKit" \
+          /o:"ersintarhan" \
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.cs.dotcover.reportsPaths="TestResults/**/coverage.cobertura.xml" \
+          /d:sonar.coverage.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/Program.cs,**/*Tests.cs,**/*Test.cs" \
+          /d:sonar.exclusions="**/bin/**,**/obj/**,**/*.xml,**/packages/**,**/_site/**,**/TestResults/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/*.md,**/*.yml,**/*.json,**/*.png,**/*.ico,**/*.svg,**/*.sh,**/*.html,**/*.css,**/*.js,**/*.map,**/*.woff,**/*.woff2" \
+          /d:sonar.cpd.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**"
+          
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Test with coverage
+      run: |
+        dotnet test --no-build --configuration Release \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults \
+          --settings coverage.runsettings || true
+          
+    - name: End SonarCloud analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      shell: bash
+      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

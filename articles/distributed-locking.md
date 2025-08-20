@@ -1,6 +1,6 @@
 # Distributed Locking with RedisKit
 
-RedisKit provides a robust distributed locking mechanism based on the Redlock algorithm, enabling safe coordination across multiple processes and machines.
+RedisKit provides a robust distributed locking mechanism for Redis-based applications, enabling safe coordination across multiple processes and machines using a single Redis instance.
 
 ## Basic Usage
 

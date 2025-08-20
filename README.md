@@ -26,7 +26,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 
 ### Enterprise Features
 
-- **🔒 Distributed Locking**: Redlock algorithm implementation with auto-renewal
+- **🔒 Distributed Locking**: Redis-based distributed locking with auto-renewal
 - **🔄 Circuit Breaker Pattern**: Automatic failure detection and recovery
 - **📈 Advanced Retry Strategies**: Multiple backoff strategies (Exponential, Decorrelated Jitter, etc.)
 - **🏥 Health Monitoring**: Automatic health checks with auto-reconnection
