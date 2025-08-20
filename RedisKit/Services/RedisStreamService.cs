@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -190,9 +191,9 @@ public class RedisStreamService : IRedisStreamService
 
     public async Task<string> AddAsync<T>(string stream, T message, int? maxLength, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
+        // Use validation helper
+        StreamValidationHelper.ValidateStreamName(stream);
+        
         if (message == null)
             throw new ArgumentNullException(nameof(message));
 
@@ -202,13 +203,8 @@ public class RedisStreamService : IRedisStreamService
         {
             _logger.LogAddAsync(prefixedStream);
 
-            var serializedMessage = await _serializer.SerializeAsync(message, cancellationToken).ConfigureAwait(false);
-
-            // Create a NameValueEntry array for the stream entry
-            var entry = new NameValueEntry[]
-            {
-                new("data", serializedMessage)
-            };
+            // Use serialization helper
+            var entry = new[] { StreamSerializationHelper.CreateDataField(message, _serializer) };
             var database = await GetDatabaseAsync();
 
             // Add to stream and get the message ID
@@ -219,9 +215,6 @@ public class RedisStreamService : IRedisStreamService
                 null, // Auto-generate ID
                 maxLength,
                 true); // Use ~ for approximate trimming (more efficient)
-
-            // Validate stream name
-            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
 
             _logger.LogAddAsyncSuccess(prefixedStream, messageId.ToString());
             return messageId.ToString();
@@ -235,8 +228,9 @@ public class RedisStreamService : IRedisStreamService
 
     public async Task<Dictionary<string, T?>> ReadAsync<T>(string stream, string? start = null, string? end = null, int count = 10, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+        // Use validation helper
+        StreamValidationHelper.ValidateStreamName(stream);
+        StreamValidationHelper.ValidateCount(count);
 
         var prefixedStream = $"{_keyPrefix}{stream}";
 
@@ -244,8 +238,6 @@ public class RedisStreamService : IRedisStreamService
         {
             _logger.LogReadAsync(prefixedStream, start ?? "0", end ?? "+", count);
 
-            // Validate stream name
-            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
             var database = await GetDatabaseAsync();
 
             // Read from stream
@@ -253,21 +245,13 @@ public class RedisStreamService : IRedisStreamService
 
             var result = new Dictionary<string, T?>();
 
+            // Use serialization helper for deserialization
             foreach (var entry in entries)
             {
-                // Extract the data field and deserialize
-                var value = GetDataFieldValue(entry);
-
-                if (value.IsNullOrEmpty) continue;
-                try
+                var data = StreamSerializationHelper.DeserializeStreamEntry<T>(entry, _serializer);
+                if (data != null)
                 {
-                    var deserialized = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
-                    result[entry.Id!] = deserialized;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}", prefixedStream, entry.Id);
-                    result[entry.Id!] = null;
+                    result[entry.Id!] = data;
                 }
             }
 
@@ -283,11 +267,9 @@ public class RedisStreamService : IRedisStreamService
 
     public async Task CreateConsumerGroupAsync(string stream, string groupName, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
-        if (string.IsNullOrEmpty(groupName))
-            throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
+        // Use validation helpers
+        StreamValidationHelper.ValidateStreamName(stream);
+        StreamValidationHelper.ValidateGroupName(groupName);
 
         var prefixedStream = $"{_keyPrefix}{stream}";
 
@@ -295,10 +277,6 @@ public class RedisStreamService : IRedisStreamService
         {
             _logger.LogCreateConsumerGroupAsync(prefixedStream, groupName);
 
-            // Validate stream and group name lengths
-            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-
-            if (groupName.Length > 512) _logger.LogWarning("Group name exceeds Redis key limit of 512 characters: {GroupName}", groupName);
             var database = await GetDatabaseAsync();
 
             // Create consumer group starting from the beginning of the stream
@@ -325,14 +303,11 @@ public class RedisStreamService : IRedisStreamService
 
     public async Task<Dictionary<string, T?>> ReadGroupAsync<T>(string stream, string groupName, string consumerName, int count = 10, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
-        if (string.IsNullOrEmpty(groupName))
-            throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
-
-        if (string.IsNullOrEmpty(consumerName))
-            throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
+        // Use validation helpers
+        StreamValidationHelper.ValidateStreamName(stream);
+        StreamValidationHelper.ValidateGroupName(groupName);
+        StreamValidationHelper.ValidateConsumerName(consumerName);
+        StreamValidationHelper.ValidateCount(count);
 
         var prefixedStream = $"{_keyPrefix}{stream}";
 
@@ -355,7 +330,7 @@ public class RedisStreamService : IRedisStreamService
             foreach (var entry in entries)
             {
                 // Extract the data field and deserialize
-                var value = GetDataFieldValue(entry);
+                var value = StreamSerializationHelper.GetDataFieldValue(entry);
 
                 if (value.IsNullOrEmpty) continue;
                 try
@@ -732,13 +707,11 @@ public class RedisStreamService : IRedisStreamService
         int? maxLength = null,
         CancellationToken cancellationToken = default) where T : class
     {
-        ValidateBatchParameters(stream, messages);
+        // Use validation helper
+        StreamValidationHelper.ValidateBatchParameters(stream, messages);
 
         try
         {
-            // Validate stream name
-            if (stream.Length > 512) _logger.LogWarning("Stream name exceeds Redis key limit of 512 characters: {Stream}", stream);
-
             var startTime = DateTime.UtcNow;
             _logger.LogDebug("Adding {Count} messages to stream {Stream} in batch", messages.Length, stream);
 
@@ -1074,82 +1047,49 @@ public class RedisStreamService : IRedisStreamService
         RetryConfiguration retryConfig, RetryResult<T> result,
         CancellationToken cancellationToken) where T : class
     {
-        var currentRetry = 0;
-
-        while (currentRetry < retryConfig.MaxRetries)
-            try
+        // Use retry helper for simplified retry logic
+        var success = await StreamRetryHelper.ExecuteWithRetryAsync(
+            async () =>
             {
-                var success = await TryProcessMessageAsync(
-                    stream, groupName, consumerName, messageId,
-                    processor, result, retryConfig, cancellationToken);
+                var claimed = await ClaimAsync<T>(
+                    stream, groupName, consumerName,
+                    (long)retryConfig.IdleTimeout.TotalMilliseconds,
+                    new[] { messageId }, cancellationToken);
 
-                if (success)
+                if (claimed.Count == 0 || !claimed.TryGetValue(messageId, out var message))
                 {
-                    _logger.LogDebug("Successfully processed message {MessageId} on retry {Retry}",
-                        messageId, currentRetry + 1);
-                    return true;
+                    _logger.LogWarning("Failed to claim message {MessageId}", messageId);
+                    return false;
                 }
 
-                currentRetry++;
-                await DelayBeforeRetryAsync(currentRetry, retryConfig, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing message {MessageId} on retry {Retry}",
-                    messageId, currentRetry + 1);
-
-                result.FailedMessages[messageId] = ex.Message;
-                currentRetry++;
-
-                if (currentRetry < retryConfig.MaxRetries)
-                    await Task.Delay(retryConfig.RetryDelay, cancellationToken);
-            }
-
-        return false;
-    }
-
-    private async Task<bool> TryProcessMessageAsync<T>(
-        string stream, string groupName, string consumerName,
-        string messageId, Func<T, Task<bool>> processor,
-        RetryResult<T> result, RetryConfiguration retryConfig,
-        CancellationToken cancellationToken) where T : class
-    {
-        var claimed = await ClaimAsync<T>(
-            stream, groupName, consumerName,
-            (long)retryConfig.IdleTimeout.TotalMilliseconds,
-            new[] { messageId }, cancellationToken);
-
-        if (claimed.Count == 0 || !claimed.TryGetValue(messageId, out var message))
-        {
-            _logger.LogWarning("Failed to claim message {MessageId}", messageId);
-            return false;
-        }
-
-        if (message == null)
-            return false;
-
-        var success = await processor(message);
-        if (success)
-        {
-            await AcknowledgeAsync(stream, groupName, messageId, cancellationToken).ConfigureAwait(false);
-            result.SuccessCount++;
-            result.ProcessedMessages[messageId] = message;
-        }
+                try
+                {
+                    var processed = await processor(message!);
+                    if (processed)
+                    {
+                        await AcknowledgeAsync(stream, groupName, messageId, cancellationToken);
+                        result.SuccessCount++;
+                        result.ProcessedMessages[messageId] = message!;
+                        return true;
+                    }
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing message {MessageId}", messageId);
+                    result.FailedMessages[messageId] = ex.Message;
+                    throw;
+                }
+            },
+            retryConfig,
+            _logger,
+            $"ProcessMessage-{messageId}",
+            cancellationToken);
 
         return success;
     }
 
-    private async Task DelayBeforeRetryAsync(int currentRetry, RetryConfiguration retryConfig, CancellationToken cancellationToken)
-    {
-        if (currentRetry >= retryConfig.MaxRetries)
-            return;
-
-        var delay = retryConfig.UseExponentialBackoff
-            ? TimeSpan.FromMilliseconds(retryConfig.RetryDelay.TotalMilliseconds * Math.Pow(2, currentRetry))
-            : retryConfig.RetryDelay;
-
-        await Task.Delay(delay, cancellationToken);
-    }
+    // TryProcessMessageAsync and DelayBeforeRetryAsync removed - functionality merged into RetryMessageProcessingAsync using StreamRetryHelper
 
     private async Task HandleFailedMessageAsync<T>(
         string stream, string messageId, RetryConfiguration retryConfig,
@@ -1183,89 +1123,62 @@ public class RedisStreamService : IRedisStreamService
             result.SuccessCount, result.FailureCount, result.DeadLetterCount, result.ElapsedTime.TotalMilliseconds);
     }
 
-    private static void ValidateBatchParameters<T>(string stream, T[] messages) where T : class
-    {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-
-        if (messages == null || messages.Length == 0)
-            throw new ArgumentException("Messages cannot be null or empty", nameof(messages));
-    }
+    // ValidateBatchParameters removed - now using StreamValidationHelper.ValidateBatchParameters
 
     private async Task<string[]> ProcessBatchMessagesAsync<T>(
         string stream, T[] messages, int? maxLength,
         CancellationToken cancellationToken) where T : class
     {
         const int optimalBatchSize = 100;
-
-        // For small batches, use simple array pooling
-        if (messages.Length <= optimalBatchSize) return await ProcessSmallBatchAsync(stream, messages, maxLength, cancellationToken);
-
-        // For large batches, use object pool for result collection
-        return await ProcessLargeBatchAsync(stream, messages, maxLength, cancellationToken);
-    }
-
-    private async Task<string[]> ProcessSmallBatchAsync<T>(
-        string stream, T[] messages, int? maxLength,
-        CancellationToken cancellationToken) where T : class
-    {
-        var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
-        var batch = database.CreateBatch();
-        var tasks = new List<Task<RedisValue>>(messages.Length);
-
         var prefixedStream = $"{_keyPrefix}{stream}";
 
-        foreach (var message in messages)
+        // For small batches, use batch operations
+        if (messages.Length <= optimalBatchSize)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
+            var batch = database.CreateBatch();
+            var tasks = new List<Task<RedisValue>>(messages.Length);
 
-            // It's safe to not await here because we are adding to a batch
-            var serializedMessageTask = _serializer.SerializeAsync(message, cancellationToken);
+            // Use serialization helper for batch serialization
+            var serializedEntries = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer, optimalBatchSize);
 
-            // This is a bit tricky: we need the serialized message to create the stream add task.
-            // We can do this more efficiently by serializing first.
-            var entryTask = serializedMessageTask.ContinueWith(t =>
-                new NameValueEntry[] { new("data", t.Result) }, cancellationToken);
-
-            var streamAddTask = entryTask.ContinueWith(t =>
-                batch.StreamAddAsync(prefixedStream, t.Result, null, maxLength, true), cancellationToken).Unwrap();
-
-            tasks.Add(streamAddTask);
-        }
-
-        batch.Execute();
-        await Task.WhenAll(tasks);
-
-        return tasks.Select(t => t.Result.ToString()).ToArray();
-    }
-
-    private async Task<string[]> ProcessLargeBatchAsync<T>(
-        string stream, T[] messages, int? maxLength,
-        CancellationToken cancellationToken) where T : class
-    {
-        var results = new ConcurrentBag<(int index, string id)>();
-
-        await Parallel.ForEachAsync(
-            messages.Select((msg, idx) => (message: msg, index: idx)),
-            CreateParallelOptions(cancellationToken),
-            async (item, ct) =>
+            for (int i = 0; i < serializedEntries.Length; i++)
             {
-                // Each parallel task will call the regular AddAsync, which is efficient for a single item.
-                // The parallelism across many items provides the throughput.
-                var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
-                results.Add((item.index, messageId));
-                LogBatchProgress(stream, item.index, messages.Length);
-            });
+                cancellationToken.ThrowIfCancellationRequested();
+                var task = batch.StreamAddAsync(prefixedStream, serializedEntries[i], null, maxLength, true);
+                tasks.Add(task);
+            }
 
-        return results
-            .OrderBy(r => r.index)
-            .Select(r => r.id)
-            .ToArray();
+            batch.Execute();
+            await Task.WhenAll(tasks);
+
+            return tasks.Select(t => t.Result.ToString()).ToArray();
+        }
+        else
+        {
+            // For large batches, use parallel processing
+            var results = new ConcurrentBag<(int index, string id)>();
+
+            await Parallel.ForEachAsync(
+                messages.Select((msg, idx) => (message: msg, index: idx)),
+                CreateParallelOptions(cancellationToken),
+                async (item, ct) =>
+                {
+                    var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
+                    results.Add((item.index, messageId));
+                    LogBatchProgress(stream, item.index, messages.Length);
+                });
+
+            return results
+                .OrderBy(r => r.index)
+                .Select(r => r.id)
+                .ToArray();
+        }
     }
 
     private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
     {
-        // Dinamik parallelism: CPU sayısına göre ayarla, max 8 ile sınırla
+        // Dynamic parallelism: Adjust based on CPU count, max 8
         var maxDegree = Math.Min(Environment.ProcessorCount * 2, 8);
 
         return new ParallelOptions
@@ -1275,30 +1188,8 @@ public class RedisStreamService : IRedisStreamService
         };
     }
 
-    private async Task AddSingleMessageAsync<T>(
-        string stream, (T message, int index) item, int? maxLength,
-        ConcurrentBag<(int index, string id)> results,
-        int totalMessages, CancellationToken cancellationToken) where T : class
-    {
-        try
-        {
-            var messageId = await AddAsync(stream, item.message, maxLength, cancellationToken).ConfigureAwait(false);
-            results.Add((item.index, messageId));
-
-            LogBatchProgress(stream, item.index, totalMessages);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            _logger.LogDebug("Batch add operation cancelled at index {Index} for stream {Stream}", item.index, stream);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to add message at index {Index} to stream {Stream}", item.index, stream);
-            throw;
-        }
-    }
-
+    // Removed AddSingleMessageAsync - no longer needed after consolidation
+    
     private void LogBatchProgress(string stream, int currentIndex, int totalMessages)
     {
         if (totalMessages > 100 && (currentIndex + 1) % 100 == 0)
@@ -1317,15 +1208,7 @@ public class RedisStreamService : IRedisStreamService
 
     // ============= Memory Optimization Methods =============
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static RedisValue GetDataFieldValue(StreamEntry entry)
-    {
-        // Optimized field lookup without LINQ
-        foreach (var fieldValue in entry.Values)
-            if (fieldValue.Name == "data")
-                return fieldValue.Value;
-        return RedisValue.Null;
-    }
+    // GetDataFieldValue removed - now using StreamSerializationHelper.GetDataFieldValue
 
     // ============= Streaming API Methods =============
 
@@ -1358,7 +1241,7 @@ public class RedisStreamService : IRedisStreamService
 
             foreach (var entry in entries)
             {
-                var value = GetDataFieldValue(entry);
+                var value = StreamSerializationHelper.GetDataFieldValue(entry);
                 if (!value.IsNullOrEmpty)
                 {
                     T? data = null;
@@ -1422,7 +1305,7 @@ public class RedisStreamService : IRedisStreamService
 
             foreach (var entry in entries)
             {
-                var value = GetDataFieldValue(entry);
+                var value = StreamSerializationHelper.GetDataFieldValue(entry);
                 T? data = null;
 
                 if (!value.IsNullOrEmpty)
