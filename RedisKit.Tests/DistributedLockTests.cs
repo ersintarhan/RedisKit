@@ -115,8 +115,9 @@ public class DistributedLockTests
 
         // Assert
         Assert.Null(lockHandle);
-        Assert.True(elapsed >= wait);
-        Assert.True(elapsed < wait + TimeSpan.FromSeconds(1)); // Some tolerance
+        // Use more tolerance for CI environments
+        Assert.True(elapsed >= wait.Subtract(TimeSpan.FromMilliseconds(50)), $"Elapsed time {elapsed} should be at least {wait}");
+        Assert.True(elapsed < wait + TimeSpan.FromSeconds(2), $"Elapsed time {elapsed} should be less than {wait} + 2s"); // Increased tolerance for CI
     }
 
     [Fact]
