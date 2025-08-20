@@ -13,11 +13,14 @@ namespace RedisKit.Services;
 /// </summary>
 public class RedisFunctionService : IRedisFunction
 {
+    private const string FunctionCommand = "FUNCTION";
+    private const string NotSupportedMessage = "Redis Functions are not supported. Requires Redis 7.0+";
+    
     private readonly IRedisConnection _connection;
     private readonly AsyncLazy<bool> _functionSupport;
     private readonly ILogger<RedisFunctionService> _logger;
-    private readonly RedisOptions _options;
     private readonly IRedisSerializer _serializer;
+    
 
     public RedisFunctionService(
         IRedisConnection connection,
@@ -27,8 +30,8 @@ public class RedisFunctionService : IRedisFunction
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-        _serializer = serializer ?? RedisSerializerFactory.Create(_options.Serializer);
+        var redisOptions = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _serializer = serializer ?? RedisSerializerFactory.Create(redisOptions.Serializer);
 
         // Initialize Redis Functions support detection lazily
         _functionSupport = new AsyncLazy<bool>(async () =>
@@ -36,7 +39,7 @@ public class RedisFunctionService : IRedisFunction
             try
             {
                 var database = await _connection.GetDatabaseAsync();
-                await database.ExecuteAsync("FUNCTION", "LIST").ConfigureAwait(false);
+                await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
                 _logger.LogInformation("Redis Functions are supported");
                 return true;
             }
@@ -47,7 +50,7 @@ public class RedisFunctionService : IRedisFunction
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error checking Redis Functions support. Assuming not supported.");
+                _logger.LogDebug(ex, "Error checking Redis Functions support. Assuming not supported.");
                 return false;
             }
         }, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -57,8 +60,8 @@ public class RedisFunctionService : IRedisFunction
     {
         ArgumentException.ThrowIfNullOrEmpty(libraryCode);
 
-        if (!await EnsureSupportedAsync(cancellationToken))
-            throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
+        if (!await EnsureSupportedAsync())
+            throw new NotSupportedException(NotSupportedMessage);
 
         try
         {
@@ -68,8 +71,8 @@ public class RedisFunctionService : IRedisFunction
 
             // Execute FUNCTION LOAD command
             var result = replace
-                ? await database.ExecuteAsync("FUNCTION", "LOAD", "REPLACE", libraryCode).ConfigureAwait(false)
-                : await database.ExecuteAsync("FUNCTION", "LOAD", libraryCode).ConfigureAwait(false);
+                ? await database.ExecuteAsync(FunctionCommand, "LOAD", "REPLACE", libraryCode).ConfigureAwait(false)
+                : await database.ExecuteAsync(FunctionCommand, "LOAD", libraryCode).ConfigureAwait(false);
 
             var success = result.ToString() == "OK" || !string.IsNullOrEmpty(result.ToString());
 
@@ -96,8 +99,8 @@ public class RedisFunctionService : IRedisFunction
     {
         ArgumentException.ThrowIfNullOrEmpty(libraryName);
 
-        if (!await EnsureSupportedAsync(cancellationToken))
-            throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
+        if (!await EnsureSupportedAsync())
+            throw new NotSupportedException(NotSupportedMessage);
 
         try
         {
@@ -106,7 +109,7 @@ public class RedisFunctionService : IRedisFunction
             var database = await _connection.GetDatabaseAsync();
 
             // Execute FUNCTION DELETE command
-            var result = await database.ExecuteAsync("FUNCTION", "DELETE", libraryName).ConfigureAwait(false);
+            var result = await database.ExecuteAsync(FunctionCommand, "DELETE", libraryName).ConfigureAwait(false);
 
             var success = result.ToString() == "OK";
 
@@ -119,13 +122,14 @@ public class RedisFunctionService : IRedisFunction
         }
         catch (RedisServerException ex) when (ex.Message.Contains("ERR no such library"))
         {
-            _logger.LogWarning("Library {LibraryName} not found", libraryName);
+            _logger.LogWarning("Function library {LibraryName} not found", libraryName);
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting function library {LibraryName}", libraryName);
-            throw;
+            _logger.LogError(ex, "Error deleting function library {LibraryName}. Redis error: {RedisError}", 
+                libraryName, ex.Message);
+            throw new InvalidOperationException($"Failed to delete function library '{libraryName}'", ex);
         }
     }
 
@@ -134,7 +138,7 @@ public class RedisFunctionService : IRedisFunction
         bool withCode = false,
         CancellationToken cancellationToken = default)
     {
-        if (!await EnsureSupportedAsync(cancellationToken)) return Enumerable.Empty<FunctionLibraryInfo>();
+        if (!await EnsureSupportedAsync()) return [];
 
         try
         {
@@ -146,13 +150,13 @@ public class RedisFunctionService : IRedisFunction
             // Execute FUNCTION LIST command
             RedisResult result;
             if (!string.IsNullOrEmpty(libraryNamePattern) && withCode)
-                result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
+                result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
             else if (!string.IsNullOrEmpty(libraryNamePattern))
-                result = await database.ExecuteAsync("FUNCTION", "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
+                result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
             else if (withCode)
-                result = await database.ExecuteAsync("FUNCTION", "LIST", "WITHCODE").ConfigureAwait(false);
+                result = await database.ExecuteAsync(FunctionCommand, "LIST", "WITHCODE").ConfigureAwait(false);
             else
-                result = await database.ExecuteAsync("FUNCTION", "LIST").ConfigureAwait(false);
+                result = await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
 
             return ParseFunctionList(result);
         }
@@ -183,7 +187,7 @@ public class RedisFunctionService : IRedisFunction
 
     public async Task<bool> FlushAsync(FlushMode mode = FlushMode.Async, CancellationToken cancellationToken = default)
     {
-        if (!await EnsureSupportedAsync(cancellationToken)) throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
+        if (!await EnsureSupportedAsync()) throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
 
         _logger.LogWarning("Flushing all function libraries, mode: {Mode}", mode);
         var database = await _connection.GetDatabaseAsync();
@@ -191,7 +195,7 @@ public class RedisFunctionService : IRedisFunction
 
         // Execute FUNCTION FLUSH command
         var result = await database.ExecuteAsync(
-            "FUNCTION",
+            FunctionCommand,
             "FLUSH", modeStr
         ).ConfigureAwait(false);
 
@@ -207,7 +211,7 @@ public class RedisFunctionService : IRedisFunction
 
     public async Task<FunctionStats> GetStatsAsync(CancellationToken cancellationToken = default)
     {
-        if (!await EnsureSupportedAsync(cancellationToken)) return new FunctionStats();
+        if (!await EnsureSupportedAsync()) return new FunctionStats();
 
         try
         {
@@ -216,7 +220,7 @@ public class RedisFunctionService : IRedisFunction
             var database = await _connection.GetDatabaseAsync();
 
             // Execute FUNCTION STATS command
-            var result = await database.ExecuteAsync("FUNCTION", "STATS").ConfigureAwait(false);
+            var result = await database.ExecuteAsync(FunctionCommand, "STATS").ConfigureAwait(false);
 
             return ParseFunctionStats(result);
         }
@@ -229,10 +233,10 @@ public class RedisFunctionService : IRedisFunction
 
     public async Task<bool> IsSupportedAsync(CancellationToken cancellationToken = default)
     {
-        return await EnsureSupportedAsync(cancellationToken);
+        return await EnsureSupportedAsync();
     }
 
-    private async Task<bool> EnsureSupportedAsync(CancellationToken cancellationToken)
+    private async Task<bool> EnsureSupportedAsync()
     {
         return await _functionSupport.Value.ConfigureAwait(false);
     }
@@ -246,167 +250,168 @@ public class RedisFunctionService : IRedisFunction
     {
         ArgumentException.ThrowIfNullOrEmpty(functionName);
 
-        if (!await EnsureSupportedAsync(cancellationToken)) throw new NotSupportedException("Redis Functions are not supported. Requires Redis 7.0+");
+        if (!await EnsureSupportedAsync())
+            throw new NotSupportedException(NotSupportedMessage);
 
         try
         {
-            _logger.LogDebug("Calling function: {FunctionName} with {KeyCount} keys and {ArgCount} args",
-                functionName, keys?.Length ?? 0, args?.Length ?? 0);
-
             var database = await _connection.GetDatabaseAsync();
+            var commandArgs = BuildCommandArguments(functionName, keys);
+            await PrepareArgumentsAsync(commandArgs, args, cancellationToken);
 
-            // Build command arguments for FCALL/FCALL_RO
-            // Format: FCALL function_name numkeys [keys...] [args...]
-            // StackExchange.Redis ExecuteAsync expects object parameters, not RedisValue
-            // IMPORTANT: numkeys must be an int, not a RedisValue
-            var commandArgs = new List<object>
-            {
-                functionName,
-                (int)(keys?.Length ?? 0)  // Cast to int explicitly
-            };
-
-            // Add keys
-            if (keys != null)
-                commandArgs.AddRange(keys);
-
-            // Add arguments - keep as objects for ExecuteAsync
-            if (args != null)
-                foreach (var arg in args)
-                {
-                    if (arg == null)
-                        commandArgs.Add(RedisValue.Null);
-                    else if (arg is string || arg is int || arg is long || arg is double || arg is bool)
-                        commandArgs.Add(arg); // Pass primitive types directly
-                    else if (arg is byte[] bytes)
-                        commandArgs.Add(bytes);
-                    else
-                        commandArgs.Add(await _serializer.SerializeAsync(arg, cancellationToken));
-                }
-
-            // Execute function using ExecuteAsync
-            // StackExchange.Redis requires parameters as individual arguments
-            // We'll use a switch to handle different argument counts
-            RedisResult result;
-            
-            // Debug logging
-            _logger.LogDebug("Executing {Command} with {ArgCount} arguments: {Args}", 
-                command, commandArgs.Count, string.Join(", ", commandArgs.Select(a => a?.ToString() ?? "null")));
-            
-            switch (commandArgs.Count)
-            {
-                case 2:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1]).ConfigureAwait(false);
-                    break;
-                case 3:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2]).ConfigureAwait(false);
-                    break;
-                case 4:
-                    
-                    var q = $"{command} {commandArgs[0]} {commandArgs[1]} {commandArgs[2]} {commandArgs[3]}";
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3]).ConfigureAwait(false);
-                    break;
-                case 5:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4]).ConfigureAwait(false);
-                    break;
-                case 6:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5]).ConfigureAwait(false);
-                    break;
-                case 7:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6]).ConfigureAwait(false);
-                    break;
-                case 8:
-                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6], commandArgs[7]).ConfigureAwait(false);
-                    break;
-                default:
-                    throw new ArgumentException($"Too many arguments for FCALL. Maximum supported is 6 keys/args combined, got {commandArgs.Count - 2}");
-            }
-
-            if (result.IsNull)
-                return null;
-
-            // Handle different return types
-            if (typeof(T) == typeof(string))
-                return result.ToString() as T;
-
-            if (typeof(T) == typeof(byte[]))
-                return (byte[]?)result as T;
-
-            // Check if result is already a simple type
-            if (result.Resp3Type == ResultType.Integer)
-            {
-                if (typeof(T) == typeof(long))
-                    return (T)(object)(long)result;
-                if (typeof(T) == typeof(int))
-                    return (T)(object)(int)result;
-                if (typeof(T) == typeof(bool))
-                    return (T)(object)((long)result != 0);
-            }
-
-            // Try to deserialize complex objects
-            if (result.Resp3Type == ResultType.BulkString && !result.IsNull)
-            {
-                var bytes = (byte[])result!;
-                return await _serializer.DeserializeAsync<T>(bytes, cancellationToken);
-            }
-
-            // Handle arrays
-            if (result.Resp3Type == ResultType.Array)
-            {
-                var arrayType = typeof(T);
-
-                // Check if T is an array type
-                if (arrayType.IsArray)
-                {
-                    var elementType = arrayType.GetElementType()!;
-                    var arrayResult = (RedisResult[])result!;
-                    var typedArray = Array.CreateInstance(elementType, arrayResult.Length);
-
-                    for (var i = 0; i < arrayResult.Length; i++)
-                    {
-                        object? element = null;
-                        var item = arrayResult[i];
-
-                        if (elementType == typeof(string))
-                        {
-                            element = item.ToString();
-                        }
-                        else if (elementType == typeof(long))
-                        {
-                            element = (long)item;
-                        }
-                        else if (elementType == typeof(int))
-                        {
-                            element = (int)item;
-                        }
-                        else if (elementType == typeof(byte[]))
-                        {
-                            element = (byte[]?)item;
-                        }
-                        else if (!item.IsNull)
-                        {
-                            // Try to deserialize complex types
-                            var bytes = (byte[])item!;
-                            element = await _serializer.DeserializeAsync(bytes, elementType, cancellationToken);
-                        }
-
-                        typedArray.SetValue(element, i);
-                    }
-
-                    return (T)(object)typedArray;
-                }
-
-                // If T is a List<> or IEnumerable<>, we could handle those too
-                // For now, throw exception for non-array collection types
-                throw new NotSupportedException($"Collection type {typeof(T).Name} is not yet supported. Use array types (T[]) instead.");
-            }
-
-            return null;
+            var result = await ExecuteFunctionAsync(database, command, commandArgs);
+            return await ConvertResultAsync<T>(result, cancellationToken);
         }
         catch (RedisServerException ex)
         {
             _logger.LogError(ex, "Function execution error: {Message}", ex.Message);
             throw new InvalidOperationException($"Function execution failed: {ex.Message}", ex);
         }
+    }
+
+    private static List<object> BuildCommandArguments(string functionName, string[]? keys)
+    {
+        // Build command arguments for FCALL/FCALL_RO
+        // Format: FCALL function_name numkeys [keys...] [args...]
+        var commandArgs = new List<object>
+        {
+            functionName,
+            keys?.Length ?? 0
+        };
+
+        // Add keys
+        if (keys != null)
+            commandArgs.AddRange(keys);
+
+        return commandArgs;
+    }
+
+    private async Task PrepareArgumentsAsync(List<object> commandArgs, object[]? args, CancellationToken cancellationToken)
+    {
+        if (args == null) return;
+
+        foreach (var arg in args)
+        {
+            var preparedArg = await PrepareArgumentAsync(arg, cancellationToken);
+            commandArgs.Add(preparedArg);
+        }
+    }
+
+    private async Task<object> PrepareArgumentAsync(object? arg, CancellationToken cancellationToken)
+    {
+        if (arg == null)
+            return RedisValue.Null;
+
+        if (arg is string || arg is int || arg is long || arg is double || arg is bool)
+            return arg; // Pass primitive types directly
+
+        if (arg is byte[] bytes)
+            return bytes;
+
+        return await _serializer.SerializeAsync(arg, cancellationToken);
+    }
+
+    private static async Task<RedisResult> ExecuteFunctionAsync(IDatabaseAsync database, string command, List<object> commandArgs)
+    {
+        // StackExchange.Redis requires parameters as individual arguments
+        return commandArgs.Count switch
+        {
+            2 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1]).ConfigureAwait(false),
+            3 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2]).ConfigureAwait(false),
+            4 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3]).ConfigureAwait(false),
+            5 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4]).ConfigureAwait(false),
+            6 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5]).ConfigureAwait(false),
+            7 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6]).ConfigureAwait(false),
+            8 => await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6], commandArgs[7]).ConfigureAwait(false),
+            _ => throw new ArgumentException($"Too many arguments for FCALL. Maximum supported is 6 keys/args combined, got {commandArgs.Count - 2}")
+        };
+    }
+
+    private async Task<T?> ConvertResultAsync<T>(RedisResult result, CancellationToken cancellationToken) where T : class
+    {
+        if (result.IsNull)
+            return null;
+
+        // Handle simple string type
+        if (typeof(T) == typeof(string))
+            return result.ToString() as T;
+
+        // Handle byte array
+        if (typeof(T) == typeof(byte[]))
+            return (byte[]?)result as T;
+
+        // Handle integer types
+        if (result.Resp3Type == ResultType.Integer)
+            return ConvertIntegerResult<T>(result);
+
+        // Handle bulk string (complex objects)
+        if (result.Resp3Type == ResultType.BulkString && !result.IsNull)
+        {
+            var bytes = (byte[])result!;
+            return await _serializer.DeserializeAsync<T>(bytes, cancellationToken);
+        }
+
+        // Handle array results
+        if (result.Resp3Type == ResultType.Array && typeof(T).IsArray)
+            return await ConvertArrayResultAsync<T>(result, cancellationToken);
+
+        if (result.Resp3Type == ResultType.Array)
+            throw new NotSupportedException($"Collection type {typeof(T).Name} is not yet supported. Use array types (T[]) instead.");
+
+        return null;
+    }
+
+    private static T? ConvertIntegerResult<T>(RedisResult result) where T : class
+    {
+        if (typeof(T) == typeof(long))
+            return (T)(object)(long)result;
+        if (typeof(T) == typeof(int))
+            return (T)(object)(int)result;
+        if (typeof(T) == typeof(bool))
+            return (T)(object)((long)result != 0);
+        return null;
+    }
+
+    private async Task<T?> ConvertArrayResultAsync<T>(RedisResult result, CancellationToken cancellationToken) where T : class
+    {
+        var arrayType = typeof(T);
+        if (!arrayType.IsArray)
+            return null;
+
+        var elementType = arrayType.GetElementType()!;
+        var arrayResult = (RedisResult[])result!;
+        var typedArray = Array.CreateInstance(elementType, arrayResult.Length);
+
+        for (var i = 0; i < arrayResult.Length; i++)
+        {
+            var element = await ConvertArrayElementAsync(arrayResult[i], elementType, cancellationToken);
+            typedArray.SetValue(element, i);
+        }
+
+        return (T)(object)typedArray;
+    }
+
+    private async Task<object?> ConvertArrayElementAsync(RedisResult item, Type elementType, CancellationToken cancellationToken)
+    {
+        if (elementType == typeof(string))
+            return item.ToString();
+
+        if (elementType == typeof(long))
+            return (long)item;
+
+        if (elementType == typeof(int))
+            return (int)item;
+
+        if (elementType == typeof(byte[]))
+            return (byte[]?)item;
+
+        if (!item.IsNull)
+        {
+            var bytes = (byte[])item!;
+            return await _serializer.DeserializeAsync(bytes, elementType, cancellationToken);
+        }
+
+        return null;
     }
 
     private static IEnumerable<FunctionLibraryInfo> ParseFunctionList(RedisResult result)
@@ -420,44 +425,51 @@ public class RedisFunctionService : IRedisFunction
             if (item.Resp3Type != ResultType.Array)
                 continue;
 
-            var libraryData = (RedisResult[])item!;
-            var library = new FunctionLibraryInfo();
-
-            // Simple key-value parsing, only handle what we need
-            for (var i = 0; i < libraryData.Length - 1; i += 2)
-            {
-                var key = libraryData[i].ToString()?.ToLower();
-                var value = libraryData[i + 1];
-
-                switch (key)
-                {
-                    case "library_name":
-                        library.Name = value.ToString() ?? string.Empty;
-                        break;
-                    case "engine":
-                        library.Engine = value.ToString() ?? "LUA";
-                        break;
-                    case "description":
-                        library.Description = value.IsNull ? null : value.ToString();
-                        break;
-                    case "library_code":
-                        // Handle both string and bulk string types
-                        if (value.Type == ResultType.BulkString || value.Type == ResultType.SimpleString)
-                        {
-                            library.Code = value.ToString() ?? string.Empty;
-                        }
-                        else if (!value.IsNull)
-                        {
-                            library.Code = value.ToString() ?? string.Empty;
-                        }
-                        break;
-                    case "functions" when value.Resp3Type == ResultType.Array:
-                        library.Functions = ParseFunctions((RedisResult[])value!);
-                        break;
-                }
-            }
-
+            var library = ParseSingleLibrary((RedisResult[])item!);
             yield return library;
+        }
+    }
+
+    private static FunctionLibraryInfo ParseSingleLibrary(RedisResult[] libraryData)
+    {
+        var library = new FunctionLibraryInfo();
+
+        // Simple key-value parsing, only handle what we need
+        for (var i = 0; i < libraryData.Length - 1; i += 2)
+        {
+            var key = libraryData[i].ToString()?.ToLower();
+            var value = libraryData[i + 1];
+
+            SetLibraryProperty(library, key, value);
+        }
+
+        return library;
+    }
+
+    private static void SetLibraryProperty(FunctionLibraryInfo library, string? key, RedisResult value)
+    {
+        switch (key)
+        {
+            case "library_name":
+                library.Name = value.ToString() ?? string.Empty;
+                break;
+            case "engine":
+                library.Engine = value.ToString() ?? "LUA";
+                break;
+            case "description":
+                library.Description = value.IsNull ? null : value.ToString();
+                break;
+            case "library_code":
+                // Set code if value is not null
+                if (!value.IsNull)
+                {
+                    library.Code = value.ToString() ?? string.Empty;
+                }
+
+                break;
+            case "functions" when value.Resp3Type == ResultType.Array:
+                library.Functions = ParseFunctions((RedisResult[])value!);
+                break;
         }
     }
 
