@@ -1,4 +1,3 @@
-using System;
 using RedisKit.Helpers;
 using Xunit;
 
@@ -26,7 +25,7 @@ public class StreamValidationHelperTests
     public void ValidateStreamName_WithInvalidName_ThrowsArgumentException(string? streamName)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateStreamName(streamName!));
         Assert.Contains("Stream name cannot be null, empty, or whitespace", exception.Message);
     }
@@ -35,7 +34,7 @@ public class StreamValidationHelperTests
     public void ValidateStreamName_WithCustomParamName_UsesItInException()
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateStreamName("", "customParam"));
         Assert.Equal("customParam", exception.ParamName);
     }
@@ -58,7 +57,7 @@ public class StreamValidationHelperTests
     public void ValidateGroupName_WithInvalidName_ThrowsArgumentException(string? groupName)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateGroupName(groupName!));
         Assert.Contains("Group name cannot be null, empty, or whitespace", exception.Message);
     }
@@ -81,7 +80,7 @@ public class StreamValidationHelperTests
     public void ValidateConsumerName_WithInvalidName_ThrowsArgumentException(string? consumerName)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateConsumerName(consumerName!));
         Assert.Contains("Consumer name cannot be null, empty, or whitespace", exception.Message);
     }
@@ -94,7 +93,7 @@ public class StreamValidationHelperTests
         var messages = new[] { "msg1", "msg2", "msg3" };
 
         // Act & Assert
-        var exception = Record.Exception(() => 
+        var exception = Record.Exception(() =>
             StreamValidationHelper.ValidateBatchParameters(stream, messages));
         Assert.Null(exception);
     }
@@ -109,7 +108,7 @@ public class StreamValidationHelperTests
         var messages = new[] { "msg1" };
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateBatchParameters(stream!, messages));
         Assert.Contains("Stream name cannot be null, empty, or whitespace", exception.Message);
     }
@@ -122,7 +121,7 @@ public class StreamValidationHelperTests
         string[]? messages = null;
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentNullException>(() => 
+        var exception = Assert.Throws<ArgumentNullException>(() =>
             StreamValidationHelper.ValidateBatchParameters(stream, messages!));
         Assert.Equal("messages", exception.ParamName);
     }
@@ -135,7 +134,7 @@ public class StreamValidationHelperTests
         var messages = Array.Empty<string>();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateBatchParameters(stream, messages));
         Assert.Contains("Messages array cannot be empty", exception.Message);
     }
@@ -150,7 +149,7 @@ public class StreamValidationHelperTests
         Func<string, Task<bool>> processor = _ => Task.FromResult(true);
 
         // Act & Assert
-        var exception = Record.Exception(() => 
+        var exception = Record.Exception(() =>
             StreamValidationHelper.ValidateRetryParameters(stream, groupName, consumerName, processor));
         Assert.Null(exception);
     }
@@ -165,7 +164,7 @@ public class StreamValidationHelperTests
         Func<string, Task<bool>>? processor = null;
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentNullException>(() => 
+        var exception = Assert.Throws<ArgumentNullException>(() =>
             StreamValidationHelper.ValidateRetryParameters(stream, groupName, consumerName, processor!));
         Assert.Equal("processor", exception.ParamName);
     }
@@ -188,7 +187,7 @@ public class StreamValidationHelperTests
         string[]? messageIds = null;
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentNullException>(() => 
+        var exception = Assert.Throws<ArgumentNullException>(() =>
             StreamValidationHelper.ValidateMessageIds(messageIds!));
         Assert.Equal("messageIds", exception.ParamName);
     }
@@ -200,7 +199,7 @@ public class StreamValidationHelperTests
         var messageIds = Array.Empty<string>();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateMessageIds(messageIds));
         Assert.Contains("Message IDs array cannot be empty", exception.Message);
     }
@@ -212,7 +211,7 @@ public class StreamValidationHelperTests
         var messageIds = new[] { "123-0", "", "125-0" };
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => 
+        var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateMessageIds(messageIds));
         Assert.Contains("Message ID cannot be null, empty, or whitespace", exception.Message);
     }
@@ -235,7 +234,7 @@ public class StreamValidationHelperTests
     public void ValidateMaxLength_WithInvalidLength_ThrowsArgumentOutOfRangeException(int maxLength)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             StreamValidationHelper.ValidateMaxLength(maxLength));
         Assert.Contains("Max length must be greater than zero", exception.Message);
     }
@@ -258,7 +257,7 @@ public class StreamValidationHelperTests
     public void ValidateCount_WithInvalidCount_ThrowsArgumentOutOfRangeException(int count)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             StreamValidationHelper.ValidateCount(count));
         Assert.Contains("Count must be greater than zero", exception.Message);
     }
@@ -280,7 +279,7 @@ public class StreamValidationHelperTests
     public void ValidateMinIdleTime_WithNegativeTime_ThrowsArgumentOutOfRangeException(long minIdleTime)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             StreamValidationHelper.ValidateMinIdleTime(minIdleTime));
         Assert.Contains("Min idle time cannot be negative", exception.Message);
     }

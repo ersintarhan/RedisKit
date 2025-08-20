@@ -193,7 +193,7 @@ public class RedisStreamService : IRedisStreamService
     {
         // Use validation helper
         StreamValidationHelper.ValidateStreamName(stream);
-        
+
         if (message == null)
             throw new ArgumentNullException(nameof(message));
 
@@ -249,10 +249,7 @@ public class RedisStreamService : IRedisStreamService
             foreach (var entry in entries)
             {
                 var data = StreamSerializationHelper.DeserializeStreamEntry<T>(entry, _serializer);
-                if (data != null)
-                {
-                    result[entry.Id!] = data;
-                }
+                if (data != null) result[entry.Id!] = data;
             }
 
             _logger.LogReadAsyncSuccess(prefixedStream, result.Count);
@@ -1072,6 +1069,7 @@ public class RedisStreamService : IRedisStreamService
                         result.ProcessedMessages[messageId] = message!;
                         return true;
                     }
+
                     return false;
                 }
                 catch (Exception ex)
@@ -1140,9 +1138,9 @@ public class RedisStreamService : IRedisStreamService
             var tasks = new List<Task<RedisValue>>(messages.Length);
 
             // Use serialization helper for batch serialization
-            var serializedEntries = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer, optimalBatchSize);
+            var serializedEntries = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer);
 
-            for (int i = 0; i < serializedEntries.Length; i++)
+            for (var i = 0; i < serializedEntries.Length; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var task = batch.StreamAddAsync(prefixedStream, serializedEntries[i], null, maxLength, true);
@@ -1154,26 +1152,24 @@ public class RedisStreamService : IRedisStreamService
 
             return tasks.Select(t => t.Result.ToString()).ToArray();
         }
-        else
-        {
-            // For large batches, use parallel processing
-            var results = new ConcurrentBag<(int index, string id)>();
 
-            await Parallel.ForEachAsync(
-                messages.Select((msg, idx) => (message: msg, index: idx)),
-                CreateParallelOptions(cancellationToken),
-                async (item, ct) =>
-                {
-                    var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
-                    results.Add((item.index, messageId));
-                    LogBatchProgress(stream, item.index, messages.Length);
-                });
+        // For large batches, use parallel processing
+        var results = new ConcurrentBag<(int index, string id)>();
 
-            return results
-                .OrderBy(r => r.index)
-                .Select(r => r.id)
-                .ToArray();
-        }
+        await Parallel.ForEachAsync(
+            messages.Select((msg, idx) => (message: msg, index: idx)),
+            CreateParallelOptions(cancellationToken),
+            async (item, ct) =>
+            {
+                var messageId = await AddAsync(stream, item.message, maxLength, ct).ConfigureAwait(false);
+                results.Add((item.index, messageId));
+                LogBatchProgress(stream, item.index, messages.Length);
+            });
+
+        return results
+            .OrderBy(r => r.index)
+            .Select(r => r.id)
+            .ToArray();
     }
 
     private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
@@ -1189,7 +1185,7 @@ public class RedisStreamService : IRedisStreamService
     }
 
     // Removed AddSingleMessageAsync - no longer needed after consolidation
-    
+
     private void LogBatchProgress(string stream, int currentIndex, int totalMessages)
     {
         if (totalMessages > 100 && (currentIndex + 1) % 100 == 0)
@@ -1206,7 +1202,6 @@ public class RedisStreamService : IRedisStreamService
             messageCount, stream, elapsedMs, rate);
     }
 
-   
 
     /// <summary>
     ///     Memory-efficient streaming reader for large datasets

@@ -195,7 +195,7 @@ public class PubSubServiceBusinessLogicTests
 
         // Act
         await _pubSub.PublishManyAsync(messages);
-        
+
         // Wait for both messages to be received
         var allReceived = countdown.Wait(TimeSpan.FromSeconds(5));
 

@@ -1,18 +1,15 @@
 using Microsoft.Extensions.Logging;
 using RedisKit.Models;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RedisKit.Helpers;
 
 /// <summary>
-/// Helper class for Redis Stream retry operations
+///     Helper class for Redis Stream retry operations
 /// </summary>
 internal static class StreamRetryHelper
 {
     /// <summary>
-    /// Executes an operation with retry logic
+    ///     Executes an operation with retry logic
     /// </summary>
     public static async Task<TResult?> ExecuteWithRetryAsync<TResult>(
         Func<Task<TResult>> operation,
@@ -24,19 +21,15 @@ internal static class StreamRetryHelper
         var maxRetries = retryConfig.MaxRetries;
         Exception? lastException = null;
 
-        for (int attempt = 0; attempt <= maxRetries; attempt++)
-        {
+        for (var attempt = 0; attempt <= maxRetries; attempt++)
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var result = await operation();
-                
-                if (attempt > 0 && logger != null)
-                {
-                    LogRetrySuccess(logger, operationName, attempt);
-                }
-                
+
+                if (attempt > 0 && logger != null) LogRetrySuccess(logger, operationName, attempt);
+
                 return result;
             }
             catch (OperationCanceledException)
@@ -46,31 +39,24 @@ internal static class StreamRetryHelper
             catch (Exception ex)
             {
                 lastException = ex;
-                
+
                 if (attempt < maxRetries)
                 {
                     var delay = CalculateDelay(attempt, retryConfig);
-                    
-                    if (logger != null)
-                    {
-                        LogRetryAttempt(logger, operationName, attempt + 1, maxRetries, delay, ex);
-                    }
-                    
+
+                    if (logger != null) LogRetryAttempt(logger, operationName, attempt + 1, maxRetries, delay, ex);
+
                     await Task.Delay(delay, cancellationToken);
                 }
             }
-        }
 
-        if (logger != null && lastException != null)
-        {
-            LogRetryFailure(logger, operationName, maxRetries, lastException);
-        }
+        if (logger != null && lastException != null) LogRetryFailure(logger, operationName, maxRetries, lastException);
 
         return default;
     }
 
     /// <summary>
-    /// Executes an operation with retry logic (non-generic version)
+    ///     Executes an operation with retry logic (non-generic version)
     /// </summary>
     public static async Task<bool> ExecuteWithRetryAsync(
         Func<Task<bool>> operation,
@@ -82,23 +68,19 @@ internal static class StreamRetryHelper
         var maxRetries = retryConfig.MaxRetries;
         Exception? lastException = null;
 
-        for (int attempt = 0; attempt <= maxRetries; attempt++)
-        {
+        for (var attempt = 0; attempt <= maxRetries; attempt++)
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var result = await operation();
-                
+
                 if (result)
                 {
-                    if (attempt > 0 && logger != null)
-                    {
-                        LogRetrySuccess(logger, operationName, attempt);
-                    }
+                    if (attempt > 0 && logger != null) LogRetrySuccess(logger, operationName, attempt);
                     return true;
                 }
-                
+
                 // If result is false and we have more retries, continue
                 if (attempt < maxRetries)
                 {
@@ -113,77 +95,70 @@ internal static class StreamRetryHelper
             catch (Exception ex)
             {
                 lastException = ex;
-                
+
                 if (attempt < maxRetries)
                 {
                     var delay = CalculateDelay(attempt, retryConfig);
-                    
-                    if (logger != null)
-                    {
-                        LogRetryAttempt(logger, operationName, attempt + 1, maxRetries, delay, ex);
-                    }
-                    
+
+                    if (logger != null) LogRetryAttempt(logger, operationName, attempt + 1, maxRetries, delay, ex);
+
                     await Task.Delay(delay, cancellationToken);
                 }
             }
-        }
 
-        if (logger != null && lastException != null)
-        {
-            LogRetryFailure(logger, operationName, maxRetries, lastException);
-        }
+        if (logger != null && lastException != null) LogRetryFailure(logger, operationName, maxRetries, lastException);
 
         return false;
     }
 
     /// <summary>
-    /// Calculates delay for retry attempt
+    ///     Calculates delay for retry attempt
     /// </summary>
     public static TimeSpan CalculateDelay(int attemptNumber, RetryConfiguration retryConfig)
     {
         var baseDelay = retryConfig.InitialDelay.TotalMilliseconds;
         double delayMs;
-        
+
         switch (retryConfig.Strategy)
         {
             case BackoffStrategy.Fixed:
                 delayMs = baseDelay;
                 break;
-                
+
             case BackoffStrategy.Linear:
                 delayMs = baseDelay * (attemptNumber + 1);
                 break;
-                
+
             case BackoffStrategy.Exponential:
                 delayMs = baseDelay * Math.Pow(retryConfig.BackoffMultiplier, attemptNumber);
                 break;
-                
+
             case BackoffStrategy.ExponentialWithJitter:
                 var exponentialDelay = baseDelay * Math.Pow(retryConfig.BackoffMultiplier, attemptNumber);
                 var jitter = exponentialDelay * retryConfig.JitterFactor * Random.Shared.NextDouble();
                 delayMs = exponentialDelay + jitter;
                 break;
-                
+
             case BackoffStrategy.DecorrelatedJitter:
                 // AWS recommended decorrelated jitter
                 var minDelay = baseDelay;
                 var maxDelay = Math.Min(retryConfig.MaxDelay.TotalMilliseconds, baseDelay * Math.Pow(3, attemptNumber));
                 delayMs = Random.Shared.NextDouble() * (maxDelay - minDelay) + minDelay;
                 break;
-                
+
             default:
                 delayMs = baseDelay;
                 break;
         }
-        
+
         // Cap at max delay
         delayMs = Math.Min(delayMs, retryConfig.MaxDelay.TotalMilliseconds);
-        
+
         return TimeSpan.FromMilliseconds(delayMs);
     }
 
     /// <summary>
-    /// Determines if an exception is retryable
+    ///     Determines if an exception is retryable
     /// </summary>
     public static bool IsRetryableException(Exception ex)
     {
@@ -241,7 +216,7 @@ internal static class StreamRetryHelper
     }
 
     /// <summary>
-    /// Wraps an async function to add retry capability
+    ///     Wraps an async function to add retry capability
     /// </summary>
     public static Func<Task<T?>> WrapWithRetry<T>(
         Func<Task<T?>> operation,
@@ -256,8 +231,8 @@ internal static class StreamRetryHelper
                 var result = await operation();
                 return result!; // We handle null by returning from ExecuteWithRetryAsync
             }
-            
-            var result = await ExecuteWithRetryAsync<T>(
+
+            var result = await ExecuteWithRetryAsync(
                 wrappedOperation,
                 retryConfig,
                 logger,

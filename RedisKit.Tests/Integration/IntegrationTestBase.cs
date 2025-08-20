@@ -30,6 +30,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     protected IRedisShardedPubSub? ShardedPubSubService { get; private set; }
 
     protected virtual string ConnectionString => "localhost:6379";
+
     //protected virtual int TestDatabase => 15; // Use database 15 for tests to avoid conflicts
     protected virtual string TestKeyPrefix => $"test:{Guid.NewGuid():N}:";
 
@@ -91,17 +92,13 @@ public abstract class IntegrationTestBase : IAsyncLifetime
             var server = ConnectionMultiplexer.GetServer(ConnectionMultiplexer.GetEndPoints()[0]);
             var info = await server.InfoAsync("server");
             if (info != null)
-            {
                 foreach (var group in info)
-                {
-                    foreach (var item in group)
-                        if (item.Key == "redis_version")
-                        {
-                            Console.WriteLine($"Redis version: {item.Value}");
-                            break;
-                        }
-                }
-            }
+                foreach (var item in group)
+                    if (item.Key == "redis_version")
+                    {
+                        Console.WriteLine($"Redis version: {item.Value}");
+                        break;
+                    }
         }
         catch
         {

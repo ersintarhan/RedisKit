@@ -1,14 +1,12 @@
-using System;
-
 namespace RedisKit.Helpers;
 
 /// <summary>
-/// Helper class for Redis Stream validation operations
+///     Helper class for Redis Stream validation operations
 /// </summary>
 internal static class StreamValidationHelper
 {
     /// <summary>
-    /// Validates a stream name
+    ///     Validates a stream name
     /// </summary>
     public static void ValidateStreamName(string stream, string paramName = "stream")
     {
@@ -17,7 +15,7 @@ internal static class StreamValidationHelper
     }
 
     /// <summary>
-    /// Validates group name for consumer groups
+    ///     Validates group name for consumer groups
     /// </summary>
     public static void ValidateGroupName(string groupName, string paramName = "groupName")
     {
@@ -26,7 +24,7 @@ internal static class StreamValidationHelper
     }
 
     /// <summary>
-    /// Validates consumer name
+    ///     Validates consumer name
     /// </summary>
     public static void ValidateConsumerName(string consumerName, string paramName = "consumerName")
     {
@@ -35,56 +33,54 @@ internal static class StreamValidationHelper
     }
 
     /// <summary>
-    /// Validates batch parameters
+    ///     Validates batch parameters
     /// </summary>
     public static void ValidateBatchParameters<T>(string stream, T[] messages)
     {
         ValidateStreamName(stream);
-        
+
         if (messages == null)
             throw new ArgumentNullException(nameof(messages), "Messages cannot be null.");
-            
+
         if (messages.Length == 0)
             throw new ArgumentException("Messages array cannot be empty.", nameof(messages));
     }
 
     /// <summary>
-    /// Validates retry parameters
+    ///     Validates retry parameters
     /// </summary>
     public static void ValidateRetryParameters<T>(
-        string stream, 
-        string groupName, 
-        string consumerName, 
+        string stream,
+        string groupName,
+        string consumerName,
         Func<T, Task<bool>>? processor)
     {
         ValidateStreamName(stream);
         ValidateGroupName(groupName);
         ValidateConsumerName(consumerName);
-        
+
         if (processor == null)
             throw new ArgumentNullException(nameof(processor), "Processor function cannot be null.");
     }
 
     /// <summary>
-    /// Validates message IDs array
+    ///     Validates message IDs array
     /// </summary>
     public static void ValidateMessageIds(string[] messageIds, string paramName = "messageIds")
     {
         if (messageIds == null)
             throw new ArgumentNullException(paramName, "Message IDs cannot be null.");
-            
+
         if (messageIds.Length == 0)
             throw new ArgumentException("Message IDs array cannot be empty.", paramName);
-            
+
         foreach (var id in messageIds)
-        {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Message ID cannot be null, empty, or whitespace.", paramName);
-        }
     }
 
     /// <summary>
-    /// Validates max length parameter
+    ///     Validates max length parameter
     /// </summary>
     public static void ValidateMaxLength(int maxLength, string paramName = "maxLength")
     {
@@ -93,7 +89,7 @@ internal static class StreamValidationHelper
     }
 
     /// <summary>
-    /// Validates count parameter
+    ///     Validates count parameter
     /// </summary>
     public static void ValidateCount(int count, string paramName = "count")
     {
@@ -102,7 +98,7 @@ internal static class StreamValidationHelper
     }
 
     /// <summary>
-    /// Validates min idle time
+    ///     Validates min idle time
     /// </summary>
     public static void ValidateMinIdleTime(long minIdleTime, string paramName = "minIdleTime")
     {

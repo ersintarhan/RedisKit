@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using NSubstitute;
 using RedisKit.Helpers;
-using RedisKit.Interfaces;
 using RedisKit.Serialization;
 using StackExchange.Redis;
 using Xunit;
@@ -17,13 +13,6 @@ public class StreamSerializationHelperTests
     public StreamSerializationHelperTests()
     {
         _serializer = Substitute.For<IRedisSerializer>();
-    }
-
-    public class TestData
-    {
-        public string Id { get; set; } = default!;
-        public string Name { get; set; } = default!;
-        public int Value { get; set; }
     }
 
     [Fact]
@@ -53,21 +42,21 @@ public class StreamSerializationHelperTests
             new TestData { Id = "2", Name = "Test2", Value = 2 },
             new TestData { Id = "3", Name = "Test3", Value = 3 }
         };
-        
-        _serializer.Serialize(Arg.Any<TestData>()).Returns(
-            x => new byte[] { (byte)((TestData)x[0]).Value });
+
+        _serializer.Serialize(Arg.Any<TestData>()).Returns(x => new[] { (byte)((TestData)x[0]).Value });
 
         // Act
         var result = StreamSerializationHelper.CreateDataFields(messages, _serializer);
 
         // Assert
         Assert.Equal(3, result.Length);
-        for (int i = 0; i < messages.Length; i++)
+        for (var i = 0; i < messages.Length; i++)
         {
             Assert.Equal("data", result[i].Name);
-            var expectedBytes = new byte[] { (byte)messages[i].Value };
+            var expectedBytes = new[] { (byte)messages[i].Value };
             Assert.Equal(expectedBytes, (byte[]?)result[i].Value);
         }
+
         _serializer.Received(3).Serialize(Arg.Any<TestData>());
     }
 
@@ -77,11 +66,11 @@ public class StreamSerializationHelperTests
         // Arrange
         var expectedData = new TestData { Id = "1", Name = "Test", Value = 42 };
         var serializedData = new byte[] { 1, 2, 3, 4 };
-        
+
         var entry = new StreamEntry(
             "123-0",
             new[] { new NameValueEntry("data", serializedData) });
-        
+
         _serializer.Deserialize<TestData>(serializedData).Returns(expectedData);
 
         // Act
@@ -138,8 +127,7 @@ public class StreamSerializationHelperTests
             new StreamEntry("125-0", new[] { new NameValueEntry("data", new byte[] { 3 }) })
         };
 
-        _serializer.Deserialize<TestData>(Arg.Any<byte[]>()).Returns(
-            x => new TestData { Id = ((byte[])x[0])[0].ToString(), Value = ((byte[])x[0])[0] });
+        _serializer.Deserialize<TestData>(Arg.Any<byte[]>()).Returns(x => new TestData { Id = ((byte[])x[0])[0].ToString(), Value = ((byte[])x[0])[0] });
 
         // Act
         var result = StreamSerializationHelper.DeserializeStreamEntries<TestData>(entries, _serializer);
@@ -163,8 +151,7 @@ public class StreamSerializationHelperTests
             new StreamEntry("125-0", new[] { new NameValueEntry("data", new byte[] { 3 }) })
         };
 
-        _serializer.Deserialize<TestData>(Arg.Any<byte[]>()).Returns(
-            x => new TestData { Id = ((byte[])x[0])[0].ToString() });
+        _serializer.Deserialize<TestData>(Arg.Any<byte[]>()).Returns(x => new TestData { Id = ((byte[])x[0])[0].ToString() });
 
         // Act
         var result = StreamSerializationHelper.DeserializeStreamEntries<TestData>(entries, _serializer);
@@ -255,7 +242,7 @@ public class StreamSerializationHelperTests
         var metadata = new { UserId = "123", Timestamp = DateTime.UtcNow };
         var serializedData = new byte[] { 1, 2, 3, 4 };
         var serializedMetadata = new byte[] { 5, 6, 7, 8 };
-        
+
         _serializer.Serialize(data).Returns(serializedData);
         _serializer.Serialize(metadata).Returns(serializedMetadata);
 
@@ -280,20 +267,19 @@ public class StreamSerializationHelperTests
             new TestData { Id = "2", Name = "Test2", Value = 2 },
             new TestData { Id = "3", Name = "Test3", Value = 3 }
         };
-        
-        _serializer.Serialize(Arg.Any<TestData>()).Returns(
-            x => new byte[] { (byte)((TestData)x[0]).Value });
+
+        _serializer.Serialize(Arg.Any<TestData>()).Returns(x => new[] { (byte)((TestData)x[0]).Value });
 
         // Act
         var result = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer, 10);
 
         // Assert
         Assert.Equal(3, result.Length);
-        for (int i = 0; i < messages.Length; i++)
+        for (var i = 0; i < messages.Length; i++)
         {
             Assert.Single(result[i]);
             Assert.Equal("data", result[i][0].Name);
-            var expectedBytes = new byte[] { (byte)messages[i].Value };
+            var expectedBytes = new[] { (byte)messages[i].Value };
             Assert.Equal(expectedBytes, (byte[]?)result[i][0].Value);
         }
     }
@@ -303,25 +289,21 @@ public class StreamSerializationHelperTests
     {
         // Arrange
         var messages = new TestData[250];
-        for (int i = 0; i < messages.Length; i++)
-        {
-            messages[i] = new TestData { Id = i.ToString(), Name = $"Test{i}", Value = i };
-        }
-        
-        _serializer.Serialize(Arg.Any<TestData>()).Returns(
-            x => new byte[] { (byte)((TestData)x[0]).Value });
+        for (var i = 0; i < messages.Length; i++) messages[i] = new TestData { Id = i.ToString(), Name = $"Test{i}", Value = i };
+
+        _serializer.Serialize(Arg.Any<TestData>()).Returns(x => new[] { (byte)((TestData)x[0]).Value });
 
         // Act
-        var result = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer, 100);
+        var result = await StreamSerializationHelper.BatchSerializeAsync(messages, _serializer);
 
         // Assert
         Assert.Equal(250, result.Length);
-        for (int i = 0; i < messages.Length; i++)
+        for (var i = 0; i < messages.Length; i++)
         {
             Assert.Single(result[i]);
             Assert.Equal("data", result[i][0].Name);
         }
-        
+
         // Should be called 250 times (once per message)
         _serializer.Received(250).Serialize(Arg.Any<TestData>());
     }
@@ -338,5 +320,12 @@ public class StreamSerializationHelperTests
         // Assert
         Assert.Empty(result);
         _serializer.DidNotReceive().Serialize(Arg.Any<TestData>());
+    }
+
+    public class TestData
+    {
+        public string Id { get; set; } = default!;
+        public string Name { get; set; } = default!;
+        public int Value { get; set; }
     }
 }

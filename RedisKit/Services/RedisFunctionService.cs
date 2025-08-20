@@ -15,12 +15,12 @@ public class RedisFunctionService : IRedisFunction
 {
     private const string FunctionCommand = "FUNCTION";
     private const string NotSupportedMessage = "Redis Functions are not supported. Requires Redis 7.0+";
-    
+
     private readonly IRedisConnection _connection;
     private readonly AsyncLazy<bool> _functionSupport;
     private readonly ILogger<RedisFunctionService> _logger;
     private readonly IRedisSerializer _serializer;
-    
+
 
     public RedisFunctionService(
         IRedisConnection connection,
@@ -127,7 +127,7 @@ public class RedisFunctionService : IRedisFunction
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting function library {LibraryName}. Redis error: {RedisError}", 
+            _logger.LogError(ex, "Error deleting function library {LibraryName}. Redis error: {RedisError}",
                 libraryName, ex.Message);
             throw new InvalidOperationException($"Failed to delete function library '{libraryName}'", ex);
         }
@@ -461,10 +461,7 @@ public class RedisFunctionService : IRedisFunction
                 break;
             case "library_code":
                 // Set code if value is not null
-                if (!value.IsNull)
-                {
-                    library.Code = value.ToString() ?? string.Empty;
-                }
+                if (!value.IsNull) library.Code = value.ToString() ?? string.Empty;
 
                 break;
             case "functions" when value.Resp3Type == ResultType.Array:
