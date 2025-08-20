@@ -1206,11 +1206,7 @@ public class RedisStreamService : IRedisStreamService
             messageCount, stream, elapsedMs, rate);
     }
 
-    // ============= Memory Optimization Methods =============
-
-    // GetDataFieldValue removed - now using StreamSerializationHelper.GetDataFieldValue
-
-    // ============= Streaming API Methods =============
+   
 
     /// <summary>
     ///     Memory-efficient streaming reader for large datasets
