@@ -66,7 +66,7 @@ public class RedisFunctionIntegrationTests : IntegrationTestBase
         long.Parse(result!).Should().Be(35);
     }
 
-    [Fact]
+    [Fact()]
     public async Task CallAsync_WithKeyOperation_ShouldModifyRedisKeys()
     {
         // Arrange

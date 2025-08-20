@@ -30,7 +30,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     protected IRedisShardedPubSub? ShardedPubSubService { get; private set; }
 
     protected virtual string ConnectionString => "localhost:6379";
-    protected virtual int TestDatabase => 15; // Use database 15 for tests to avoid conflicts
+    //protected virtual int TestDatabase => 15; // Use database 15 for tests to avoid conflicts
     protected virtual string TestKeyPrefix => $"test:{Guid.NewGuid():N}:";
 
     public virtual async Task InitializeAsync()
@@ -43,7 +43,8 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         // Add Redis services
         services.AddRedisKit(options =>
         {
-            options.ConnectionString = $"{ConnectionString},defaultDatabase={TestDatabase}";
+            //options.ConnectionString = $"{ConnectionString},defaultDatabase={TestDatabase}";
+            options.ConnectionString = $"{ConnectionString}";
             options.CacheKeyPrefix = TestKeyPrefix;
             options.DefaultTtl = TimeSpan.FromMinutes(5);
             options.OperationTimeout = TimeSpan.FromSeconds(10);
@@ -57,7 +58,8 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         // Get services
         var redisConnection = ServiceProvider.GetRequiredService<IRedisConnection>();
         ConnectionMultiplexer = await redisConnection.GetMultiplexerAsync();
-        Database = ConnectionMultiplexer.GetDatabase(TestDatabase);
+        //Database = ConnectionMultiplexer.GetDatabase(TestDatabase);
+        Database = ConnectionMultiplexer.GetDatabase();
 
         CacheService = ServiceProvider.GetRequiredService<IRedisCacheService>();
         PubSubService = ServiceProvider.GetRequiredService<IRedisPubSubService>();
@@ -89,13 +91,17 @@ public abstract class IntegrationTestBase : IAsyncLifetime
             var server = ConnectionMultiplexer.GetServer(ConnectionMultiplexer.GetEndPoints()[0]);
             var info = await server.InfoAsync("server");
             if (info != null)
+            {
                 foreach (var group in info)
-                foreach (var item in group)
-                    if (item.Key == "redis_version")
-                    {
-                        Console.WriteLine($"Redis version: {item.Value}");
-                        break;
-                    }
+                {
+                    foreach (var item in group)
+                        if (item.Key == "redis_version")
+                        {
+                            Console.WriteLine($"Redis version: {item.Value}");
+                            break;
+                        }
+                }
+            }
         }
         catch
         {

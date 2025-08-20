@@ -255,36 +255,71 @@ public class RedisFunctionService : IRedisFunction
 
             var database = await _connection.GetDatabaseAsync();
 
-            // Build command arguments efficiently
-            var commandArgs = new List<RedisValue>(2 + (keys?.Length ?? 0) + (args?.Length ?? 0))
+            // Build command arguments for FCALL/FCALL_RO
+            // Format: FCALL function_name numkeys [keys...] [args...]
+            // StackExchange.Redis ExecuteAsync expects object parameters, not RedisValue
+            // IMPORTANT: numkeys must be an int, not a RedisValue
+            var commandArgs = new List<object>
             {
                 functionName,
-                keys?.Length ?? 0
+                (int)(keys?.Length ?? 0)  // Cast to int explicitly
             };
 
             // Add keys
             if (keys != null)
-                commandArgs.AddRange(keys.Select(k => (RedisValue)k));
+                commandArgs.AddRange(keys);
 
-            // Add arguments - simplified serialization
+            // Add arguments - keep as objects for ExecuteAsync
             if (args != null)
                 foreach (var arg in args)
                 {
-                    RedisValue redisValue;
                     if (arg == null)
-                        redisValue = RedisValue.Null;
-                    else if (arg is string str)
-                        redisValue = str;
+                        commandArgs.Add(RedisValue.Null);
+                    else if (arg is string || arg is int || arg is long || arg is double || arg is bool)
+                        commandArgs.Add(arg); // Pass primitive types directly
                     else if (arg is byte[] bytes)
-                        redisValue = bytes;
+                        commandArgs.Add(bytes);
                     else
-                        redisValue = await _serializer.SerializeAsync(arg, cancellationToken);
-
-                    commandArgs.Add(redisValue);
+                        commandArgs.Add(await _serializer.SerializeAsync(arg, cancellationToken));
                 }
 
-            // Execute function with simplified parameter passing
-            var result = await database.ExecuteAsync(command, commandArgs.ToArray()).ConfigureAwait(false);
+            // Execute function using ExecuteAsync
+            // StackExchange.Redis requires parameters as individual arguments
+            // We'll use a switch to handle different argument counts
+            RedisResult result;
+            
+            // Debug logging
+            _logger.LogDebug("Executing {Command} with {ArgCount} arguments: {Args}", 
+                command, commandArgs.Count, string.Join(", ", commandArgs.Select(a => a?.ToString() ?? "null")));
+            
+            switch (commandArgs.Count)
+            {
+                case 2:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1]).ConfigureAwait(false);
+                    break;
+                case 3:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2]).ConfigureAwait(false);
+                    break;
+                case 4:
+                    
+                    var q = $"{command} {commandArgs[0]} {commandArgs[1]} {commandArgs[2]} {commandArgs[3]}";
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3]).ConfigureAwait(false);
+                    break;
+                case 5:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4]).ConfigureAwait(false);
+                    break;
+                case 6:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5]).ConfigureAwait(false);
+                    break;
+                case 7:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6]).ConfigureAwait(false);
+                    break;
+                case 8:
+                    result = await database.ExecuteAsync(command, commandArgs[0], commandArgs[1], commandArgs[2], commandArgs[3], commandArgs[4], commandArgs[5], commandArgs[6], commandArgs[7]).ConfigureAwait(false);
+                    break;
+                default:
+                    throw new ArgumentException($"Too many arguments for FCALL. Maximum supported is 6 keys/args combined, got {commandArgs.Count - 2}");
+            }
 
             if (result.IsNull)
                 return null;
@@ -401,6 +436,20 @@ public class RedisFunctionService : IRedisFunction
                         break;
                     case "engine":
                         library.Engine = value.ToString() ?? "LUA";
+                        break;
+                    case "description":
+                        library.Description = value.IsNull ? null : value.ToString();
+                        break;
+                    case "library_code":
+                        // Handle both string and bulk string types
+                        if (value.Type == ResultType.BulkString || value.Type == ResultType.SimpleString)
+                        {
+                            library.Code = value.ToString() ?? string.Empty;
+                        }
+                        else if (!value.IsNull)
+                        {
+                            library.Code = value.ToString() ?? string.Empty;
+                        }
                         break;
                     case "functions" when value.Resp3Type == ResultType.Array:
                         library.Functions = ParseFunctions((RedisResult[])value!);
