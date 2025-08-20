@@ -54,12 +54,15 @@ jobs:
         ./.sonar/scanner/dotnet-sonarscanner begin \
           /k:"ersintarhan_RedisKit" \
           /o:"ersintarhan" \
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.host.url="https://sonarcloud.io" \
-          /d:sonar.cs.dotcover.reportsPaths="TestResults/**/coverage.cobertura.xml" \
+          /d:sonar.cs.opencover.reportsPaths="TestResults/**/coverage.opencover.xml" \
+          /d:sonar.cs.cobertura.reportsPaths="TestResults/**/coverage.cobertura.xml" \
           /d:sonar.coverage.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/Program.cs,**/*Tests.cs,**/*Test.cs" \
           /d:sonar.exclusions="**/bin/**,**/obj/**,**/*.xml,**/packages/**,**/_site/**,**/TestResults/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/*.md,**/*.yml,**/*.json,**/*.png,**/*.ico,**/*.svg,**/*.sh,**/*.html,**/*.css,**/*.js,**/*.map,**/*.woff,**/*.woff2" \
-          /d:sonar.cpd.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**"
+          /d:sonar.cpd.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**" \
+          /d:sonar.sources="RedisKit" \
+          /d:sonar.tests="RedisKit.Tests"
           
     - name: Build
       run: dotnet build --no-restore --configuration Release
@@ -69,6 +72,7 @@ jobs:
         dotnet test --no-build --configuration Release \
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults \
+          --logger trx \
           --settings coverage.runsettings || true
           
     - name: End SonarCloud analysis
@@ -76,4 +80,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
-      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
