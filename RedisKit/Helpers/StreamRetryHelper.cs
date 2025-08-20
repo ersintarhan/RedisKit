@@ -248,10 +248,14 @@ internal static class StreamRetryHelper
         RetryConfiguration retryConfig,
         ILogger? logger = null) where T : class
     {
-        return async () => await ExecuteWithRetryAsync(
-            operation,
-            retryConfig,
-            logger,
-            operation.Method?.Name);
+        return async () =>
+        {
+            var result = await ExecuteWithRetryAsync<T>(
+                async () => await operation(),
+                retryConfig,
+                logger,
+                operation.Method?.Name);
+            return result;
+        };
     }
 }
