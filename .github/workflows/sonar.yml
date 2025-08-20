@@ -75,8 +75,6 @@ jobs:
           /o:"ersintarhan" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.host.url="https://sonarcloud.io" \
-          /d:sonar.scanner.force-deprecated-java-version="true" \
-          /d:sonar.scm.disabled="true" \
           /d:sonar.cs.opencover.reportsPaths="TestResults/**/coverage.opencover.xml" \
           /d:sonar.cs.cobertura.reportsPaths="TestResults/**/coverage.cobertura.xml" \
           /d:sonar.coverage.exclusions="RedisKit.Tests/**,RedisKit.Benchmarks/**,RedisKit.Example/**,**/Program.cs,**/*Tests.cs,**/*Test.cs" \
