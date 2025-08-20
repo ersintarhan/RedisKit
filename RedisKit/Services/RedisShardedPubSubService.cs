@@ -64,7 +64,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         ArgumentException.ThrowIfNullOrEmpty(channel);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (!await EnsureSupportedAsync(cancellationToken)) 
+        if (!await EnsureSupportedAsync(cancellationToken))
             throw new NotSupportedException("Sharded Pub/Sub is not supported. Requires Redis 7.0+");
 
         _logger.LogDebug("Publishing to sharded channel: {Channel}", channel);
@@ -91,7 +91,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         var result = boxedResult switch
         {
             long count => count,
-            int intCount => (long)intCount,
+            int intCount => intCount,
             null => 0L,
             _ => Convert.ToInt64(boxedResult)
         };
@@ -239,7 +239,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
             },
             _logger,
             RedisErrorPatterns.UnknownCommand,
-            defaultValue: new ShardedPubSubStats(),
+            new ShardedPubSubStats(),
             operationName: "GetShardedPubSubStats"
         ).ConfigureAwait(false) ?? new ShardedPubSubStats();
     }
@@ -270,7 +270,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
                 {
                     var items = (RedisResult[])result!;
                     _logger.LogDebug("PUBSUB SHARDNUMSUB array length: {Length}", items.Length);
-                    if (items.Length >= 2) 
+                    if (items.Length >= 2)
                     {
                         var count = items[1];
                         _logger.LogDebug("Subscriber count from Redis: {Count}", count);
@@ -289,7 +289,7 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         var result = boxedResult switch
         {
             long count => count,
-            int intCount => (long)intCount,
+            int intCount => intCount,
             null => 0L,
             _ => Convert.ToInt64(boxedResult)
         };

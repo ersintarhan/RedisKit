@@ -84,7 +84,7 @@ internal sealed class RedisLockHandle : ILockHandle
             },
             _logger,
             "extend lock",
-            defaultValue: (object?)0,
+            0,
             GetLockKey(Resource)
         ).ConfigureAwait(false);
 

@@ -108,7 +108,7 @@ public class SafeSerializationBufferTests
             buffer.Dispose();
             buffer.Dispose();
         });
-        
+
         Assert.Null(exception);
     }
 

@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using RedisKit.Helpers;
 using RedisKit.Interfaces;
@@ -111,7 +110,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
     private readonly IRedisConnection _connection;
 
     // Channel subscriptions: channel -> list of handlers
-    private readonly ObjectPool<ConcurrentDictionary<string, List<SubscriptionHandler>>>? _dictionaryPool;
+    // ObjectPool removed - ConcurrentDictionary pooling is an anti-pattern
 
     // Handler ID to subscription mapping for fast unsubscribe
     private readonly ConcurrentDictionary<string, HandlerMetadata> _handlerMap;
@@ -134,8 +133,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
     public RedisPubSubService(
         IRedisConnection connection,
         ILogger<RedisPubSubService> logger,
-        IOptions<RedisOptions> options,
-        ObjectPoolProvider? poolProvider = null)
+        IOptions<RedisOptions> options)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -145,19 +143,9 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         // Create serializer based on configuration
         _serializer = RedisSerializerFactory.Create(redisOptions.Serializer);
 
-        if (redisOptions.Pooling.Enabled)
-        {
-            var provider = poolProvider ?? new DefaultObjectPoolProvider();
-            if (provider is DefaultObjectPoolProvider defaultProvider) defaultProvider.MaximumRetained = redisOptions.Pooling.MaxPoolSize;
-            _dictionaryPool = provider.Create<ConcurrentDictionary<string, List<SubscriptionHandler>>>();
-            _channelHandlers = _dictionaryPool.Get();
-            _patternHandlers = _dictionaryPool.Get();
-        }
-        else
-        {
-            _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
-            _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
-        }
+        // Initialize dictionaries without pooling (ConcurrentDictionary pooling is anti-pattern)
+        _channelHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
+        _patternHandlers = new ConcurrentDictionary<string, List<SubscriptionHandler>>();
 
         _handlerMap = new ConcurrentDictionary<string, HandlerMetadata>();
         _statistics = new ConcurrentDictionary<string, SubscriptionStats>();
@@ -176,8 +164,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
     public async Task<long> PublishAsync<T>(string channel, T message, CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(channel))
-            throw new ArgumentException("Channel cannot be null or empty", nameof(channel));
+        ValidationUtils.ValidateChannelName(channel);
 
         if (message == null)
             throw new ArgumentNullException(nameof(message));
@@ -185,7 +172,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         ThrowIfDisposed();
 
         _logger.LogPublishAsync(channel);
-        
+
         var boxedResult = await RedisOperationExecutor.ExecuteAsync<object>(
             async () =>
             {
@@ -267,8 +254,8 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
         Func<string, T, CancellationToken, Task>? metadataHandler = null,
         CancellationToken cancellationToken = default) where T : class
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException($"{type} key cannot be null or empty", nameof(key));
+        // Validate the key (channel or pattern name)
+        ValidationUtils.ValidateChannelName(key);
 
         if (handler == null && metadataHandler == null)
             throw new ArgumentNullException(nameof(handler));
@@ -535,8 +522,8 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
     private async Task UnsubscribeInternalAsync(string key, SubscriptionType type, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(key))
-            throw new ArgumentException($"{type} key cannot be null or empty", nameof(key));
+        // Validate the key (channel or pattern name)
+        ValidationUtils.ValidateChannelName(key);
 
         ThrowIfDisposed();
 
@@ -679,8 +666,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
     public async Task<bool> HasSubscribersAsync(string channel, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(channel))
-            throw new ArgumentException("Channel cannot be null or empty", nameof(channel));
+        ValidationUtils.ValidateChannelName(channel);
 
         var count = await GetSubscriberCountAsync(channel, cancellationToken).ConfigureAwait(false);
         return count > 0;
@@ -688,8 +674,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
     public Task<int> GetSubscriberCountAsync(string channel, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(channel))
-            throw new ArgumentException("Channel cannot be null or empty", nameof(channel));
+        ValidationUtils.ValidateChannelName(channel);
 
         // For StackExchange.Redis, we can only track our own subscriptions
         // There's no direct way to get global subscriber count without access to server commands
@@ -733,11 +718,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
             _subscriptionLock?.Dispose();
 
-            if (_dictionaryPool != null)
-            {
-                _dictionaryPool.Return(_channelHandlers);
-                _dictionaryPool.Return(_patternHandlers);
-            }
+            // Dictionary pooling removed - was an anti-pattern
         }
 
         _disposed = true;
@@ -760,11 +741,7 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
         _subscriptionLock?.Dispose();
 
-        if (_dictionaryPool != null)
-        {
-            _dictionaryPool.Return(_channelHandlers);
-            _dictionaryPool.Return(_patternHandlers);
-        }
+        // Dictionary pooling removed - was an anti-pattern
 
         _disposed = true;
         GC.SuppressFinalize(this);
@@ -782,18 +759,21 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
     public async Task PublishManyAsync<T>(IEnumerable<(string channel, T message)> messages, CancellationToken cancellationToken = default) where T : class
     {
-        var subscriber = await GetSubscriberAsync();
-        var batch = subscriber.Multiplexer.GetDatabase().CreateBatch();
-        var tasks = new List<Task>();
-
-        foreach (var (channel, message) in messages)
+        await RedisOperationExecutor.ExecuteVoidAsync(async () =>
         {
-            var serialized = await _serializer.SerializeAsync(message, cancellationToken);
-            tasks.Add(batch.PublishAsync(RedisChannel.Literal(channel), serialized));
-        }
+            var subscriber = await GetSubscriberAsync();
+            var batch = subscriber.Multiplexer.GetDatabase().CreateBatch();
+            var tasks = new List<Task>();
 
-        batch.Execute();
-        await Task.WhenAll(tasks);
+            foreach (var (channel, message) in messages)
+            {
+                var serialized = await _serializer.SerializeAsync(message, cancellationToken);
+                tasks.Add(batch.PublishAsync(RedisChannel.Literal(channel), serialized));
+            }
+
+            batch.Execute();
+            await Task.WhenAll(tasks);
+        }, _logger, "PublishManyAsync", cancellationToken).ConfigureAwait(false);
     }
 
     #endregion

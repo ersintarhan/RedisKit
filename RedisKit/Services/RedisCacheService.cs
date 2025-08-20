@@ -9,6 +9,7 @@ using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
 using RedisKit.Serialization;
+using RedisKit.Utilities;
 using StackExchange.Redis;
 
 namespace RedisKit.Services;
@@ -73,7 +74,7 @@ public class RedisCacheService : IRedisCacheService
                 },
                 _logger,
                 "script evaluation",
-                defaultValue: (object?)false,
+                false,
                 operationName: "LuaSupportCheck"
             ).ConfigureAwait(false);
 
@@ -280,7 +281,7 @@ public class RedisCacheService : IRedisCacheService
     // Override SetKeyPrefix to validate prefix
     public void SetKeyPrefix(string prefix)
     {
-        ValidateRedisKey(prefix);
+        ValidationUtils.ValidateKeyPrefix(prefix);
         _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
     }
 
@@ -301,8 +302,7 @@ public class RedisCacheService : IRedisCacheService
     // Add validation to protect against too-large keys
     private static void ValidateRedisKey(string key)
     {
-        // Redis keys can't be longer than 512 MB (but practically less)
-        if (!string.IsNullOrEmpty(key) && key.Length > RedisConstants.MaxRedisKeyLength) throw new ArgumentException($"Redis key exceeds maximum allowed length of {RedisConstants.MaxRedisKeyLength}", nameof(key));
+        ValidationUtils.ValidateRedisKey(key);
     }
 
 

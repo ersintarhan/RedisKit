@@ -60,7 +60,7 @@ public class RedisDistributedLock : IDistributedLock
             async () =>
             {
                 var database = await _connection.GetDatabaseAsync();
-                
+
                 // Try to acquire the lock using SET NX PX
                 var lockResult = await database.StringSetAsync(
                     lockKey,
@@ -68,7 +68,7 @@ public class RedisDistributedLock : IDistributedLock
                     expiry,
                     When.NotExists,
                     CommandFlags.DemandMaster);
-                
+
                 return (object?)lockResult;
             },
             _logger,
@@ -231,7 +231,7 @@ public class RedisDistributedLock : IDistributedLock
             _logger,
             string.Join(",", resources),
             cancellationToken,
-            handleSpecificExceptions: ex =>
+            ex =>
             {
                 // Clean up any acquired locks using LINQ
                 var releaseTasks = acquiredLocks.Select(async acquired =>

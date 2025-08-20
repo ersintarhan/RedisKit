@@ -46,7 +46,7 @@ public class RedisFunctionService : IRedisFunction
                 },
                 _logger,
                 RedisErrorPatterns.UnknownCommand,
-                defaultValue: (object?)false,
+                false,
                 operationName: "FunctionSupportCheck"
             ).ConfigureAwait(false);
 
@@ -260,13 +260,14 @@ public class RedisFunctionService : IRedisFunction
             _logger,
             functionName,
             cancellationToken,
-            handleSpecificExceptions: ex =>
+            ex =>
             {
                 if (ex is RedisServerException redisEx)
                 {
                     _logger.LogError(redisEx, "Function execution error: {Message}", redisEx.Message);
                     throw new InvalidOperationException($"Function execution failed: {redisEx.Message}", redisEx);
                 }
+
                 return null; // Let RedisOperationExecutor handle other exceptions
             }
         ).ConfigureAwait(false);

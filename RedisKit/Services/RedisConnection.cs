@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using RedisKit.Exceptions;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -76,13 +77,12 @@ namespace RedisKit.Services;
 public class RedisConnection : IRedisConnection, IDisposable
 {
     private readonly IRedisCircuitBreaker _circuitBreaker;
-    private readonly SemaphoreSlim _connectionLock = new(1, 1);
+
+    private readonly AsyncLazy<ConnectionMultiplexer> _connectionLazy;
     private readonly Timer? _healthCheckTimer;
     private readonly ConnectionHealthStatus _healthStatus;
     private readonly ILogger<RedisConnection> _logger;
     private readonly RedisOptions _options;
-
-    private ConnectionMultiplexer? _connection;
     private bool _disposed;
     private TimeSpan? _lastRetryDelay;
 
@@ -132,6 +132,9 @@ public class RedisConnection : IRedisConnection, IDisposable
             IsHealthy = false,
             LastCheckTime = DateTime.UtcNow
         };
+
+        // Initialize connection lazy
+        _connectionLazy = new AsyncLazy<ConnectionMultiplexer>(CreateConnectionAsync, LazyThreadSafetyMode.ExecutionAndPublication);
 
         // Setup health monitoring if enabled
         if (_options.HealthMonitoring.Enabled)
@@ -249,83 +252,69 @@ public class RedisConnection : IRedisConnection, IDisposable
     /// <exception cref="RedisCircuitOpenException">Thrown when circuit breaker is open due to failures.</exception>
     /// <exception cref="InvalidOperationException">Thrown when connection cannot be established after all retries.</exception>
     /// <remarks>
-    ///     This method implements the following behavior:
-    ///     1. Checks circuit breaker state before attempting connection
-    ///     2. Returns existing connection if healthy
-    ///     3. Uses semaphore locking for thread-safe connection creation
-    ///     4. Implements retry logic with configurable backoff
-    ///     5. Records success/failure metrics for circuit breaker
-    ///     6. Sets up event handlers for connection monitoring
-    ///     The method is idempotent and safe to call concurrently.
+    ///     This method uses AsyncLazy to ensure thread-safe, single-instance connection creation.
+    ///     The connection is created only once and reused for all subsequent calls.
+    ///     Circuit breaker protection is applied during connection creation.
     /// </remarks>
     public async Task<ConnectionMultiplexer> GetConnection()
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(RedisConnection));
 
-        // Check circuit breaker
+        // Check circuit breaker before accessing connection
         if (!await _circuitBreaker.CanExecuteAsync())
         {
             var stats = _circuitBreaker.GetStats();
             throw new RedisCircuitOpenException($"Circuit breaker is open. Time until half-open: {stats.TimeUntilHalfOpen}");
         }
 
-        // First check without locking
-        if (_connection != null && _connection.IsConnected)
-        {
-            await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
-            UpdateHealthStatus(true, TimeSpan.Zero);
-            return _connection;
-        }
-
-        // Use semaphore for connection creation
-        await _connectionLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            // Double-check pattern
-            if (_connection != null && _connection.IsConnected)
-            {
-                await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
-                UpdateHealthStatus(true, TimeSpan.Zero);
-                return _connection;
-            }
+            var connection = await _connectionLazy.Value.ConfigureAwait(false);
 
-            _logger.LogConnectionCreating(RedactConnectionString(_options.ConnectionString));
-
-            // Configure connection with advanced timeout settings
-            var config = ConfigurationOptions.Parse(_options.ConnectionString);
-            ApplyTimeoutSettings(config);
-
-            // Retry with advanced backoff strategy
-            var connection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
-
-            if (connection == null || !connection.IsConnected)
+            // Verify connection is still healthy
+            if (!connection.IsConnected)
             {
                 await _circuitBreaker.RecordFailureAsync().ConfigureAwait(false);
-                UpdateHealthStatus(false, TimeSpan.Zero, "Failed to establish connection");
-                throw new InvalidOperationException("Failed to establish Redis connection after all retry attempts");
+                UpdateHealthStatus(false, TimeSpan.Zero, "Connection is no longer connected");
+                throw new InvalidOperationException("Redis connection is no longer connected");
             }
 
-            _connection = connection;
             await _circuitBreaker.RecordSuccessAsync().ConfigureAwait(false);
             UpdateHealthStatus(true, TimeSpan.Zero);
-
-            // Setup connection event handlers
-            SetupConnectionEventHandlers(_connection);
-
-            _logger.LogConnectionSuccess(_options.ConnectionString);
-            return _connection;
+            return connection;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is RedisCircuitOpenException))
         {
             await _circuitBreaker.RecordFailureAsync(ex).ConfigureAwait(false);
             UpdateHealthStatus(false, TimeSpan.Zero, ex.Message);
             throw;
         }
-        finally
-        {
-            _connectionLock.Release();
-        }
+    }
+
+    /// <summary>
+    ///     Creates and initializes a new Redis connection with retry logic.
+    /// </summary>
+    /// <returns>A connected ConnectionMultiplexer instance.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when connection cannot be established after all retries.</exception>
+    private async Task<ConnectionMultiplexer> CreateConnectionAsync()
+    {
+        _logger.LogConnectionCreating(RedactConnectionString(_options.ConnectionString));
+
+        // Configure connection with advanced timeout settings
+        var config = ConfigurationOptions.Parse(_options.ConnectionString);
+        ApplyTimeoutSettings(config);
+
+        // Retry with advanced backoff strategy
+        var connection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
+
+        if (connection == null || !connection.IsConnected) throw new InvalidOperationException("Failed to establish Redis connection after all retry attempts");
+
+        // Setup connection event handlers
+        SetupConnectionEventHandlers(connection);
+
+        _logger.LogConnectionSuccess(RedactConnectionString(_options.ConnectionString));
+        return connection;
     }
 
     private async Task<ConnectionMultiplexer?> ConnectWithRetryAsync(ConfigurationOptions config)
@@ -461,42 +450,45 @@ public class RedisConnection : IRedisConnection, IDisposable
         {
             var stopwatch = Stopwatch.StartNew();
 
-            // Try to ping Redis
-            if (_connection != null && _connection.IsConnected)
+            // Try to ping Redis if connection is available
+            if (_connectionLazy.IsValueCreated)
             {
-                var db = _connection.GetDatabase();
-                using var cts = new CancellationTokenSource(_options.HealthMonitoring.CheckTimeout);
-
-                await db.PingAsync().ConfigureAwait(false);
-                stopwatch.Stop();
-
-                UpdateHealthStatus(true, stopwatch.Elapsed);
-                _logger.LogHealthCheckSuccess(stopwatch.ElapsedMilliseconds);
-            }
-            else
-            {
-                // Connection is not available
-                UpdateHealthStatus(false, TimeSpan.Zero, "Connection not available");
-
-                // Auto-reconnect if enabled and threshold reached
-                if (_options.HealthMonitoring.AutoReconnect &&
-                    _healthStatus.ConsecutiveFailures >= _options.HealthMonitoring.ConsecutiveFailuresThreshold)
+                var connection = await _connectionLazy.Value.ConfigureAwait(false);
+                if (connection.IsConnected)
                 {
-                    _logger.LogHealthCheckFailureWithReconnect(_healthStatus.ConsecutiveFailures);
+                    var db = connection.GetDatabase();
+                    using var cts = new CancellationTokenSource(_options.HealthMonitoring.CheckTimeout);
 
-                    // Use Task.Run with proper error handling to prevent unobserved exceptions
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await GetConnection().ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogAutoReconnectionFailed(ex);
-                        }
-                    });
+                    await db.PingAsync().ConfigureAwait(false);
+                    stopwatch.Stop();
+
+                    UpdateHealthStatus(true, stopwatch.Elapsed);
+                    _logger.LogHealthCheckSuccess(stopwatch.ElapsedMilliseconds);
+                    return;
                 }
+            }
+
+            // Connection is not available or not connected
+            UpdateHealthStatus(false, TimeSpan.Zero, "Connection not available");
+
+            // Auto-reconnect if enabled and threshold reached
+            if (_options.HealthMonitoring.AutoReconnect &&
+                _healthStatus.ConsecutiveFailures >= _options.HealthMonitoring.ConsecutiveFailuresThreshold)
+            {
+                _logger.LogHealthCheckFailureWithReconnect(_healthStatus.ConsecutiveFailures);
+
+                // Use Task.Run with proper error handling to prevent unobserved exceptions
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await GetConnection().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogAutoReconnectionFailed(ex);
+                    }
+                });
             }
         }
         catch (Exception ex)
@@ -555,11 +547,15 @@ public class RedisConnection : IRedisConnection, IDisposable
         if (!_disposed && disposing)
         {
             _healthCheckTimer?.Dispose();
-            _connectionLock?.Dispose();
 
             try
             {
-                _connection?.Dispose();
+                // Dispose the connection if it was created
+                if (_connectionLazy.IsValueCreated)
+                {
+                    var connection = _connectionLazy.Value.Result;
+                    connection?.Dispose();
+                }
             }
             catch (Exception ex)
             {
