@@ -10,6 +10,17 @@ jobs:
   sonarcloud:
     runs-on: ubuntu-latest
     
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
     - uses: actions/checkout@v4
       with:
@@ -19,6 +30,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
+        
+    - name: Install Redis CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y redis-tools
         
     - name: Cache SonarCloud packages
       uses: actions/cache@v4
@@ -68,12 +84,18 @@ jobs:
       run: dotnet build --no-restore --configuration Release
       
     - name: Test with coverage
+      env:
+        REDIS_CONNECTION_STRING: localhost:6379
       run: |
+        # Wait for Redis to be ready
+        timeout 30s bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
+        
+        # Run tests with coverage (including integration tests)
         dotnet test --no-build --configuration Release \
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults \
           --logger trx \
-          --settings coverage.runsettings || true
+          --settings coverage.runsettings
           
     - name: End SonarCloud analysis
       env:
