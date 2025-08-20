@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using RedisKit.Constants;
 using RedisKit.Exceptions;
 using StackExchange.Redis;
 
@@ -33,12 +34,12 @@ internal static class RedisOperationExecutor
         }
         catch (RedisConnectionException ex)
         {
-            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ConnectionError, operationName, key);
             throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
         }
         catch (RedisTimeoutException ex)
         {
-            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.RedisTimeout, operationName, key);
             throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
         }
         catch (RedisServerException ex)
@@ -51,7 +52,7 @@ internal static class RedisOperationExecutor
                     return result;
             }
 
-            logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ServerError, operationName, key);
             throw new RedisKitServerException($"Redis server error during {operationName}", ex);
         }
         catch (Exception ex) when (ex is not RedisKitException)
@@ -64,7 +65,44 @@ internal static class RedisOperationExecutor
                     return result;
             }
 
-            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.UnexpectedError, operationName, key);
+            throw new RedisKitException($"Unexpected error during {operationName}", ex);
+        }
+    }
+
+
+    /// <summary>
+    ///     Executes a Redis operation with standardized exception handling (ValueTask version)
+    /// </summary>
+    public static async ValueTask ExecuteAsync(
+        Func<ValueTask> operation,
+        ILogger? logger,
+        string? key = null,
+        CancellationToken cancellationToken = default,
+        [CallerMemberName] string operationName = "")
+    {
+        try
+        {
+            await operation().ConfigureAwait(false);
+        }
+        catch (RedisConnectionException ex)
+        {
+            logger?.LogError(ex, LogMessageTemplates.ConnectionError, operationName, key);
+            throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
+        }
+        catch (RedisTimeoutException ex)
+        {
+            logger?.LogError(ex, LogMessageTemplates.RedisTimeout, operationName, key);
+            throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
+        }
+        catch (RedisServerException ex)
+        {
+            logger?.LogError(ex, LogMessageTemplates.ServerError, operationName, key);
+            throw new RedisKitServerException($"Redis server error during {operationName}", ex);
+        }
+        catch (Exception ex) when (ex is not RedisKitException)
+        {
+            logger?.LogError(ex, LogMessageTemplates.UnexpectedError, operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }
     }
@@ -86,23 +124,21 @@ internal static class RedisOperationExecutor
         }
         catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
         {
-            logger?.LogDebug("Expected error pattern '{Pattern}' encountered during {Operation}: {Message}",
-                errorPattern, operationName, ex.Message);
             return defaultValue;
         }
         catch (RedisConnectionException ex)
         {
-            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ConnectionError, operationName, key);
             throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
         }
         catch (RedisTimeoutException ex)
         {
-            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.RedisTimeout, operationName, key);
             throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
         }
         catch (Exception ex) when (ex is not RedisKitException)
         {
-            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.UnexpectedError, operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }
     }
@@ -124,62 +160,25 @@ internal static class RedisOperationExecutor
         }
         catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
         {
-            logger?.LogDebug("Error pattern '{Pattern}' encountered, executing fallback for {Operation}",
-                errorPattern, operationName);
             return await fallbackOperation().ConfigureAwait(false);
         }
         catch (RedisConnectionException ex)
         {
-            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ConnectionError, operationName, key);
             throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
         }
         catch (RedisTimeoutException ex)
         {
-            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.RedisTimeout, operationName, key);
             throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
         }
         catch (Exception ex) when (ex is not RedisKitException)
         {
-            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.UnexpectedError, operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }
     }
 
-    /// <summary>
-    ///     Executes a Redis operation with standardized exception handling (ValueTask version)
-    /// </summary>
-    public static async ValueTask ExecuteAsync(
-        Func<ValueTask> operation,
-        ILogger? logger,
-        string? key = null,
-        CancellationToken cancellationToken = default,
-        [CallerMemberName] string operationName = "")
-    {
-        try
-        {
-            await operation().ConfigureAwait(false);
-        }
-        catch (RedisConnectionException ex)
-        {
-            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
-            throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
-        }
-        catch (RedisTimeoutException ex)
-        {
-            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
-            throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
-        }
-        catch (RedisServerException ex)
-        {
-            logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
-            throw new RedisKitServerException($"Redis server error during {operationName}", ex);
-        }
-        catch (Exception ex) when (ex is not RedisKitException)
-        {
-            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
-            throw new RedisKitException($"Unexpected error during {operationName}", ex);
-        }
-    }
 
     /// <summary>
     ///     Executes a Redis operation with standardized exception handling (void return)
@@ -197,22 +196,22 @@ internal static class RedisOperationExecutor
         }
         catch (RedisConnectionException ex)
         {
-            logger?.LogError(ex, "Redis connection error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ConnectionError, operationName, key);
             throw new RedisKitConnectionException($"Failed to connect to Redis during {operationName}", ex);
         }
         catch (RedisTimeoutException ex)
         {
-            logger?.LogError(ex, "Redis timeout during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.RedisTimeout, operationName, key);
             throw new RedisKitTimeoutException($"Redis operation timed out during {operationName}", ex);
         }
         catch (RedisServerException ex)
         {
-            logger?.LogError(ex, "Redis server error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.ServerError, operationName, key);
             throw new RedisKitServerException($"Redis server error during {operationName}", ex);
         }
         catch (Exception ex) when (ex is not RedisKitException)
         {
-            logger?.LogError(ex, "Unexpected error during {Operation} for key: {Key}", operationName, key);
+            logger?.LogError(ex, LogMessageTemplates.UnexpectedError, operationName, key);
             throw new RedisKitException($"Unexpected error during {operationName}", ex);
         }
     }
