@@ -26,11 +26,12 @@ internal static class ValidationUtils
     /// </summary>
     /// <param name="prefix">The key prefix to validate</param>
     /// <param name="paramName">The parameter name for exception messages</param>
-    /// <exception cref="ArgumentException">Thrown when prefix is null or exceeds maximum length</exception>
-    public static void ValidateKeyPrefix(string prefix, string paramName = "prefix")
+    /// <exception cref="ArgumentNullException">Thrown when prefix is null</exception>
+    /// <exception cref="ArgumentException">Thrown when prefix exceeds maximum length</exception>
+    public static void ValidateKeyPrefix(string? prefix, string paramName = "prefix")
     {
         if (prefix is null)
-            throw new ArgumentException("Key prefix cannot be null.", paramName);
+            throw new ArgumentNullException(paramName, "Key prefix cannot be null.");
 
         // Empty string is valid for prefixes (means no prefix)
         if (prefix.Length > RedisConstants.MaxRedisKeyLength)
@@ -101,10 +102,10 @@ internal static class ValidationUtils
     /// </summary>
     /// <param name="messageIds">The array of message IDs to validate</param>
     /// <param name="paramName">The parameter name for exception messages</param>
-    public static void ValidateMessageIds(string[] messageIds, string paramName = "messageIds")
+    public static void ValidateMessageIds(string[]? messageIds, string paramName = "messageIds")
     {
         if (messageIds is null)
-            throw new ArgumentException("Message IDs array cannot be null.", paramName);
+            throw new ArgumentNullException(paramName, "Message IDs array cannot be null.");
 
         if (messageIds.Length == 0)
             throw new ArgumentException("Message IDs array cannot be empty.", paramName);
@@ -119,10 +120,11 @@ internal static class ValidationUtils
     /// </summary>
     /// <param name="count">The count to validate</param>
     /// <param name="paramName">The parameter name for exception messages</param>
-    public static void ValidatePositiveCount(int count, string paramName = "count")
+    /// <param name="message">Optional custom error message</param>
+    public static void ValidatePositiveCount(int count, string paramName = "count", string? message = null)
     {
         if (count <= 0)
-            throw new ArgumentOutOfRangeException(paramName, count, "Count must be greater than zero.");
+            throw new ArgumentOutOfRangeException(paramName, count, message ?? "Count must be greater than zero.");
     }
 
     /// <summary>
@@ -130,10 +132,11 @@ internal static class ValidationUtils
     /// </summary>
     /// <param name="timeMs">The time in milliseconds to validate</param>
     /// <param name="paramName">The parameter name for exception messages</param>
-    public static void ValidateNonNegativeTime(long timeMs, string paramName)
+    /// <param name="message">Optional custom error message</param>
+    public static void ValidateNonNegativeTime(long timeMs, string paramName, string? message = null)
     {
         if (timeMs < 0)
-            throw new ArgumentOutOfRangeException(paramName, timeMs, "Time value cannot be negative.");
+            throw new ArgumentOutOfRangeException(paramName, timeMs, message ?? "Time value cannot be negative.");
     }
 
     /// <summary>
@@ -156,10 +159,10 @@ internal static class ValidationUtils
     /// <typeparam name="T">The message type</typeparam>
     /// <param name="messages">The messages array to validate</param>
     /// <param name="paramName">The parameter name for exception messages</param>
-    public static void ValidateMessageBatch<T>(T[] messages, string paramName = "messages") where T : class
+    public static void ValidateMessageBatch<T>(T[]? messages, string paramName = "messages") where T : class
     {
         if (messages is null)
-            throw new ArgumentException("Messages array cannot be null.", paramName);
+            throw new ArgumentNullException(paramName, "Messages array cannot be null.");
 
         if (messages.Length == 0)
             throw new ArgumentException("Messages array cannot be empty.", paramName);
@@ -179,7 +182,7 @@ internal static class ValidationUtils
     public static void ValidateFunction<TInput, TOutput>(Func<TInput, TOutput>? function, string paramName = "function")
     {
         if (function is null)
-            throw new ArgumentException("Function cannot be null.", paramName);
+            throw new ArgumentNullException(paramName, "Function cannot be null.");
     }
 
     /// <summary>
@@ -192,6 +195,6 @@ internal static class ValidationUtils
     public static void ValidateAsyncFunction<TInput, TOutput>(Func<TInput, Task<TOutput>>? function, string paramName = "function")
     {
         if (function is null)
-            throw new ArgumentException("Function cannot be null.", paramName);
+            throw new ArgumentNullException(paramName, "Function cannot be null.");
     }
 }

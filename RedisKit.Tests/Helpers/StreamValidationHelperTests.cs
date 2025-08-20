@@ -213,7 +213,7 @@ public class StreamValidationHelperTests
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
             StreamValidationHelper.ValidateMessageIds(messageIds));
-        Assert.Contains("Message ID cannot be null, empty, or whitespace", exception.Message);
+        Assert.StartsWith("Message ID at index", exception.Message);
     }
 
     [Theory]
