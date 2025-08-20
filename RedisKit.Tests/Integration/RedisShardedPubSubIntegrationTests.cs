@@ -15,6 +15,7 @@ public class RedisShardedPubSubIntegrationTests : IntegrationTestBase
 
         // Assert
         // Will be true for Redis 7.0+, false otherwise
+        Assert.IsType<bool>(isSupported);
         Console.WriteLine($"Sharded Pub/Sub supported: {isSupported}");
 
         if (!isSupported) throw new SkipException("Redis 7.0+ required for Sharded Pub/Sub tests");
@@ -185,7 +186,7 @@ public class RedisShardedPubSubIntegrationTests : IntegrationTestBase
             channel,
             async (msg, ct) => await Task.CompletedTask);
 
-        await Task.Delay(100);
+        await Task.Delay(500); // Increase delay to ensure subscription is established
 
         // Act
         var countWithOne = await ShardedPubSubService.GetSubscriberCountAsync(channel);

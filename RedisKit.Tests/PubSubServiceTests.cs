@@ -47,7 +47,8 @@ public class PubSubServiceTests
         var service = CreateSut();
 
         // Act & Assert
-        await service.DisposeAsync(); // Should not throw
+        var exception = await Record.ExceptionAsync(async () => await service.DisposeAsync());
+        Assert.Null(exception);
     }
 
     #endregion
@@ -305,7 +306,7 @@ public class PubSubServiceTests
             Arg.Any<CommandFlags>());
     }
 
-    private async Task Handler(TestMessage msg, CancellationToken ct)
+    private static async Task Handler(TestMessage msg, CancellationToken ct)
     {
         _ = true;
         await Task.CompletedTask;
@@ -415,7 +416,7 @@ public class PubSubServiceTests
             .Returns(Task.CompletedTask);
 
         // Act - Subscribe first
-        var token = await sut.SubscribePatternAsync<TestMessage>(pattern, async (msg, ct) => { await Task.CompletedTask; });
+        _ = await sut.SubscribePatternAsync<TestMessage>(pattern, async (msg, ct) => { await Task.CompletedTask; });
 
         // Then unsubscribe
         await sut.UnsubscribePatternAsync(pattern);

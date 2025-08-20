@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using StackExchange.Redis;
@@ -54,17 +55,30 @@ public class RedisDistributedLock : IDistributedLock
 
         var lockId = GenerateLockId();
         var lockKey = GetLockKey(resource);
-        var database = await _connection.GetDatabaseAsync();
 
-        // Try to acquire the lock using SET NX PX
-        var acquired = await database.StringSetAsync(
+        var acquired = await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                var database = await _connection.GetDatabaseAsync();
+                
+                // Try to acquire the lock using SET NX PX
+                var lockResult = await database.StringSetAsync(
+                    lockKey,
+                    lockId,
+                    expiry,
+                    When.NotExists,
+                    CommandFlags.DemandMaster);
+                
+                return (object?)lockResult;
+            },
+            _logger,
             lockKey,
-            lockId,
-            expiry,
-            When.NotExists,
-            CommandFlags.DemandMaster);
+            cancellationToken
+        ).ConfigureAwait(false);
 
-        if (acquired)
+        var lockAcquired = acquired is bool result && result;
+
+        if (lockAcquired)
         {
             _logger?.LogDebug("Acquired lock for resource: {Resource}, LockId: {LockId}", resource, lockId);
 
@@ -133,10 +147,21 @@ public class RedisDistributedLock : IDistributedLock
         if (resource.Length > 512)
             throw new ArgumentException("Resource name exceeds Redis key limit of 512 characters", nameof(resource));
 
-        var database = await _connection.GetDatabaseAsync();
         var lockKey = GetLockKey(resource);
 
-        return await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
+        var exists = await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                var database = await _connection.GetDatabaseAsync();
+                var keyExists = await database.KeyExistsAsync(lockKey, CommandFlags.DemandMaster).ConfigureAwait(false);
+                return (object?)keyExists;
+            },
+            _logger,
+            lockKey,
+            cancellationToken
+        ).ConfigureAwait(false);
+
+        return exists is bool result && result;
     }
 
     public async Task<bool> ExtendLockAsync(
@@ -176,50 +201,55 @@ public class RedisDistributedLock : IDistributedLock
 
         var acquiredLocks = new List<ILockHandle>();
 
-        try
-        {
-            // Try to acquire all locks
-            foreach (var resource in resources)
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
             {
-                var handle = await AcquireLockAsync(resource, expiry, cancellationToken).ConfigureAwait(false);
-                if (handle != null)
+                // Try to acquire all locks
+                foreach (var resource in resources)
                 {
-                    acquiredLocks.Add(handle);
+                    var handle = await AcquireLockAsync(resource, expiry, cancellationToken).ConfigureAwait(false);
+                    if (handle != null)
+                    {
+                        acquiredLocks.Add(handle);
+                    }
+                    else
+                    {
+                        // Failed to acquire one lock, release all acquired locks
+                        _logger?.LogDebug("Failed to acquire multi-lock. Could not lock resource: {Resource}", resource);
+
+                        // Use LINQ with Task.WhenAll for parallel release
+                        await Task.WhenAll(acquiredLocks.Select(acquired =>
+                            acquired.ReleaseAsync(cancellationToken)));
+
+                        return null;
+                    }
                 }
-                else
+
+                _logger?.LogDebug("Successfully acquired multi-lock for {Count} resources", resources.Length);
+                return new MultiLockHandle(acquiredLocks);
+            },
+            _logger,
+            string.Join(",", resources),
+            cancellationToken,
+            handleSpecificExceptions: ex =>
+            {
+                // Clean up any acquired locks using LINQ
+                var releaseTasks = acquiredLocks.Select(async acquired =>
                 {
-                    // Failed to acquire one lock, release all acquired locks
-                    _logger?.LogDebug("Failed to acquire multi-lock. Could not lock resource: {Resource}", resource);
+                    try
+                    {
+                        await acquired.ReleaseAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        // Best effort cleanup
+                    }
+                });
 
-                    // Use LINQ with Task.WhenAll for parallel release
-                    await Task.WhenAll(acquiredLocks.Select(acquired =>
-                        acquired.ReleaseAsync(cancellationToken)));
-
-                    return null;
-                }
+                Task.WhenAll(releaseTasks).GetAwaiter().GetResult();
+                return null; // Re-throw the exception
             }
-
-            _logger?.LogDebug("Successfully acquired multi-lock for {Count} resources", resources.Length);
-            return new MultiLockHandle(acquiredLocks);
-        }
-        catch (Exception)
-        {
-            // Clean up any acquired locks using LINQ
-            var releaseTasks = acquiredLocks.Select(async acquired =>
-            {
-                try
-                {
-                    await acquired.ReleaseAsync(cancellationToken).ConfigureAwait(false);
-                }
-                catch
-                {
-                    // Best effort cleanup
-                }
-            });
-
-            await Task.WhenAll(releaseTasks);
-            throw;
-        }
+        ).ConfigureAwait(false);
     }
 
     /// <summary>

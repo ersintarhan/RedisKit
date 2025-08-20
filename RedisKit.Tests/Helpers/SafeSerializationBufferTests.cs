@@ -102,9 +102,14 @@ public class SafeSerializationBufferTests
         var buffer = new SafeSerializationBuffer();
 
         // Act & Assert - Should not throw
-        buffer.Dispose();
-        buffer.Dispose();
-        buffer.Dispose();
+        var exception = Record.Exception(() =>
+        {
+            buffer.Dispose();
+            buffer.Dispose();
+            buffer.Dispose();
+        });
+        
+        Assert.Null(exception);
     }
 
     [Fact]

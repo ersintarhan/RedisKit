@@ -17,7 +17,7 @@ internal static class PatternMatcher
     {
         if (string.IsNullOrEmpty(pattern))
             return string.IsNullOrEmpty(input);
-            
+
         if (string.IsNullOrEmpty(input))
             return pattern == "*"; // Only * pattern matches empty input
 

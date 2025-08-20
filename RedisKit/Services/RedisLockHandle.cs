@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using StackExchange.Redis;
 
@@ -63,35 +64,40 @@ internal sealed class RedisLockHandle : ILockHandle
         if (_disposed || !_isAcquired)
             return false;
 
-        try
-        {
-            var script = @"
-                    if redis.call('get', KEYS[1]) == ARGV[1] then
-                        return redis.call('pexpire', KEYS[1], ARGV[2])
-                    else
-                        return 0
-                    end";
-
-            var result = await _database.ScriptEvaluateAsync(
-                script,
-                new RedisKey[] { GetLockKey(Resource) },
-                new RedisValue[] { LockId, (long)expiry.TotalMilliseconds },
-                CommandFlags.DemandMaster);
-
-            if ((int)result == 1)
+        var extendResult = await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+            async () =>
             {
-                ExpiresAt = DateTime.UtcNow.Add(expiry);
-                return true;
-            }
+                var script = @"
+                        if redis.call('get', KEYS[1]) == ARGV[1] then
+                            return redis.call('pexpire', KEYS[1], ARGV[2])
+                        else
+                            return 0
+                        end";
 
-            _isAcquired = false;
-            return false;
-        }
-        catch (Exception ex)
+                var result = await _database.ScriptEvaluateAsync(
+                    script,
+                    new RedisKey[] { GetLockKey(Resource) },
+                    new RedisValue[] { LockId, (long)expiry.TotalMilliseconds },
+                    CommandFlags.DemandMaster);
+
+                return (object?)(int)result;
+            },
+            _logger,
+            "extend lock",
+            defaultValue: (object?)0,
+            GetLockKey(Resource)
+        ).ConfigureAwait(false);
+
+        var resultInt = extendResult is int result ? result : 0;
+
+        if (resultInt == 1)
         {
-            _logger?.LogError(ex, "Failed to extend lock for resource: {Resource}", Resource);
-            return false;
+            ExpiresAt = DateTime.UtcNow.Add(expiry);
+            return true;
         }
+
+        _isAcquired = false;
+        return false;
     }
 
     public async Task ReleaseAsync(CancellationToken cancellationToken = default)
@@ -163,23 +169,15 @@ internal sealed class RedisLockHandle : ILockHandle
         if (_disposed || !_isAcquired)
             return;
 
-        try
+        var success = await ExtendAsync(_defaultExpiry).ConfigureAwait(false);
+        if (!success)
         {
-            var success = await ExtendAsync(_defaultExpiry).ConfigureAwait(false);
-            if (!success)
-            {
-                _logger?.LogWarning("Failed to auto-renew lock for resource: {Resource}", Resource);
-                _isAcquired = false;
-            }
-            else
-            {
-                _logger?.LogDebug("Auto-renewed lock for resource: {Resource}", Resource);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "Error during lock auto-renewal for resource: {Resource}", Resource);
+            _logger?.LogWarning("Failed to auto-renew lock for resource: {Resource}", Resource);
             _isAcquired = false;
+        }
+        else
+        {
+            _logger?.LogDebug("Auto-renewed lock for resource: {Resource}", Resource);
         }
     }
 

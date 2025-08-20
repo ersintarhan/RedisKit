@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Serialization;
@@ -63,28 +64,39 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
         ArgumentException.ThrowIfNullOrEmpty(channel);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (!await EnsureSupportedAsync(cancellationToken)) throw new NotSupportedException("Sharded Pub/Sub is not supported. Requires Redis 7.0+");
+        if (!await EnsureSupportedAsync(cancellationToken)) 
+            throw new NotSupportedException("Sharded Pub/Sub is not supported. Requires Redis 7.0+");
 
-        try
+        _logger.LogDebug("Publishing to sharded channel: {Channel}", channel);
+
+        var boxedResult = await RedisOperationExecutor.ExecuteAsync<object>(
+            async () =>
+            {
+                var subscriber = await _connection.GetSubscriberAsync();
+                var serialized = await _serializer.SerializeAsync(message, cancellationToken);
+
+                // Use native sharded pub/sub support
+                var subscribers = await subscriber.PublishAsync(RedisChannel.Sharded(channel), serialized).ConfigureAwait(false);
+
+                _logger.LogInformation("Published to sharded channel {Channel}, reached {Subscribers} subscribers",
+                    channel, subscribers);
+
+                return subscribers;
+            },
+            _logger,
+            channel,
+            cancellationToken
+        );
+
+        var result = boxedResult switch
         {
-            _logger.LogDebug("Publishing to sharded channel: {Channel}", channel);
+            long count => count,
+            int intCount => (long)intCount,
+            null => 0L,
+            _ => Convert.ToInt64(boxedResult)
+        };
 
-            var subscriber = await _connection.GetSubscriberAsync();
-            var serialized = await _serializer.SerializeAsync(message, cancellationToken);
-
-            // Use native sharded pub/sub support
-            var subscribers = await subscriber.PublishAsync(RedisChannel.Sharded(channel), serialized).ConfigureAwait(false);
-
-            _logger.LogInformation("Published to sharded channel {Channel}, reached {Subscribers} subscribers",
-                channel, subscribers);
-
-            return subscribers;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error publishing to sharded channel {Channel}", channel);
-            throw;
-        }
+        return result;
     }
 
     public async Task<SubscriptionToken> SubscribeAsync<T>(
@@ -237,32 +249,51 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
 
         if (!await EnsureSupportedAsync(cancellationToken)) return 0;
 
-        try
-        {
-            _logger.LogDebug("Getting subscriber count for sharded channel: {Channel}", channel);
+        _logger.LogDebug("Getting subscriber count for sharded channel: {Channel}", channel);
 
-            var database = await _connection.GetDatabaseAsync();
-
-            // Note: PUBSUB SHARDNUMSUB requires raw command execution
-            // StackExchange.Redis doesn't have native support for this command yet
-            var result = await database.ExecuteAsync(
-                "PUBSUB",
-                "SHARDNUMSUB", channel
-            ).ConfigureAwait(false);
-
-            if (result.Resp3Type == ResultType.Array)
+        var boxedResult = await RedisOperationExecutor.ExecuteAsync<object>(
+            async () =>
             {
-                var items = (RedisResult[])result!;
-                if (items.Length >= 2) return (long)items[1];
-            }
+                var database = await _connection.GetDatabaseAsync();
 
-            return 0;
-        }
-        catch (Exception ex)
+                // Note: PUBSUB SHARDNUMSUB requires raw command execution
+                // StackExchange.Redis doesn't have native support for this command yet
+                var result = await database.ExecuteAsync(
+                    "PUBSUB",
+                    "SHARDNUMSUB", channel
+                ).ConfigureAwait(false);
+
+                _logger.LogDebug("PUBSUB SHARDNUMSUB result: {Result}, Type: {Type}", result, result.Resp3Type);
+
+                if (result.Resp3Type == ResultType.Array)
+                {
+                    var items = (RedisResult[])result!;
+                    _logger.LogDebug("PUBSUB SHARDNUMSUB array length: {Length}", items.Length);
+                    if (items.Length >= 2) 
+                    {
+                        var count = items[1];
+                        _logger.LogDebug("Subscriber count from Redis: {Count}", count);
+                        return (long)count;
+                    }
+                }
+
+                _logger.LogWarning("PUBSUB SHARDNUMSUB returned unexpected format: {Result}", result);
+                return 0L;
+            },
+            _logger,
+            channel,
+            cancellationToken
+        );
+
+        var result = boxedResult switch
         {
-            _logger.LogError(ex, "Error getting subscriber count for channel {Channel}", channel);
-            return 0;
-        }
+            long count => count,
+            int intCount => (long)intCount,
+            null => 0L,
+            _ => Convert.ToInt64(boxedResult)
+        };
+
+        return result;
     }
 
     public async Task<bool> IsSupportedAsync(CancellationToken cancellationToken = default)

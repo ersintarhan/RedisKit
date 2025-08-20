@@ -82,7 +82,7 @@ public class PatternMatcherTests
     {
         // Act & Assert - Should not throw exceptions
         var exception = Record.Exception(() => PatternMatcher.IsMatch("test", pattern));
-        
+
         // Should not throw an exception
         exception.Should().BeNull();
     }

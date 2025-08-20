@@ -286,8 +286,8 @@ public class RedisStreamService : IRedisStreamService
             },
             _logger,
             RedisErrorPatterns.BusyGroup,
-            defaultValue: (object?)true, // Return true even if group exists
-            key: prefixedStream
+            true, // Return true even if group exists
+            prefixedStream
         ).ConfigureAwait(false);
     }
 
@@ -979,6 +979,70 @@ public class RedisStreamService : IRedisStreamService
         }
     }
 
+    /// <summary>
+    ///     Streaming consumer group reader with automatic acknowledgment
+    /// </summary>
+    public async IAsyncEnumerable<(string Id, T? Data, Func<Task> AckFunc)> ReadGroupStreamingAsync<T>(
+        string stream,
+        string groupName,
+        string consumerName,
+        int batchSize = 10,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : class
+    {
+        if (string.IsNullOrEmpty(stream))
+            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
+        if (string.IsNullOrEmpty(groupName))
+            throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
+        if (string.IsNullOrEmpty(consumerName))
+            throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
+
+        var prefixedStream = $"{_keyPrefix}{stream}";
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var database = await GetDatabaseAsync();
+            var entries = await database.StreamReadGroupAsync(
+                prefixedStream,
+                groupName,
+                consumerName,
+                ">",
+                batchSize).ConfigureAwait(false);
+
+            if (entries.Length == 0)
+            {
+                // No new messages, wait a bit before checking again
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                continue;
+            }
+
+            foreach (var entry in entries)
+            {
+                var value = StreamSerializationHelper.GetDataFieldValue(entry);
+                T? data = null;
+
+                if (!value.IsNullOrEmpty)
+                    try
+                    {
+                        data = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}",
+                            prefixedStream, entry.Id);
+                    }
+
+                // Create acknowledgment function closure
+                var messageId = entry.Id.ToString();
+                if (!string.IsNullOrEmpty(messageId))
+                {
+                    var ackFunc = async () => { await AcknowledgeAsync(stream, groupName, messageId, cancellationToken); };
+
+                    yield return (messageId, data, ackFunc);
+                }
+            }
+        }
+    }
+
     public void SetKeyPrefix(string prefix)
     {
         _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
@@ -1248,70 +1312,6 @@ public class RedisStreamService : IRedisStreamService
             // If we got less than batch size, we've reached the end
             if (entries.Length < batchSize)
                 yield break;
-        }
-    }
-
-    /// <summary>
-    ///     Streaming consumer group reader with automatic acknowledgment
-    /// </summary>
-    public async IAsyncEnumerable<(string Id, T? Data, Func<Task> AckFunc)> ReadGroupStreamingAsync<T>(
-        string stream,
-        string groupName,
-        string consumerName,
-        int batchSize = 10,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : class
-    {
-        if (string.IsNullOrEmpty(stream))
-            throw new ArgumentException("Stream cannot be null or empty", nameof(stream));
-        if (string.IsNullOrEmpty(groupName))
-            throw new ArgumentException("Group name cannot be null or empty", nameof(groupName));
-        if (string.IsNullOrEmpty(consumerName))
-            throw new ArgumentException("Consumer name cannot be null or empty", nameof(consumerName));
-
-        var prefixedStream = $"{_keyPrefix}{stream}";
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            var database = await GetDatabaseAsync();
-            var entries = await database.StreamReadGroupAsync(
-                prefixedStream,
-                groupName,
-                consumerName,
-                ">",
-                batchSize).ConfigureAwait(false);
-
-            if (entries.Length == 0)
-            {
-                // No new messages, wait a bit before checking again
-                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-                continue;
-            }
-
-            foreach (var entry in entries)
-            {
-                var value = StreamSerializationHelper.GetDataFieldValue(entry);
-                T? data = null;
-
-                if (!value.IsNullOrEmpty)
-                    try
-                    {
-                        data = await _serializer.DeserializeAsync<T>(value!, cancellationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error deserializing message from stream {Stream} with ID {Id}",
-                            prefixedStream, entry.Id);
-                    }
-
-                // Create acknowledgment function closure
-                var messageId = entry.Id.ToString();
-                if (!string.IsNullOrEmpty(messageId))
-                {
-                    var ackFunc = async () => { await AcknowledgeAsync(stream, groupName, messageId, cancellationToken); };
-
-                    yield return (messageId, data, ackFunc);
-                }
-            }
         }
     }
 

@@ -268,6 +268,7 @@ public class StreamSerializationHelperTests
             new TestData { Id = "3", Name = "Test3", Value = 3 }
         };
 
+        // ReSharper disable once MethodHasAsyncOverload
         _serializer.Serialize(Arg.Any<TestData>()).Returns(x => new[] { (byte)((TestData)x[0]).Value });
 
         // Act

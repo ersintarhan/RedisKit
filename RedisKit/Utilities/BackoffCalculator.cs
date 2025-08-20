@@ -71,13 +71,10 @@ internal static class BackoffCalculator
     private static TimeSpan CalculateExponential(int attempt, RetryConfiguration config)
     {
         var delayMs = config.InitialDelay.TotalMilliseconds * Math.Pow(config.BackoffMultiplier, attempt);
-        
+
         // Prevent overflow by capping to reasonable maximum
-        if (double.IsInfinity(delayMs) || double.IsNaN(delayMs) || delayMs > TimeSpan.MaxValue.TotalMilliseconds)
-        {
-            return config.MaxDelay;
-        }
-        
+        if (double.IsInfinity(delayMs) || double.IsNaN(delayMs) || delayMs > TimeSpan.MaxValue.TotalMilliseconds) return config.MaxDelay;
+
         return TimeSpan.FromMilliseconds(delayMs);
     }
 

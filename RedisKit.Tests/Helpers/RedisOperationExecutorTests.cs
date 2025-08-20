@@ -114,7 +114,7 @@ public class RedisOperationExecutorTests
             _logger,
             "test-key",
             CancellationToken.None,
-            handleSpecificExceptions: ex =>
+            ex =>
             {
                 if (ex is RedisServerException rse && rse.Message.Contains("Custom"))
                     return customResult;
@@ -413,7 +413,7 @@ public class RedisOperationExecutorTests
                 () => throw new RedisServerException("Different error"),
                 _logger,
                 "NOSCRIPT",
-                defaultValue: null,
+                null,
                 "test-key"
             )
         );
@@ -511,7 +511,7 @@ public class RedisOperationExecutorTests
                 () => throw new RedisConnectionException(ConnectionFailureType.SocketFailure, "Connection failed"),
                 _logger,
                 "NOSCRIPT",
-                defaultValue: null,
+                null,
                 "test-key"
             )
         );

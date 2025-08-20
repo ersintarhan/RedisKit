@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using RedisKit.Helpers;
 using RedisKit.Interfaces;
 using RedisKit.Logging;
 using RedisKit.Models;
@@ -183,22 +184,25 @@ public class RedisPubSubService : IRedisPubSubService, IDisposable, IAsyncDispos
 
         ThrowIfDisposed();
 
-        try
-        {
-            _logger.LogPublishAsync(channel);
-            var subscriber = await GetSubscriberAsync();
+        _logger.LogPublishAsync(channel);
+        
+        var boxedResult = await RedisOperationExecutor.ExecuteAsync<object>(
+            async () =>
+            {
+                var subscriber = await GetSubscriberAsync();
+                var serialized = await _serializer.SerializeAsync(message, cancellationToken).ConfigureAwait(false);
+                var subscriberCount = await subscriber.PublishAsync(RedisChannel.Literal(channel), serialized);
+                _logger.LogPublishAsyncSuccess(channel);
+                return subscriberCount;
+            },
+            _logger,
+            channel,
+            cancellationToken
+        );
 
-            var serialized = await _serializer.SerializeAsync(message, cancellationToken).ConfigureAwait(false);
-            var subscriberCount = await subscriber.PublishAsync(RedisChannel.Literal(channel), serialized);
+        var result = boxedResult is long count ? count : 0;
 
-            _logger.LogPublishAsyncSuccess(channel);
-            return subscriberCount;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogPublishAsyncError(channel, ex);
-            throw;
-        }
+        return result;
     }
 
     #endregion

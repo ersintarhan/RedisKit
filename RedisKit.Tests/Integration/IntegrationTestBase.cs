@@ -89,19 +89,13 @@ public abstract class IntegrationTestBase : IAsyncLifetime
             var server = ConnectionMultiplexer.GetServer(ConnectionMultiplexer.GetEndPoints()[0]);
             var info = await server.InfoAsync("server");
             if (info != null)
-            {
                 foreach (var group in info)
-                {
-                    foreach (var item in group)
+                foreach (var item in group)
+                    if (item.Key == "redis_version")
                     {
-                        if (item.Key == "redis_version")
-                        {
-                            Console.WriteLine($"Redis version: {item.Value}");
-                            break;
-                        }
+                        Console.WriteLine($"Redis version: {item.Value}");
+                        break;
                     }
-                }
-            }
         }
         catch
         {

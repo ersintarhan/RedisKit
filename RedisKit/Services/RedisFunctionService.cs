@@ -92,6 +92,7 @@ public class RedisFunctionService : IRedisFunction
                     _logger.LogError(ex, "Error loading function library: {Message}", ex.Message);
                     throw new InvalidOperationException($"Failed to load function library: {ex.Message}", ex);
                 }
+
                 return null;
             }
         ).ConfigureAwait(false) is true;
@@ -125,7 +126,7 @@ public class RedisFunctionService : IRedisFunction
             },
             _logger,
             RedisErrorPatterns.NoSuchLibrary,
-            defaultValue: (object?)false
+            false
         ).ConfigureAwait(false) is true;
     }
 

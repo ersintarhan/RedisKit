@@ -100,7 +100,7 @@ internal static class RedisOperationExecutor
         }
         catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
         {
-            logger?.LogDebug("Expected error pattern '{Pattern}' encountered during {Operation}: {Message}", 
+            logger?.LogDebug("Expected error pattern '{Pattern}' encountered during {Operation}: {Message}",
                 errorPattern, operationName, ex.Message);
             return defaultValue;
         }
@@ -138,7 +138,7 @@ internal static class RedisOperationExecutor
         }
         catch (RedisServerException ex) when (ex.Message.Contains(errorPattern, StringComparison.OrdinalIgnoreCase))
         {
-            logger?.LogDebug("Error pattern '{Pattern}' encountered, executing fallback for {Operation}", 
+            logger?.LogDebug("Error pattern '{Pattern}' encountered, executing fallback for {Operation}",
                 errorPattern, operationName);
             return await fallbackOperation().ConfigureAwait(false);
         }

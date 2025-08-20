@@ -62,19 +62,22 @@ public class RedisCacheService : IRedisCacheService
         // Initialize Lua script support detection lazily
         _luaScriptSupport = new AsyncLazy<bool>(async () =>
         {
-            try
-            {
-                var database = await GetDatabaseAsync().ConfigureAwait(false);
-                var result = await database.ScriptEvaluateAsync("return 'PONG'").ConfigureAwait(false);
-                var supported = result?.ToString() == "PONG";
-                _logger.LogDebug("Lua script support detected: {Supported}", supported);
-                return supported;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Lua script support check failed, using fallback mode");
-                return false;
-            }
+            var supportedResult = await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+                async () =>
+                {
+                    var database = await GetDatabaseAsync().ConfigureAwait(false);
+                    var scriptResult = await database.ScriptEvaluateAsync("return 'PONG'").ConfigureAwait(false);
+                    var supported = scriptResult?.ToString() == "PONG";
+                    _logger.LogDebug("Lua script support detected: {Supported}", supported);
+                    return (object?)supported;
+                },
+                _logger,
+                "script evaluation",
+                defaultValue: (object?)false,
+                operationName: "LuaSupportCheck"
+            ).ConfigureAwait(false);
+
+            return supportedResult is bool result && result;
         }, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
@@ -205,7 +208,7 @@ public class RedisCacheService : IRedisCacheService
             _logger,
             string.Join(", ", originalKeys),
             cancellationToken
-        ).ConfigureAwait(false) as Dictionary<string, T?> ?? new Dictionary<string, T?>();
+        ).ConfigureAwait(false) ?? new Dictionary<string, T?>();
     }
 
     public async Task SetManyAsync<T>(IDictionary<string, T> values, TimeSpan? ttl = null, CancellationToken cancellationToken = default) where T : class
@@ -214,44 +217,19 @@ public class RedisCacheService : IRedisCacheService
 
         var expiry = ttl ?? _options.DefaultTtl;
 
-        try
-        {
-            // Validate input to prevent potential DoS attacks
-            if (values.Count > RedisConstants.DefaultBatchSizeThreshold) // Limit batch size to prevent memory issues
-                _logger.LogSetManyBatchSizeWarning(values.Count, RedisConstants.DefaultBatchSizeThreshold);
+        // Validate input to prevent potential DoS attacks
+        if (values.Count > RedisConstants.DefaultBatchSizeThreshold) // Limit batch size to prevent memory issues
+            _logger.LogSetManyBatchSizeWarning(values.Count, RedisConstants.DefaultBatchSizeThreshold);
 
-            _logger.LogSetManyAsync(values.Count);
-            var stopwatch = Stopwatch.StartNew();
+        _logger.LogSetManyAsync(values.Count);
+        var stopwatch = Stopwatch.StartNew();
 
-            // Lua support will be checked lazily when needed
+        await ProcessBatchesAsync(values, expiry, cancellationToken);
 
-            await ProcessBatchesAsync(values, expiry, cancellationToken);
+        stopwatch.Stop();
+        _logger.LogSetManyAsyncSuccess(values.Count);
 
-            stopwatch.Stop();
-            _logger.LogSetManyAsyncSuccess(values.Count);
-
-            LogPerformanceIfSlow(stopwatch, values.Count);
-        }
-        catch (RedisConnectionException ex)
-        {
-            _logger.LogSetManyAsyncError(ex);
-            throw;
-        }
-        catch (RedisTimeoutException ex)
-        {
-            _logger.LogSetManyAsyncError(ex);
-            throw;
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogSetManyAsyncError(ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogSetManyAsyncError(ex);
-            throw;
-        }
+        LogPerformanceIfSlow(stopwatch, values.Count);
     }
 
     public async ValueTask<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
@@ -439,36 +417,43 @@ public class RedisCacheService : IRedisCacheService
 
     private async Task SetManyWithFallback((RedisKey Key, RedisValue Value)[] pairs, TimeSpan? expiry)
     {
-        // Get the synchronous IDatabase interface to create a batch
-        var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
+        await RedisOperationExecutor.ExecuteVoidAsync(
+            async () =>
+            {
+                // Get the synchronous IDatabase interface to create a batch
+                var database = (await _connection.GetMultiplexerAsync()).GetDatabase();
 
-        if (expiry == TimeSpan.Zero || expiry == null)
-        {
-            // No TTL: use MSET for single round-trip
-            var kvpArray = pairs
-                .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
-                .ToArray();
-            await database.StringSetAsync(kvpArray).ConfigureAwait(false);
-        }
-        else
-        {
-            // With TTL: use a batch to pipeline MSET and EXPIRE commands
-            var batch = database.CreateBatch();
+                if (expiry == TimeSpan.Zero || expiry == null)
+                {
+                    // No TTL: use MSET for single round-trip
+                    var kvpArray = pairs
+                        .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
+                        .ToArray();
+                    await database.StringSetAsync(kvpArray).ConfigureAwait(false);
+                }
+                else
+                {
+                    // With TTL: use a batch to pipeline MSET and EXPIRE commands
+                    var batch = database.CreateBatch();
 
-            var kvpArray = pairs
-                .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
-                .ToArray();
+                    var kvpArray = pairs
+                        .Select(p => new KeyValuePair<RedisKey, RedisValue>(p.Key, p.Value))
+                        .ToArray();
 
-            // First: MSET
-            var msetTask = batch.StringSetAsync(kvpArray);
+                    // First: MSET
+                    var msetTask = batch.StringSetAsync(kvpArray);
 
-            // Then: parallel EXPIRE to minimize round-trips
-            using var pooledTasks = _taskListPool!.GetPooled();
-            var expireTasks = pooledTasks.Value;
-            expireTasks.AddRange(pairs.Select(pair => batch.KeyExpireAsync(pair.Key, expiry.Value)));
-            batch.Execute();
-            await Task.WhenAll(expireTasks.Append(msetTask));
-        }
+                    // Then: parallel EXPIRE to minimize round-trips
+                    using var pooledTasks = _taskListPool!.GetPooled();
+                    var expireTasks = pooledTasks.Value;
+                    expireTasks.AddRange(pairs.Select(pair => batch.KeyExpireAsync(pair.Key, expiry.Value)));
+                    batch.Execute();
+                    await Task.WhenAll(expireTasks.Append(msetTask));
+                }
+            },
+            _logger,
+            $"batch_set_{pairs.Length}_keys"
+        ).ConfigureAwait(false);
     }
 
     private Task<IDatabaseAsync> GetDatabaseAsync()
