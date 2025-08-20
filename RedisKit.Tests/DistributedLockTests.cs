@@ -316,7 +316,7 @@ public class DistributedLockTests
 
         var callCount = 0;
         _dbAsync.KeyExistsAsync(Arg.Any<RedisKey>(), CommandFlags.DemandMaster)
-            .Returns(_ => Task.FromResult(++callCount == 1)); // First call returns true (locked), second returns false (unlocked)
+            .Returns(_ => Task.FromResult(++callCount <= 2)); // First 2 calls return true (locked), then false (unlocked)
 
         // Act & Assert - Should not throw
         await sut.WaitForUnlockAsync(resource, timeout);
