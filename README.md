@@ -1,5 +1,13 @@
 # RedisKit
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ersintarhan_RedisKit&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ersintarhan_RedisKit)
+
 A production-ready, enterprise-grade Redis library for .NET 9 with advanced caching, pub/sub, and streaming features.
 
 ## 🚀 Features

@@ -100,8 +100,13 @@ jobs:
           --logger trx \
           --settings coverage.runsettings
           
-        # Debug: List coverage files
-        find "${{ github.workspace }}/TestResults" -name "*.xml" -type f || echo "No coverage files found"
+        # Debug: List coverage files and show content
+        echo "=== Searching for coverage files ==="
+        find "${{ github.workspace }}/TestResults" -name "*.xml" -type f
+        echo "=== Coverage file contents ==="
+        find "${{ github.workspace }}/TestResults" -name "coverage.cobertura.xml" -exec head -20 {} \;
+        echo "=== Directory structure ==="
+        ls -la "${{ github.workspace }}/TestResults" || echo "TestResults not found"
           
     - name: End SonarCloud analysis
       env:
