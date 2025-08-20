@@ -208,39 +208,40 @@ public class RedisShardedPubSubService : IRedisShardedPubSub, IDisposable
     {
         if (!await EnsureSupportedAsync(cancellationToken)) return new ShardedPubSubStats();
 
-        try
-        {
-            _logger.LogDebug("Getting sharded pub/sub statistics");
+        _logger.LogDebug("Getting sharded pub/sub statistics");
 
-            var database = await _connection.GetDatabaseAsync();
-
-            // Note: PUBSUB SHARDCHANNELS requires raw command execution
-            // StackExchange.Redis doesn't have native support for this command yet
-            var channelsResult = await database.ExecuteAsync("PUBSUB", "SHARDCHANNELS")
-                .ConfigureAwait(false);
-
-            var stats = new ShardedPubSubStats
+        return await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+            async () =>
             {
-                TotalChannels = _handlers.Count(h => !h.Key.StartsWith("pattern:")),
-                TotalPatterns = _handlers.Count(h => h.Key.StartsWith("pattern:")),
-                TotalSubscribers = _subscriptions.Count,
-                CollectedAt = DateTime.UtcNow
-            };
+                var database = await _connection.GetDatabaseAsync();
 
-            // Parse channels from result
-            if (channelsResult.Resp3Type == ResultType.Array)
-            {
-                var channels = (RedisResult[])channelsResult!;
-                stats.TotalChannels = channels.Length;
-            }
+                // Note: PUBSUB SHARDCHANNELS requires raw command execution
+                // StackExchange.Redis doesn't have native support for this command yet
+                var channelsResult = await database.ExecuteAsync("PUBSUB", "SHARDCHANNELS")
+                    .ConfigureAwait(false);
 
-            return stats;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting sharded pub/sub statistics");
-            return new ShardedPubSubStats();
-        }
+                var stats = new ShardedPubSubStats
+                {
+                    TotalChannels = _handlers.Count(h => !h.Key.StartsWith("pattern:")),
+                    TotalPatterns = _handlers.Count(h => h.Key.StartsWith("pattern:")),
+                    TotalSubscribers = _subscriptions.Count,
+                    CollectedAt = DateTime.UtcNow
+                };
+
+                // Parse channels from result
+                if (channelsResult.Resp3Type == ResultType.Array)
+                {
+                    var channels = (RedisResult[])channelsResult!;
+                    stats.TotalChannels = channels.Length;
+                }
+
+                return stats;
+            },
+            _logger,
+            RedisErrorPatterns.UnknownCommand,
+            defaultValue: new ShardedPubSubStats(),
+            operationName: "GetShardedPubSubStats"
+        ).ConfigureAwait(false) ?? new ShardedPubSubStats();
     }
 
     public async Task<long> GetSubscriberCountAsync(string channel, CancellationToken cancellationToken = default)

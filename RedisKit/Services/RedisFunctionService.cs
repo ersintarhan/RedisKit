@@ -36,23 +36,21 @@ public class RedisFunctionService : IRedisFunction
         // Initialize Redis Functions support detection lazily
         _functionSupport = new AsyncLazy<bool>(async () =>
         {
-            try
-            {
-                var database = await _connection.GetDatabaseAsync();
-                await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
-                _logger.LogInformation("Redis Functions are supported");
-                return true;
-            }
-            catch (RedisServerException ex) when (ex.Message.Contains("unknown command") || ex.Message.Contains("ERR unknown command"))
-            {
-                _logger.LogWarning("Redis Functions are not supported. Requires Redis 7.0+");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex, "Error checking Redis Functions support. Assuming not supported.");
-                return false;
-            }
+            var supportResult = await RedisOperationExecutor.ExecuteWithSilentErrorHandlingAsync(
+                async () =>
+                {
+                    var database = await _connection.GetDatabaseAsync();
+                    await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
+                    _logger.LogInformation("Redis Functions are supported");
+                    return (object?)true;
+                },
+                _logger,
+                RedisErrorPatterns.UnknownCommand,
+                defaultValue: (object?)false,
+                operationName: "FunctionSupportCheck"
+            ).ConfigureAwait(false);
+
+            return supportResult is bool result && result;
         }, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
@@ -137,31 +135,31 @@ public class RedisFunctionService : IRedisFunction
     {
         if (!await EnsureSupportedAsync()) return [];
 
-        try
-        {
-            _logger.LogDebug("Listing function libraries, pattern: {Pattern}, withCode: {WithCode}",
-                libraryNamePattern, withCode);
+        _logger.LogDebug("Listing function libraries, pattern: {Pattern}, withCode: {WithCode}",
+            libraryNamePattern, withCode);
 
-            var database = await _connection.GetDatabaseAsync();
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                var database = await _connection.GetDatabaseAsync();
 
-            // Execute FUNCTION LIST command
-            RedisResult result;
-            if (!string.IsNullOrEmpty(libraryNamePattern) && withCode)
-                result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
-            else if (!string.IsNullOrEmpty(libraryNamePattern))
-                result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
-            else if (withCode)
-                result = await database.ExecuteAsync(FunctionCommand, "LIST", "WITHCODE").ConfigureAwait(false);
-            else
-                result = await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
+                // Execute FUNCTION LIST command
+                RedisResult result;
+                if (!string.IsNullOrEmpty(libraryNamePattern) && withCode)
+                    result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern, "WITHCODE").ConfigureAwait(false);
+                else if (!string.IsNullOrEmpty(libraryNamePattern))
+                    result = await database.ExecuteAsync(FunctionCommand, "LIST", "LIBRARYNAME", libraryNamePattern).ConfigureAwait(false);
+                else if (withCode)
+                    result = await database.ExecuteAsync(FunctionCommand, "LIST", "WITHCODE").ConfigureAwait(false);
+                else
+                    result = await database.ExecuteAsync(FunctionCommand, "LIST").ConfigureAwait(false);
 
-            return ParseFunctionList(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error listing function libraries");
-            throw;
-        }
+                return ParseFunctionList(result);
+            },
+            _logger,
+            libraryNamePattern,
+            cancellationToken
+        ).ConfigureAwait(false) ?? [];
     }
 
     public async Task<T?> CallAsync<T>(
@@ -210,22 +208,21 @@ public class RedisFunctionService : IRedisFunction
     {
         if (!await EnsureSupportedAsync()) return new FunctionStats();
 
-        try
-        {
-            _logger.LogDebug("Getting function statistics");
+        _logger.LogDebug("Getting function statistics");
 
-            var database = await _connection.GetDatabaseAsync();
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                var database = await _connection.GetDatabaseAsync();
 
-            // Execute FUNCTION STATS command
-            var result = await database.ExecuteAsync(FunctionCommand, "STATS").ConfigureAwait(false);
+                // Execute FUNCTION STATS command
+                var result = await database.ExecuteAsync(FunctionCommand, "STATS").ConfigureAwait(false);
 
-            return ParseFunctionStats(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting function statistics");
-            throw;
-        }
+                return ParseFunctionStats(result);
+            },
+            _logger,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false) ?? new FunctionStats();
     }
 
     public async Task<bool> IsSupportedAsync(CancellationToken cancellationToken = default)
@@ -250,20 +247,29 @@ public class RedisFunctionService : IRedisFunction
         if (!await EnsureSupportedAsync())
             throw new NotSupportedException(NotSupportedMessage);
 
-        try
-        {
-            var database = await _connection.GetDatabaseAsync();
-            var commandArgs = BuildCommandArguments(functionName, keys);
-            await PrepareArgumentsAsync(commandArgs, args, cancellationToken);
+        return await RedisOperationExecutor.ExecuteAsync(
+            async () =>
+            {
+                var database = await _connection.GetDatabaseAsync();
+                var commandArgs = BuildCommandArguments(functionName, keys);
+                await PrepareArgumentsAsync(commandArgs, args, cancellationToken);
 
-            var result = await ExecuteFunctionAsync(database, command, commandArgs);
-            return await ConvertResultAsync<T>(result, cancellationToken);
-        }
-        catch (RedisServerException ex)
-        {
-            _logger.LogError(ex, "Function execution error: {Message}", ex.Message);
-            throw new InvalidOperationException($"Function execution failed: {ex.Message}", ex);
-        }
+                var result = await ExecuteFunctionAsync(database, command, commandArgs);
+                return await ConvertResultAsync<T>(result, cancellationToken);
+            },
+            _logger,
+            functionName,
+            cancellationToken,
+            handleSpecificExceptions: ex =>
+            {
+                if (ex is RedisServerException redisEx)
+                {
+                    _logger.LogError(redisEx, "Function execution error: {Message}", redisEx.Message);
+                    throw new InvalidOperationException($"Function execution failed: {redisEx.Message}", redisEx);
+                }
+                return null; // Let RedisOperationExecutor handle other exceptions
+            }
+        ).ConfigureAwait(false);
     }
 
     private static List<object> BuildCommandArguments(string functionName, string[]? keys)
