@@ -5,19 +5,8 @@ using RedisKit.Models;
 namespace RedisKit.Tests.InMemory;
 
 // Simple message wrapper for testing
-public class ChannelMessage<T> where T : class
-{
-    public string Channel { get; set; } = "";
-    public T Data { get; set; } = default!;
-}
 
 // Simple stats class for testing
-public class PubSubStats
-{
-    public int TotalChannels { get; set; }
-    public int TotalSubscribers { get; set; }
-    public DateTime CollectedAt { get; set; }
-}
 
 /// <summary>
 ///     In-memory implementation of IRedisPubSubService for testing

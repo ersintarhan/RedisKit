@@ -11,9 +11,15 @@ public class InMemoryLogger : ILogger
 
     public IReadOnlyList<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
-    public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+    public IDisposable BeginScope<TState>(TState state)
+    {
+        return NullScope.Instance;
+    }
 
-    public bool IsEnabled(LogLevel logLevel) => true;
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return true;
+    }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
@@ -30,7 +36,10 @@ public class InMemoryLogger : ILogger
         _logEntries.Add(entry);
     }
 
-    public void Clear() => _logEntries.Clear();
+    public void Clear()
+    {
+        _logEntries.Clear();
+    }
 
     public bool HasLogEntry(LogLevel logLevel, string messageSubstring)
     {
@@ -42,26 +51,22 @@ public class InMemoryLogger : ILogger
         return _logEntries.Any(e => e.EventId == eventId);
     }
 
-    public LogEntry? GetLastLogEntry() => _logEntries.LastOrDefault();
+    public LogEntry? GetLastLogEntry()
+    {
+        return _logEntries.LastOrDefault();
+    }
 
-    public IEnumerable<LogEntry> GetLogEntries(LogLevel logLevel) => _logEntries.Where(e => e.LogLevel == logLevel);
+    public IEnumerable<LogEntry> GetLogEntries(LogLevel logLevel)
+    {
+        return _logEntries.Where(e => e.LogLevel == logLevel);
+    }
 
     private sealed class NullScope : IDisposable
     {
         public static NullScope Instance { get; } = new();
-        public void Dispose() { }
-    }
-}
 
-/// <summary>
-///     Represents a log entry captured by InMemoryLogger
-/// </summary>
-public class LogEntry
-{
-    public LogLevel LogLevel { get; init; }
-    public EventId EventId { get; init; }
-    public string Message { get; init; } = string.Empty;
-    public Exception? Exception { get; init; }
-    public object? State { get; init; }
-    public DateTime Timestamp { get; init; }
+        public void Dispose()
+        {
+        }
+    }
 }

@@ -6,6 +6,41 @@ namespace RedisKit.Tests.Integration;
 [Collection("StreamTests")] // Sequential execution to avoid connection issues
 public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 {
+    #region Batch Operations
+
+    [Fact]
+    public async Task AddBatchAsync_WithMultipleMessages_AddsAllMessages()
+    {
+        // Arrange
+        var stream = GenerateTestKey("batch-stream");
+        var messages = new[]
+        {
+            new TestEvent { Id = 1, Name = "Batch 1" },
+            new TestEvent { Id = 2, Name = "Batch 2" },
+            new TestEvent { Id = 3, Name = "Batch 3" }
+        };
+
+        // Act
+        var messageIds = await StreamService.AddBatchAsync(stream, messages);
+
+        // Assert
+        Assert.Equal(3, messageIds.Length);
+        Assert.All(messageIds, id => Assert.Contains("-", id));
+
+        // Verify all messages were added
+        var retrievedMessages = await StreamService.ReadAsync<TestEvent>(stream, count: 10);
+        Assert.Equal(3, retrievedMessages.Count);
+
+        var sortedMessages = retrievedMessages.Values.OrderBy(m => m?.Id).ToList();
+        for (var i = 0; i < 3; i++)
+        {
+            Assert.Equal(i + 1, sortedMessages[i]!.Id);
+            Assert.Equal($"Batch {i + 1}", sortedMessages[i]!.Name);
+        }
+    }
+
+    #endregion
+
     #region Basic Stream Operations
 
     [Fact]
@@ -21,7 +56,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         // Assert
         Assert.NotNull(messageId);
         Assert.Contains("-", messageId); // Redis ID format: timestamp-sequence
-        
+
         // Verify message was added
         var messages = await StreamService.ReadAsync<TestEvent>(stream, count: 1);
         Assert.Single(messages);
@@ -41,7 +76,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 
         // Add more messages than maxLength
         var messageIds = new List<string>();
-        for (int i = 1; i <= 5; i++)
+        for (var i = 1; i <= 5; i++)
         {
             var message = new TestEvent { Id = i, Name = $"Event {i}" };
             var messageId = await StreamService.AddAsync(stream, message, maxLength);
@@ -51,11 +86,11 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 
         // Act & Assert
         var allMessages = await StreamService.ReadAsync<TestEvent>(stream, count: 10);
-        
+
         // Trimming might not be automatic or might work differently
         // Just verify we can read messages and the latest is preserved
         Assert.NotEmpty(allMessages);
-        
+
         // Latest messages should still be present
         var latestMessage = allMessages.Values.OrderByDescending(m => m?.Id).First();
         Assert.Equal(5, latestMessage!.Id);
@@ -67,9 +102,9 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         // Arrange
         var stream = GenerateTestKey("range-stream");
         var messageIds = new List<string>();
-        
+
         // Add multiple messages
-        for (int i = 1; i <= 5; i++)
+        for (var i = 1; i <= 5; i++)
         {
             var message = new TestEvent { Id = i, Name = $"Event {i}" };
             var messageId = await StreamService.AddAsync(stream, message);
@@ -78,18 +113,14 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         }
 
         // Act - Read from start to end (range logic might work differently)
-        var messages = await StreamService.ReadAsync<TestEvent>(stream, 
-            start: "-", 
-            end: "+", 
-            count: 10);
+        var messages = await StreamService.ReadAsync<TestEvent>(stream,
+            "-",
+            "+");
 
         // Assert - Should get all messages
         Assert.Equal(5, messages.Count);
         var sortedMessages = messages.Values.OrderBy(m => m?.Id).ToList();
-        for (int i = 0; i < 5; i++)
-        {
-            Assert.Equal(i + 1, sortedMessages[i]!.Id);
-        }
+        for (var i = 0; i < 5; i++) Assert.Equal(i + 1, sortedMessages[i]!.Id);
     }
 
     [Fact]
@@ -115,15 +146,15 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         // Arrange
         var stream = GenerateTestKey("group-stream");
         var groupName = "test-group";
-        
+
         // Add a message first (required for group creation)
         await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Initial" });
 
         // Act & Assert - Should not throw
         await StreamService.CreateConsumerGroupAsync(stream, groupName);
-        
+
         // Verify group exists by trying to read from it
-        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, "consumer1", count: 1);
+        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, "consumer1", 1);
         Assert.NotNull(messages);
     }
 
@@ -134,18 +165,18 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("consumer-stream");
         var groupName = "consumer-group";
         var consumerName = "consumer1";
-        
+
         // Add messages
         var message1 = new TestEvent { Id = 1, Name = "Event 1" };
         var message2 = new TestEvent { Id = 2, Name = "Event 2" };
         await StreamService.AddAsync(stream, message1);
         await StreamService.AddAsync(stream, message2);
-        
+
         // Create group
         await StreamService.CreateConsumerGroupAsync(stream, groupName);
 
         // Act
-        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName, count: 10);
+        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName);
 
         // Assert
         Assert.Equal(2, messages.Count);
@@ -161,18 +192,18 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("ack-stream");
         var groupName = "ack-group";
         var consumerName = "consumer1";
-        
+
         // Add message and create group
         var messageId = await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Test" });
         await StreamService.CreateConsumerGroupAsync(stream, groupName);
-        
+
         // Read message (makes it pending)
-        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName, count: 1);
+        var messages = await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName, 1);
         var pendingMessageId = messages.Keys.First();
 
         // Act & Assert - Should not throw
         await StreamService.AcknowledgeAsync(stream, groupName, pendingMessageId);
-        
+
         // Note: Could verify message is no longer pending if GetPendingAsync returns dictionary
     }
 
@@ -184,7 +215,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var groupName = "autoack-group";
         var consumerName = "consumer1";
         var processedMessages = new List<TestEvent>();
-        
+
         // Add messages
         await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Event 1" });
         await StreamService.AddAsync(stream, new TestEvent { Id = 2, Name = "Event 2" });
@@ -192,20 +223,19 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 
         // Act
         await StreamService.ReadGroupWithAutoAckAsync<TestEvent>(
-            stream, 
-            groupName, 
+            stream,
+            groupName,
             consumerName,
             async message =>
             {
                 processedMessages.Add(message);
                 await Task.Delay(10); // Simulate processing
                 return true; // Auto-acknowledge
-            },
-            count: 10);
+            });
 
         // Assert
         Assert.Equal(2, processedMessages.Count);
-        
+
         // Note: Could verify no pending messages if GetPendingAsync returns expected type
     }
 
@@ -216,22 +246,22 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("no-autoack-stream");
         var groupName = "no-autoack-group";
         var consumerName = "consumer1";
-        
+
         // Add message
         await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Event 1" });
         await StreamService.CreateConsumerGroupAsync(stream, groupName);
 
         // Act
         await StreamService.ReadGroupWithAutoAckAsync<TestEvent>(
-            stream, 
-            groupName, 
+            stream,
+            groupName,
             consumerName,
             async message =>
             {
                 await Task.Delay(10);
                 return false; // Don't acknowledge
             },
-            count: 1);
+            1);
 
         // Note: Could verify message is still pending if GetPendingAsync returns expected type
     }
@@ -247,17 +277,17 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("pending-stream");
         var groupName = "pending-group";
         var consumerName = "consumer1";
-        
+
         // Add messages and create group
         await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Pending 1" });
         await StreamService.AddAsync(stream, new TestEvent { Id = 2, Name = "Pending 2" });
         await StreamService.CreateConsumerGroupAsync(stream, groupName);
-        
+
         // Read messages to make them pending
-        await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName, count: 2);
+        await StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName, 2);
 
         // Act
-        var pendingMessages = await StreamService.GetPendingAsync(stream, groupName, count: 10);
+        var pendingMessages = await StreamService.GetPendingAsync(stream, groupName);
 
         // Assert
         Assert.NotNull(pendingMessages);
@@ -270,9 +300,9 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         // Arrange
         var stream = GenerateTestKey("trim-test-stream");
         var maxLength = 3;
-        
+
         // Add many messages
-        for (int i = 1; i <= 10; i++)
+        for (var i = 1; i <= 10; i++)
         {
             await StreamService.AddAsync(stream, new TestEvent { Id = i, Name = $"Event {i}" });
             await Task.Delay(5);
@@ -283,52 +313,16 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
 
         // Assert
         var remainingMessages = await StreamService.ReadAsync<TestEvent>(stream, count: 20);
-        
+
         // Trimming should reduce the number of messages
-        Assert.True(remainingMessages.Count <= 10, 
+        Assert.True(remainingMessages.Count <= 10,
             $"Expected trimming to reduce messages, got {remainingMessages.Count}");
-        
+
         // Latest messages should be preserved
         if (remainingMessages.Any())
         {
             var latestMessage = remainingMessages.Values.OrderByDescending(m => m?.Id).First();
             Assert.Equal(10, latestMessage!.Id);
-        }
-    }
-
-
-    #endregion
-
-    #region Batch Operations
-
-    [Fact]
-    public async Task AddBatchAsync_WithMultipleMessages_AddsAllMessages()
-    {
-        // Arrange
-        var stream = GenerateTestKey("batch-stream");
-        var messages = new[]
-        {
-            new TestEvent { Id = 1, Name = "Batch 1" },
-            new TestEvent { Id = 2, Name = "Batch 2" },
-            new TestEvent { Id = 3, Name = "Batch 3" }
-        };
-
-        // Act
-        var messageIds = await StreamService.AddBatchAsync(stream, messages);
-
-        // Assert
-        Assert.Equal(3, messageIds.Length);
-        Assert.All(messageIds, id => Assert.Contains("-", id));
-        
-        // Verify all messages were added
-        var retrievedMessages = await StreamService.ReadAsync<TestEvent>(stream, count: 10);
-        Assert.Equal(3, retrievedMessages.Count);
-        
-        var sortedMessages = retrievedMessages.Values.OrderBy(m => m?.Id).ToList();
-        for (int i = 0; i < 3; i++)
-        {
-            Assert.Equal(i + 1, sortedMessages[i]!.Id);
-            Assert.Equal($"Batch {i + 1}", sortedMessages[i]!.Name);
         }
     }
 
@@ -343,7 +337,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("null-test");
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
             StreamService.AddAsync<TestEvent>(stream, null!));
     }
 
@@ -355,7 +349,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var groupName = "test-group";
 
         // Act & Assert
-        await Assert.ThrowsAnyAsync<Exception>(() => 
+        await Assert.ThrowsAnyAsync<Exception>(() =>
             StreamService.CreateConsumerGroupAsync(stream, groupName));
     }
 
@@ -366,12 +360,12 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         var stream = GenerateTestKey("no-group-stream");
         var groupName = "nonexistent-group";
         var consumerName = "consumer1";
-        
+
         // Add a message first
         await StreamService.AddAsync(stream, new TestEvent { Id = 1, Name = "Test" });
 
         // Act & Assert
-        await Assert.ThrowsAnyAsync<Exception>(() => 
+        await Assert.ThrowsAnyAsync<Exception>(() =>
             StreamService.ReadGroupAsync<TestEvent>(stream, groupName, consumerName));
     }
 
@@ -385,7 +379,7 @@ public class RedisStreamServiceIntegrationTests : IntegrationTestBase
         // Act & Assert - Should handle long stream names
         var messageId = await StreamService.AddAsync(longStreamName, message);
         Assert.NotNull(messageId);
-        
+
         var retrieved = await StreamService.ReadAsync<TestEvent>(longStreamName, count: 1);
         Assert.Single(retrieved);
     }

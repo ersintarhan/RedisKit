@@ -301,7 +301,6 @@ public class DistributedLockTests
         await Assert.ThrowsAsync<ArgumentException>(() => sut.AcquireMultiLockAsync(emptyResources, expiry));
     }
 
-
     #endregion
 
     #region WaitForUnlockAsync Tests
@@ -338,7 +337,7 @@ public class DistributedLockTests
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<TimeoutException>(() => sut.WaitForUnlockAsync(resource, timeout));
-        
+
         Assert.Contains($"Timeout waiting for resource '{resource}' to be unlocked", ex.Message);
 
         // Verify multiple checks were made

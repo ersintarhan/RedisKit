@@ -63,7 +63,7 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
 
         // Act
         await CacheService.SetAsync(key, value, shortTtl);
-        
+
         // Verify it exists immediately
         var immediate = await CacheService.GetAsync<TestModel>(key);
         Assert.NotNull(immediate);
@@ -87,10 +87,10 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
         var existingKey1 = "existing-1";
         var existingKey2 = "existing-2";
         var nonExistentKey = "non-existent";
-        
+
         var value1 = new TestModel { Id = 10, Name = "Existing 1" };
         var value2 = new TestModel { Id = 20, Name = "Existing 2" };
-        
+
         await CacheService.SetAsync(existingKey1, value1);
         await CacheService.SetAsync(existingKey2, value2);
 
@@ -147,7 +147,7 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
         // Assert - Verify a sampling of items were stored
         var sampleKeys = new[] { "chunk-test-1", "chunk-test-500", "chunk-test-1000", "chunk-test-1500" };
         var retrieved = await CacheService.GetManyAsync<TestModel>(sampleKeys);
-        
+
         foreach (var key in sampleKeys)
         {
             Assert.NotNull(retrieved[key]);
@@ -162,24 +162,15 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
         // Arrange
         var keys = new[] { "delete-many-1", "delete-many-2", "delete-many-3" };
         var value = new TestModel { Id = 999, Name = "Delete Many Test" };
-        
-        foreach (var key in keys)
-        {
-            await CacheService.SetAsync(key, value);
-        }
+
+        foreach (var key in keys) await CacheService.SetAsync(key, value);
 
         // Act - Delete each key individually since DeleteManyAsync doesn't exist
-        foreach (var key in keys)
-        {
-            await CacheService.DeleteAsync(key);
-        }
+        foreach (var key in keys) await CacheService.DeleteAsync(key);
 
         // Assert
         var results = await CacheService.GetManyAsync<TestModel>(keys);
-        foreach (var result in results.Values)
-        {
-            Assert.Null(result);
-        }
+        foreach (var result in results.Values) Assert.Null(result);
     }
 
     #endregion
@@ -204,11 +195,11 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         // Verify batch operations took effect
         var retrieved1 = await CacheService.GetAsync<TestModel>("batch-op-1");
         var retrieved2 = await CacheService.GetAsync<TestModel>("batch-op-2");
-        
+
         Assert.NotNull(retrieved1);
         Assert.Equal(testModel1.Id, retrieved1.Id);
         Assert.Null(retrieved2); // Should be deleted by batch operation
@@ -221,7 +212,7 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
         var existingKey = "exists-test-key";
         var nonExistentKey = "not-exists-test-key";
         var value = new TestModel { Id = 2001, Name = "Exists Test" };
-        
+
         await CacheService.SetAsync(existingKey, value);
 
         // Act
@@ -283,7 +274,7 @@ public class RedisCacheServiceIntegrationTests : IntegrationTestBase
         Assert.Empty(result);
     }
 
-    [Fact]  
+    [Fact]
     public async Task SetManyAsync_WithEmptyData_ThrowsArgumentOutOfRangeException()
     {
         // Arrange

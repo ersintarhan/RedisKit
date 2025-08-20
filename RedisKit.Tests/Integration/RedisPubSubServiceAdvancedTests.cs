@@ -1,5 +1,5 @@
-using MessagePack;
 using System.Collections.Concurrent;
+using MessagePack;
 using Xunit;
 
 namespace RedisKit.Tests.Integration;
@@ -68,10 +68,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
             async (msg, channelName, ct) =>
             {
                 receivedMessages.Add((msg, channelName));
-                if (Interlocked.Increment(ref receivedCount) >= 3)
-                {
-                    messageCount.SetResult(true);
-                }
+                if (Interlocked.Increment(ref receivedCount) >= 3) messageCount.SetResult(true);
                 await Task.CompletedTask;
             });
 
@@ -94,10 +91,10 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         }
 
         // Assert (allow partial success due to timing)
-        Assert.True(receivedMessages.Count >= 2, 
+        Assert.True(receivedMessages.Count >= 2,
             $"Expected at least 2 messages, got {receivedMessages.Count}");
         var messagesList = receivedMessages.ToList();
-        
+
         Assert.Contains(messagesList, m => m.Message.Id == 1 && m.Channel.EndsWith("-1"));
         Assert.Contains(messagesList, m => m.Message.Id == 2 && m.Channel.EndsWith("-2"));
         Assert.Contains(messagesList, m => m.Message.Id == 3 && m.Channel.EndsWith("-abc"));
@@ -157,9 +154,9 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         if (result1 != null) Assert.Equal(message.Id, result1.Id);
         if (result2 != null) Assert.Equal(message.Id, result2.Id);
         if (result3 != null) Assert.Equal(message.Id, result3.Id);
-        
+
         // At least one subscription should have received the message
-        Assert.True(result1 != null || result2 != null || result3 != null, 
+        Assert.True(result1 != null || result2 != null || result3 != null,
             "At least one subscription should receive the message");
 
         // Cleanup
@@ -190,7 +187,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         await Task.Delay(200); // Give more time for subscription
 
         // Act - Publish messages
-        for (int i = 1; i <= messageCount; i++)
+        for (var i = 1; i <= messageCount; i++)
         {
             var message = new TestMessage { Id = i, Content = $"Message {i}" };
             await PubSubService.PublishAsync(channel, message);
@@ -201,7 +198,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         await Task.Delay(1000);
 
         // Assert (allow partial success due to timing)
-        Assert.True(receivedMessages.Count >= 1, 
+        Assert.True(receivedMessages.Count >= 1,
             $"Expected at least 1 message, got {receivedMessages.Count}");
 
         // Cleanup
@@ -225,20 +222,14 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         var token = await PubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) =>
         {
             receivedMessages.Add(msg);
-            if (Interlocked.Increment(ref receivedCount) >= 10)
-            {
-                completionSource.SetResult(true);
-            }
+            if (Interlocked.Increment(ref receivedCount) >= 10) completionSource.SetResult(true);
             await Task.CompletedTask;
         });
 
         await Task.Delay(100);
 
         // Act - Publish messages individually (BatchPublishAsync doesn't exist)
-        foreach (var message in messages)
-        {
-            await PubSubService.PublishAsync(channel, message);
-        }
+        foreach (var message in messages) await PubSubService.PublishAsync(channel, message);
 
         // Wait for all messages (with timeout fallback)
         try
@@ -251,13 +242,10 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         }
 
         // Assert (allow partial success due to timing)
-        Assert.True(receivedMessages.Count >= 5, 
+        Assert.True(receivedMessages.Count >= 5,
             $"Expected at least 5 messages, got {receivedMessages.Count}");
         var receivedIds = receivedMessages.Select(m => m.Id).OrderBy(id => id).ToList();
-        for (int i = 1; i <= 10; i++)
-        {
-            Assert.Equal(i, receivedIds[i - 1]);
-        }
+        for (var i = 1; i <= 10; i++) Assert.Equal(i, receivedIds[i - 1]);
 
         // Cleanup
         await PubSubService.UnsubscribeAsync(token);
@@ -279,12 +267,10 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         var token = await PubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) =>
         {
             Interlocked.Increment(ref processingCount);
-            
+
             if (msg.Id == 2) // Throw exception on message 2
-            {
                 throw new InvalidOperationException("Test exception");
-            }
-            
+
             goodMessagesReceived.Add(msg.Id);
             await Task.CompletedTask;
         });
@@ -316,7 +302,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
 
         // Act & Assert - Should not throw
         await PubSubService.UnsubscribeAsync(fakeChannel);
-        
+
         // Verify no exception was thrown
         Assert.True(true);
     }
@@ -379,7 +365,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         {
             Assert.Fail("Complex message was not received within timeout");
         }
-        
+
         Assert.NotNull(result);
 
         // Assert
@@ -427,7 +413,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
     {
         // Arrange
         var channel = GenerateTestKey("has-subs-channel");
-        
+
         // Subscribe first
         var token = await PubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) => await Task.CompletedTask);
         await Task.Delay(100); // Let subscription establish
@@ -449,7 +435,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
     {
         // Arrange
         var channel = GenerateTestKey("count-channel");
-        
+
         // Subscribe multiple times
         var token1 = await PubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) => await Task.CompletedTask);
         var token2 = await PubSubService.SubscribeAsync<TestMessage>(channel, async (msg, ct) => await Task.CompletedTask);
@@ -476,7 +462,7 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
         var exceptions = new ConcurrentBag<Exception>();
 
         // Act - Concurrent subscribe/unsubscribe operations
-        for (int i = 0; i < 20; i++)
+        for (var i = 0; i < 20; i++)
         {
             var channelIndex = i;
             tasks.Add(Task.Run(async () =>
@@ -484,9 +470,9 @@ public class RedisPubSubServiceAdvancedTests : IntegrationTestBase
                 try
                 {
                     var channel = $"{baseChannel}-{channelIndex}";
-                    var token = await PubSubService.SubscribeAsync<TestMessage>(channel, 
+                    var token = await PubSubService.SubscribeAsync<TestMessage>(channel,
                         async (msg, ct) => await Task.CompletedTask);
-                    
+
                     await Task.Delay(10);
                     await PubSubService.UnsubscribeAsync(token);
                 }

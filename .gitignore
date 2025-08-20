@@ -43,3 +43,4 @@ logs/
 /.sonarqube
 .claude/settings.local.json
 CLAUDE.md
+/CoverageReport

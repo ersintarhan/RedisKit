@@ -4,7 +4,6 @@ using NSubstitute;
 using RedisKit.Interfaces;
 using RedisKit.Models;
 using RedisKit.Services;
-using StackExchange.Redis;
 using Xunit;
 
 namespace RedisKit.Tests;
