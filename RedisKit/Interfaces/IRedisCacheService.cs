@@ -64,5 +64,5 @@ public interface IRedisCacheService
     /// <summary>
     ///     Sets a prefix for all cache keys
     /// </summary>
-    void SetKeyPrefix(string prefix);
+    void SetKeyPrefix(string? prefix);
 }

@@ -279,10 +279,10 @@ public class RedisCacheService : IRedisCacheService
     }
 
     // Override SetKeyPrefix to validate prefix
-    public void SetKeyPrefix(string prefix)
+    public void SetKeyPrefix(string? prefix)
     {
         ValidationUtils.ValidateKeyPrefix(prefix);
-        _keyPrefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+        _keyPrefix = prefix!;
     }
 
     public async Task<BatchResult> ExecuteBatchAsync(Action<IBatchOperations> configureBatch)

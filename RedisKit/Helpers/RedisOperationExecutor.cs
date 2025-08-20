@@ -61,7 +61,7 @@ internal static class RedisOperationExecutor
             if (handleSpecificExceptions != null)
             {
                 var result = handleSpecificExceptions(ex);
-                if (result != null || handleSpecificExceptions(ex) is not null)
+                if (result is not null)
                     return result;
             }
 
@@ -74,7 +74,7 @@ internal static class RedisOperationExecutor
             if (handleSpecificExceptions != null)
             {
                 var result = handleSpecificExceptions(ex);
-                if (result != null || handleSpecificExceptions(ex) is not null)
+                if (result is not null)
                     return result;
             }
 

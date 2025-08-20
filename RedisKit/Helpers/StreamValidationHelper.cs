@@ -69,7 +69,7 @@ internal static class StreamValidationHelper
     /// </summary>
     public static void ValidateMaxLength(int maxLength, string paramName = "maxLength")
     {
-        ValidationUtils.ValidatePositiveCount(maxLength, paramName);
+        ValidationUtils.ValidatePositiveCount(maxLength, paramName, "Max length must be greater than zero.");
     }
 
     /// <summary>
@@ -85,6 +85,6 @@ internal static class StreamValidationHelper
     /// </summary>
     public static void ValidateMinIdleTime(long minIdleTime, string paramName = "minIdleTime")
     {
-        ValidationUtils.ValidateNonNegativeTime(minIdleTime, paramName);
+        ValidationUtils.ValidateNonNegativeTime(minIdleTime, paramName, "Min idle time cannot be negative.");
     }
 }

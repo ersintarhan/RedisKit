@@ -120,7 +120,7 @@ public class InMemoryRedisCache : IRedisCacheService
         return ValueTask.CompletedTask;
     }
 
-    public void SetKeyPrefix(string prefix)
+    public void SetKeyPrefix(string? prefix)
     {
         ArgumentNullException.ThrowIfNull(prefix);
         _keyPrefix = prefix;
