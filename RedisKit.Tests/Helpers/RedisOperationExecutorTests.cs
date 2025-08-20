@@ -113,6 +113,7 @@ public class RedisOperationExecutorTests
             () => throw new RedisServerException("Custom error"),
             _logger,
             "test-key",
+            CancellationToken.None,
             handleSpecificExceptions: ex =>
             {
                 if (ex is RedisServerException rse && rse.Message.Contains("Custom"))

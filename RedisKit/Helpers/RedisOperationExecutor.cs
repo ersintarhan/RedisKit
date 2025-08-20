@@ -18,8 +18,8 @@ internal static class RedisOperationExecutor
         ILogger? logger,
         string? key = null,
         CancellationToken cancellationToken = default,
-        [CallerMemberName] string operationName = "",
-        Func<Exception, T?>? handleSpecificExceptions = null) where T : class
+        Func<Exception, T?>? handleSpecificExceptions = null,
+        [CallerMemberName] string operationName = "") where T : class
     {
         try
         {

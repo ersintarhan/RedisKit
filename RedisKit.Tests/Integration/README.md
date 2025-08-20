@@ -16,6 +16,9 @@ dotnet test --filter "FullyQualifiedName~Integration"
 # Run specific service tests
 dotnet test --filter "FullyQualifiedName~RedisFunctionIntegrationTests"
 dotnet test --filter "FullyQualifiedName~RedisShardedPubSubIntegrationTests"
+
+# Clean Redis Functions before running tests (recommended)
+redis-cli FUNCTION FLUSH SYNC
 ```
 
 ## Test Categories
@@ -25,6 +28,7 @@ dotnet test --filter "FullyQualifiedName~RedisShardedPubSubIntegrationTests"
 - Requires Redis 7.0+ with FUNCTION command support
 - Tests will be skipped if Redis Functions are not available
 - Verifies function loading, calling, and management
+- **Important**: Run `redis-cli FUNCTION FLUSH SYNC` before running tests to avoid conflicts with existing functions
 
 ### Sharded Pub/Sub Tests
 
@@ -41,12 +45,16 @@ dotnet test --filter "FullyQualifiedName~RedisShardedPubSubIntegrationTests"
 
 ## Known Issues
 
-1. **Redis Functions Detection**: Some Redis installations may not properly expose the FUNCTION command even on Redis 7.0+. This can be due to:
+1. **Redis Functions FCALL Timeout**: In some cases, existing functions in Redis can cause FCALL commands to timeout. Solution:
+    - Run `redis-cli FUNCTION FLUSH SYNC` before running tests
+    - This clears all loaded functions and ensures a clean state
+
+2. **Redis Functions Detection**: Some Redis installations may not properly expose the FUNCTION command even on Redis 7.0+. This can be due to:
     - ACL restrictions
     - Redis configuration
     - Module loading issues
 
-2. **Test Isolation**: Tests use database 15 by default and unique key prefixes to avoid conflicts
+3. **Test Isolation**: Tests use database 15 by default and unique key prefixes to avoid conflicts
 
 ## Configuration
 
