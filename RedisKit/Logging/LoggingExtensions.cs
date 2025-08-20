@@ -127,7 +127,6 @@ internal static partial class LoggingExtensions
     [LoggerMessage(305, LogLevel.Error, "MessagePack deserialization failed for {Type} from {ByteCount} bytes")]
     public static partial void LogMessagePackDeserializeError(this ILogger logger, string type, int byteCount, Exception ex);
 
-    // System.Text.Json Serializer
     [LoggerMessage(311, LogLevel.Debug, "Serializing {Type} using System.Text.Json")]
     public static partial void LogJsonSerialize(this ILogger logger, string type);
 
