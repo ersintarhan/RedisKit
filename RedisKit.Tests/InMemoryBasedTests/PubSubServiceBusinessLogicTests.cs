@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using FluentAssertions;
 using RedisKit.Models;
 using RedisKit.Tests.InMemory;
@@ -79,18 +80,14 @@ public class PubSubServiceBusinessLogicTests
     public async Task SubscribePatternAsync_Should_Match_Patterns()
     {
         // Arrange
-        var receivedMessages = new List<string>();
+        var receivedMessages = new ConcurrentBag<string>();
         var pattern = "test-*";
-        var tcs1 = new TaskCompletionSource<bool>();
-        var tcs2 = new TaskCompletionSource<bool>();
-        var messageCount = 0;
+        var countdown = new CountdownEvent(2); // Expecting 2 matching messages
 
         await _pubSub.SubscribePatternAsync<string>(pattern, async (msg, ct) =>
         {
             receivedMessages.Add(msg);
-            messageCount++;
-            if (messageCount == 1) tcs1.SetResult(true);
-            if (messageCount == 2) tcs2.SetResult(true);
+            countdown.Signal();
             await Task.CompletedTask;
         });
 
@@ -100,9 +97,10 @@ public class PubSubServiceBusinessLogicTests
         var count3 = await _pubSub.PublishAsync("other-channel", "Message3");
 
         // Wait for messages to be processed
-        await Task.WhenAll(tcs1.Task, tcs2.Task).WaitAsync(TimeSpan.FromSeconds(1));
+        var allReceived = countdown.Wait(TimeSpan.FromSeconds(5));
 
         // Assert
+        allReceived.Should().BeTrue("Two messages matching pattern should be received within 5 seconds");
         count1.Should().Be(1, "test-1 should match pattern test-*");
         count2.Should().Be(1, "test-2 should match pattern test-*");
         count3.Should().Be(0, "other-channel should not match pattern test-*");
@@ -172,21 +170,20 @@ public class PubSubServiceBusinessLogicTests
     public async Task PublishManyAsync_Should_Publish_Multiple_Messages()
     {
         // Arrange
-        var receivedMessages = new Dictionary<string, string>();
-        var tcs1 = new TaskCompletionSource<bool>();
-        var tcs2 = new TaskCompletionSource<bool>();
+        var receivedMessages = new ConcurrentDictionary<string, string>();
+        var countdown = new CountdownEvent(2);
 
         await _pubSub.SubscribeAsync<string>("channel1", async (msg, ct) =>
         {
             receivedMessages["channel1"] = msg;
-            tcs1.SetResult(true);
+            countdown.Signal();
             await Task.CompletedTask;
         });
 
         await _pubSub.SubscribeAsync<string>("channel2", async (msg, ct) =>
         {
             receivedMessages["channel2"] = msg;
-            tcs2.SetResult(true);
+            countdown.Signal();
             await Task.CompletedTask;
         });
 
@@ -198,9 +195,12 @@ public class PubSubServiceBusinessLogicTests
 
         // Act
         await _pubSub.PublishManyAsync(messages);
-        await Task.WhenAll(tcs1.Task, tcs2.Task).WaitAsync(TimeSpan.FromSeconds(1));
+        
+        // Wait for both messages to be received
+        var allReceived = countdown.Wait(TimeSpan.FromSeconds(5));
 
         // Assert
+        allReceived.Should().BeTrue("Both messages should be received within 5 seconds");
         receivedMessages.Should().HaveCount(2);
         receivedMessages["channel1"].Should().Be("Message1");
         receivedMessages["channel2"].Should().Be("Message2");
