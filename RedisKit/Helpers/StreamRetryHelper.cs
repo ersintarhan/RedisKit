@@ -250,8 +250,15 @@ internal static class StreamRetryHelper
     {
         return async () =>
         {
+            // Wrap the nullable operation to match ExecuteWithRetryAsync's signature
+            async Task<T> wrappedOperation()
+            {
+                var result = await operation();
+                return result!; // We handle null by returning from ExecuteWithRetryAsync
+            }
+            
             var result = await ExecuteWithRetryAsync<T>(
-                async () => await operation(),
+                wrappedOperation,
                 retryConfig,
                 logger,
                 operation.Method?.Name);

@@ -182,7 +182,7 @@ public class MultiLockHandleTests
         // Assert - Wait a bit for the async operation to complete
         await Task.Delay(100);
 
-        foreach (var lockHandle in _lockHandles) lockHandle.Received().ReleaseAsync();
+        foreach (var lockHandle in _lockHandles) _ = lockHandle.Received().ReleaseAsync();
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class MultiLockHandleTests
         // Assert - Wait a bit for the async operation to complete
         await Task.Delay(100);
 
-        foreach (var lockHandle in _lockHandles) lockHandle.Received(1).ReleaseAsync();
+        foreach (var lockHandle in _lockHandles) _ = lockHandle.Received(1).ReleaseAsync();
     }
 
     [Fact]
