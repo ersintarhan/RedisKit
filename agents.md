@@ -44,6 +44,7 @@ dotnet pack -c Release
 - Services follow dependency injection pattern with interface segregation
 - Circuit breaker pattern implemented for fault tolerance
 - Async/await patterns throughout with proper ConfigureAwait(false)
+- String literal duplication avoided using centralized `LogMessageTemplates` constants
 
 ### Testing Standards
 - Unit tests use NSubstitute for mocking Redis dependencies
@@ -68,3 +69,6 @@ dotnet pack -c Release
 6. RedisOperationExecutor provides centralized exception handling - all new Redis operations should use it
 7. Circuit breaker pattern protects against Redis failures - don't bypass it
 8. All Redis keys should be validated using ValidateRedisKey() method
+9. Code coverage target is 65%+ (achieved via comprehensive test suite)
+10. Qodana quality analysis is integrated in CI pipeline - check for code quality issues
+11. Use LogMessageTemplates constants instead of string literals to avoid duplication warnings
