@@ -4,3 +4,13 @@ profile:
   name: qodana.recommended
 include:
   - name: CheckDependencyLicenses
+exclude:
+  - name: All
+    paths:
+      - RedisKit.Tests/**  # Exclude test files from analysis
+      - RedisKit.Benchmarks/**  # Exclude benchmark files 
+      - RedisKit.Example/**  # Exclude example files
+      - "**/_site/**"  # Exclude generated docs
+      - "**/bin/**"
+      - "**/obj/**"
+      - "**/TestResults/**"
