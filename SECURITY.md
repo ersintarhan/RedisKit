@@ -6,6 +6,7 @@ We release patches for security vulnerabilities. Which versions are eligible for
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 1.2.x   | :white_check_mark: |
 | 1.1.x   | :white_check_mark: |
 | 1.0.x   | :x:                |
 | < 1.0   | :x:                |
@@ -20,7 +21,8 @@ We take the security of RedisKit seriously. If you believe you have found a secu
 - Exploit the vulnerability in production environments
 
 ### Please DO:
-- Email us at: security@rediskit.com (or create a security advisory on GitHub)
+- Create a GitHub Security Advisory (preferred): Go to Security → Advisories → Report a vulnerability
+- Or contact the maintainer through GitHub issues (for non-critical issues)
 - Include the following information:
   - Type of vulnerability (e.g., buffer overflow, SQL injection, cross-site scripting, etc.)
   - Full paths of source file(s) related to the vulnerability
@@ -44,9 +46,13 @@ When we release a security update:
 3. We will update the NuGet package
 4. We will notify users through GitHub and our communication channels
 
-## Dependencies
+## Automated Security Monitoring
 
-This project uses Dependabot to keep dependencies up to date. Security updates are automatically created as pull requests when vulnerabilities are discovered in our dependencies.
+This project uses multiple automated security tools:
+
+- **Dependabot**: Automatically creates pull requests for security updates in dependencies
+- **Qodana Code Quality**: Continuous code quality and security analysis with 1,168+ inspection rules
+- **GitHub Security Advisories**: Automatic vulnerability detection in dependencies
 
 ### Key Dependencies:
 - **StackExchange.Redis**: Core Redis client library
@@ -81,9 +87,8 @@ RedisKit includes several security features:
 
 ## Contact
 
-For security concerns, please email: security@rediskit.com
-
-For general questions, please open a GitHub issue.
+For security vulnerabilities: Create a GitHub Security Advisory  
+For general questions: Open a GitHub issue
 
 ## Acknowledgments
 
