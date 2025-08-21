@@ -1,8 +1,9 @@
 # RedisKit
 
 [![Build Status](https://github.com/ersintarhan/RedisKit/workflows/CI/badge.svg)](https://github.com/ersintarhan/RedisKit/actions)
+[![Code Quality](https://img.shields.io/badge/qodana-65%25%20coverage-brightgreen)](https://qodana.cloud/projects/ersintarhan-RedisKit)
 [![Tests](https://img.shields.io/badge/tests-645%20passed-brightgreen)](https://github.com/ersintarhan/RedisKit/actions)
-[![Coverage](https://img.shields.io/badge/coverage-62%25-brightgreen)](#testing)
+[![Coverage](https://img.shields.io/badge/coverage-65%25-brightgreen)](#testing)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![NuGet](https://img.shields.io/nuget/v/RedisKit.svg)](https://www.nuget.org/packages/RedisKit/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
