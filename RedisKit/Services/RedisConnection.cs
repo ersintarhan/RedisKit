@@ -109,7 +109,7 @@ public class RedisConnection : IRedisConnection, IDisposable
             _options.TimeoutSettings.SyncTimeout.TotalMilliseconds < 0 ||
             _options.TimeoutSettings.AsyncTimeout.TotalMilliseconds < 0)
             throw new ArgumentException("Redis timeout settings must be non-negative", nameof(options));
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Use provided circuit breaker or create a new one
         if (circuitBreaker != null)

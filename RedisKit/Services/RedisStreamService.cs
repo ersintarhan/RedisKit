@@ -1276,7 +1276,7 @@ public class RedisStreamService : IRedisStreamService
                             prefixedStream, entry.Id);
                     }
 
-                    yield return (entry.Id!, data);
+                    yield return (entry.Id, data)!;
                 }
 
                 currentStart = entry.Id!;

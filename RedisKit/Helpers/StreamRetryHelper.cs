@@ -236,7 +236,7 @@ internal static class StreamRetryHelper
                 wrappedOperation,
                 retryConfig,
                 logger,
-                operation.Method?.Name);
+                operation.Method.Name);
             return result;
         };
     }

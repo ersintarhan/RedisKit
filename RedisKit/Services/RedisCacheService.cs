@@ -47,7 +47,7 @@ public class RedisCacheService : IRedisCacheService
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Create the serializer based on configuration
         // In a future refactor, IRedisSerializer should be injected directly.
@@ -68,7 +68,7 @@ public class RedisCacheService : IRedisCacheService
                 {
                     var database = await GetDatabaseAsync().ConfigureAwait(false);
                     var scriptResult = await database.ScriptEvaluateAsync("return 'PONG'").ConfigureAwait(false);
-                    var supported = scriptResult?.ToString() == "PONG";
+                    var supported = scriptResult.ToString() == "PONG";
                     _logger.LogDebug("Lua script support detected: {Supported}", supported);
                     return (object?)supported;
                 },

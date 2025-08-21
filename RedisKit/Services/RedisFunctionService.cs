@@ -30,7 +30,7 @@ public class RedisFunctionService : IRedisFunction
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        var redisOptions = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        var redisOptions = options.Value ?? throw new ArgumentNullException(nameof(options));
         _serializer = serializer ?? RedisSerializerFactory.Create(redisOptions.Serializer);
 
         // Initialize Redis Functions support detection lazily
@@ -441,7 +441,7 @@ public class RedisFunctionService : IRedisFunction
         // Simple key-value parsing, only handle what we need
         for (var i = 0; i < libraryData.Length - 1; i += 2)
         {
-            var key = libraryData[i].ToString()?.ToLower();
+            var key = libraryData[i].ToString().ToLower();
             var value = libraryData[i + 1];
 
             SetLibraryProperty(library, key, value);
@@ -455,17 +455,17 @@ public class RedisFunctionService : IRedisFunction
         switch (key)
         {
             case "library_name":
-                library.Name = value.ToString() ?? string.Empty;
+                library.Name = value.ToString();
                 break;
             case "engine":
-                library.Engine = value.ToString() ?? "LUA";
+                library.Engine = value.ToString();
                 break;
             case "description":
                 library.Description = value.IsNull ? null : value.ToString();
                 break;
             case "library_code":
                 // Set code if value is not null
-                if (!value.IsNull) library.Code = value.ToString() ?? string.Empty;
+                if (!value.IsNull) library.Code = value.ToString();
 
                 break;
             case "functions" when value.Resp3Type == ResultType.Array:
@@ -489,17 +489,17 @@ public class RedisFunctionService : IRedisFunction
             // Simplified parsing - only essential fields
             for (var i = 0; i < funcArray.Length - 1; i += 2)
             {
-                var key = funcArray[i].ToString()?.ToLower();
+                var key = funcArray[i].ToString().ToLower();
                 var value = funcArray[i + 1];
 
                 if (key == "name")
                 {
-                    function.Name = value.ToString() ?? string.Empty;
+                    function.Name = value.ToString();
                 }
                 else if (key == "flags" && value.Resp3Type == ResultType.Array)
                 {
                     var flags = (RedisResult[])value!;
-                    function.Flags = flags.Select(f => f.ToString() ?? string.Empty).ToList();
+                    function.Flags = flags.Select(f => f.ToString()).ToList();
                     function.IsReadOnly = function.Flags.Contains("no-writes");
                 }
             }
@@ -556,7 +556,7 @@ public class RedisFunctionService : IRedisFunction
                 var engineStats = (RedisResult[])enginesArray[j + 1]!;
                 for (var k = 0; k < engineStats.Length - 1; k += 2)
                 {
-                    var statKey = engineStats[k].ToString()?.ToLower();
+                    var statKey = engineStats[k].ToString().ToLower();
                     var statValue = engineStats[k + 1];
 
                     switch (statKey)
