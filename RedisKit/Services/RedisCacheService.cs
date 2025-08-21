@@ -42,12 +42,12 @@ public class RedisCacheService : IRedisCacheService
     public RedisCacheService(
         IRedisConnection connection,
         ILogger<RedisCacheService> logger,
-        IOptions<RedisOptions> options,
+        IOptions<RedisOptions>? options,
         ObjectPoolProvider? poolProvider = null)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         // Create the serializer based on configuration
         // In a future refactor, IRedisSerializer should be injected directly.
