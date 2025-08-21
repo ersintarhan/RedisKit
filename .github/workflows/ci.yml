@@ -15,74 +15,48 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        configuration: [Debug, Release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
-    # Setup Redis based on OS
-    - name: Start Redis (Docker)
-      if: runner.os == 'Linux'
+    - name: Start Redis
       run: |
         docker run -d --name redis -p 6379:6379 redis:7-alpine
         sleep 5
         docker exec redis redis-cli ping
     
-    - name: Setup Redis (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install redis
-        brew services start redis
-        sleep 5
-        redis-cli ping
-    
-    - name: Setup Redis (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        echo "Skipping Redis on Windows - Integration tests will be disabled"
-      shell: powershell
-    
     - name: Restore dependencies
       run: dotnet restore
     
     - name: Build
-      run: dotnet build --no-restore --configuration ${{ matrix.configuration }}
+      run: dotnet build --no-restore --configuration Release
     
-    - name: Run Unit Tests
-      run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category!=Integration" --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.os }}-${{ matrix.configuration }}"
-    
-    - name: Run Integration Tests (Linux/macOS)
-      if: runner.os != 'Windows'
-      run: dotnet test --no-build --configuration ${{ matrix.configuration }} --filter "Category=Integration" --verbosity normal --logger trx --results-directory "TestResults-Integration-${{ matrix.os }}-${{ matrix.configuration }}"
+    - name: Run All Tests with Coverage
+      run: |
+        dotnet test --no-build --configuration Release \
+          --verbosity normal \
+          --logger trx \
+          --results-directory "TestResults" \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat="lcov,cobertura" \
+          /p:CoverletOutput=./coverage/ \
+          /p:ExcludeByFile="**/bin/**,**/obj/**"
       env:
         REDIS_CONNECTION: localhost:6379
-      continue-on-error: true  # Don't fail if integration tests fail
-    
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results-${{ matrix.os }}-${{ matrix.configuration }}
-        path: |
-          TestResults-${{ matrix.os }}-${{ matrix.configuration }}
-          TestResults-Integration-${{ matrix.os }}-${{ matrix.configuration }}
-    
-    - name: Generate coverage report
-      if: matrix.os == 'ubuntu-latest' && matrix.configuration == 'Release'
-      run: |
-        dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./coverage/
     
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.configuration == 'Release'
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -90,6 +64,19 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+    
+    - name: Prepare Qodana coverage
+      run: |
+        mkdir -p .qodana/code-coverage
+        cp ./coverage/coverage.info .qodana/code-coverage/
+    
+    - name: Run Qodana Code Quality
+      uses: JetBrains/qodana-action@v2025.1
+      with:
+        pr-mode: false
+      env:
+        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_634141825 }}
+        QODANA_ENDPOINT: 'https://qodana.cloud'
 
   package:
     needs: build
