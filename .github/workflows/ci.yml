@@ -43,24 +43,42 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
     
+    - name: Restore test packages
+      run: dotnet restore RedisKit.Tests/RedisKit.Tests.csproj
+    
     - name: Run All Tests with Coverage
       run: |
-        dotnet test --no-build --configuration Release \
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
           --verbosity normal \
           --logger trx \
           --results-directory "TestResults" \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat="lcov,cobertura" \
-          /p:CoverletOutput=./coverage/ \
-          /p:ExcludeByFile="**/bin/**,**/obj/**"
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       env:
         REDIS_CONNECTION: localhost:6379
+    
+    - name: Generate Codecov coverage
+      run: |
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --collect:"XPlat Code Coverage" \
+          --results-directory "CodecovResults" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+      env:
+        REDIS_CONNECTION: localhost:6379
+    
+    - name: Find coverage files
+      run: |
+        find TestResults -name "*.info" -type f
+        find CodecovResults -name "*.xml" -type f
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage/coverage.cobertura.xml
+        directory: ./CodecovResults
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
@@ -68,7 +86,7 @@ jobs:
     - name: Prepare Qodana coverage
       run: |
         mkdir -p .qodana/code-coverage
-        cp ./coverage/coverage.info .qodana/code-coverage/
+        find TestResults -name "*.info" -exec cp {} .qodana/code-coverage/ \;
     
     - name: Run Qodana Code Quality
       uses: JetBrains/qodana-action@v2025.1
