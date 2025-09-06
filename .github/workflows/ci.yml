@@ -90,8 +90,15 @@ jobs:
         # Verify Redis is working
         docker exec redis-master redis-cli -a redis_password ping
         
-        # Verify Sentinels are working
-        docker exec sentinel-1 redis-cli -p 26379 ping
+        # Verify Sentinels are working (they might need more time)
+        for i in {1..5}; do
+          if docker exec sentinel-1 redis-cli -p 26379 ping 2>/dev/null; then
+            echo "Sentinel is ready"
+            break
+          fi
+          echo "Waiting for Sentinel to be ready... (attempt $i/5)"
+          sleep 2
+        done
     
     - name: Restore dependencies
       run: dotnet restore

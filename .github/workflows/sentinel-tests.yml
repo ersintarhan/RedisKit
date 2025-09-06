@@ -39,15 +39,15 @@ jobs:
     
     - name: Setup Redis Sentinel Cluster
       run: |
-        # Use docker-compose for cleaner setup
-        docker-compose -f docker-compose.sentinel.yml up -d
+        # Use docker compose (new syntax) for cleaner setup
+        docker compose -f docker-compose.sentinel.yml up -d
         
         # Wait for cluster to be ready
         echo "Waiting for Redis Sentinel cluster to be ready..."
         sleep 15
         
         # Verify services
-        docker-compose -f docker-compose.sentinel.yml ps
+        docker compose -f docker-compose.sentinel.yml ps
         
         # Check Redis Master
         docker exec redis-master redis-cli -a redis_password ping
@@ -89,7 +89,7 @@ jobs:
         
         # Stop the master to trigger failover
         echo "Stopping Redis master to trigger failover..."
-        docker-compose -f docker-compose.sentinel.yml stop redis-master
+        docker compose -f docker-compose.sentinel.yml stop redis-master
         
         # Wait for failover
         echo "Waiting for failover to complete..."
@@ -118,5 +118,5 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        docker-compose -f docker-compose.sentinel.yml logs
-        docker-compose -f docker-compose.sentinel.yml down -v
+        docker compose -f docker-compose.sentinel.yml logs
+        docker compose -f docker-compose.sentinel.yml down -v
