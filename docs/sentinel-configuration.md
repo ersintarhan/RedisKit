@@ -74,16 +74,16 @@ Use the provided `docker-compose.sentinel.yml` for local development and testing
 
 ```bash
 # Start Sentinel cluster
-docker-compose -f docker-compose.sentinel.yml up -d
+docker compose -f docker-compose.sentinel.yml up -d
 
 # View logs
-docker-compose -f docker-compose.sentinel.yml logs -f
+docker compose -f docker-compose.sentinel.yml logs -f
 
 # Test failover by stopping master
-docker-compose -f docker-compose.sentinel.yml stop redis-master
+docker compose -f docker-compose.sentinel.yml stop redis-master
 
 # Clean up
-docker-compose -f docker-compose.sentinel.yml down
+docker compose -f docker-compose.sentinel.yml down
 ```
 
 ## Production Deployment
@@ -319,5 +319,5 @@ The migration is transparent to application code when using RedisKit services.
 ## Resources
 
 - [Redis Sentinel Documentation](https://redis.io/docs/manual/sentinel/)
-- [RedisKit GitHub Repository](https://github.com/yourusername/RedisKit)
+- [RedisKit GitHub Repository](https://github.com/ersintarhan/RedisKit)
 - [StackExchange.Redis Sentinel Support](https://stackexchange.github.io/StackExchange.Redis/Configuration.html#sentinel)

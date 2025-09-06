@@ -224,12 +224,12 @@ services.AddRedisServices(options =>
 });
 ```
 
-### Redis Sentinel Configuration
+### Redis Sentinel Configuration (High Availability)
 
 ```csharp
 services.AddRedisServices(options =>
 {
-    // Configure Redis Sentinel for high availability
+    // Configure Redis Sentinel for high availability and automatic failover
     options.Sentinel = new SentinelOptions
     {
         Endpoints = new List<string> 
@@ -240,8 +240,12 @@ services.AddRedisServices(options =>
         },
         ServiceName = "mymaster",
         RedisPassword = "your_redis_password",
-        EnableFailoverHandling = true
+        EnableFailoverHandling = true,
+        HealthCheckInterval = TimeSpan.FromSeconds(30)
     };
+    
+    // Note: When using Sentinel, ConnectionString is not required
+    // RedisKit will automatically discover the master via Sentinel
 });
 ```
 
@@ -1418,7 +1422,7 @@ var subscribers = await shardedPubSub.PublishAsync(
 - [x] Redis Functions support (Redis 7.x) - ✅ Completed
 - [x] Sharded Pub/Sub (Redis 7.x) - ✅ Completed
 - [x] Distributed locking primitives - ✅ Completed
-- [ ] Redis Sentinel support
+- [x] Redis Sentinel support (High Availability with automatic failover)
 - [ ] Redis Cluster native support
 - [ ] ACL v2 improvements (Redis 7.x)
 - [ ] Client-side caching support
