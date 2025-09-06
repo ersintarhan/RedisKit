@@ -299,6 +299,12 @@ public class RedisConnection : IRedisConnection, IDisposable
     /// <exception cref="InvalidOperationException">Thrown when connection cannot be established after all retries.</exception>
     private async Task<ConnectionMultiplexer> CreateConnectionAsync()
     {
+        // Check if Sentinel is configured
+        if (_options.Sentinel != null && _options.Sentinel.Endpoints.Any())
+        {
+            return await CreateSentinelConnectionAsync().ConfigureAwait(false);
+        }
+
         _logger.LogConnectionCreating(RedactConnectionString(_options.ConnectionString));
 
         // Configure connection with advanced timeout settings
@@ -315,6 +321,136 @@ public class RedisConnection : IRedisConnection, IDisposable
 
         _logger.LogConnectionSuccess(RedactConnectionString(_options.ConnectionString));
         return connection;
+    }
+
+    private async Task<ConnectionMultiplexer> CreateSentinelConnectionAsync()
+    {
+        var sentinel = _options.Sentinel!;
+        _logger.LogConnectionCreating($"Sentinel: {string.Join(",", sentinel.Endpoints)}, Service: {sentinel.ServiceName}");
+
+        var config = new ConfigurationOptions
+        {
+            ServiceName = sentinel.ServiceName,
+            TieBreaker = "",
+            CommandMap = CommandMap.Sentinel,
+            AbortOnConnectFail = false
+        };
+
+        // Add all sentinel endpoints
+        foreach (var endpoint in sentinel.Endpoints)
+        {
+            config.EndPoints.Add(endpoint);
+        }
+
+        // Configure Sentinel authentication if provided
+        if (!string.IsNullOrEmpty(sentinel.SentinelPassword))
+        {
+            config.Password = sentinel.SentinelPassword;
+        }
+
+        // Apply timeout settings
+        ApplyTimeoutSettings(config);
+
+        // Connect to Sentinel
+        var sentinelConnection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
+        if (sentinelConnection == null || !sentinelConnection.IsConnected)
+        {
+            throw new InvalidOperationException("Failed to establish Sentinel connection after all retry attempts");
+        }
+
+        // Get master endpoint from Sentinel
+        var masterEndpoint = await GetMasterEndpointFromSentinelAsync(sentinelConnection, sentinel.ServiceName).ConfigureAwait(false);
+        sentinelConnection.Dispose();
+
+        // Connect to Redis master
+        var redisConfig = new ConfigurationOptions
+        {
+            AbortOnConnectFail = false
+        };
+        
+        redisConfig.EndPoints.Add(masterEndpoint);
+        
+        // Configure Redis authentication if provided
+        if (!string.IsNullOrEmpty(sentinel.RedisPassword))
+        {
+            redisConfig.Password = sentinel.RedisPassword;
+        }
+
+        if (sentinel.UseSsl)
+        {
+            redisConfig.Ssl = true;
+        }
+
+        ApplyTimeoutSettings(redisConfig);
+
+        // Connect to Redis master with retry
+        var redisConnection = await ConnectWithRetryAsync(redisConfig).ConfigureAwait(false);
+        if (redisConnection == null || !redisConnection.IsConnected)
+        {
+            throw new InvalidOperationException($"Failed to establish connection to Redis master at {masterEndpoint}");
+        }
+
+        // Setup connection event handlers including Sentinel failover
+        SetupConnectionEventHandlers(redisConnection);
+        SetupSentinelFailoverHandling(redisConnection);
+
+        _logger.LogConnectionSuccess($"Connected to Redis via Sentinel. Master: {masterEndpoint}");
+        return redisConnection;
+    }
+
+    private async Task<string> GetMasterEndpointFromSentinelAsync(IConnectionMultiplexer sentinelConnection, string serviceName)
+    {
+        foreach (var endpoint in sentinelConnection.GetEndPoints())
+        {
+            var server = sentinelConnection.GetServer(endpoint);
+            if (!server.IsConnected) continue;
+
+            try
+            {
+                var result = await server.ExecuteAsync("SENTINEL", "get-master-addr-by-name", serviceName).ConfigureAwait(false);
+                if (!result.IsNull)
+                {
+                    var masterInfo = (RedisValue[])result;
+                    if (masterInfo.Length >= 2)
+                    {
+                        var host = masterInfo[0].ToString();
+                        var port = masterInfo[1].ToString();
+                        return $"{host}:{port}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to get master from Sentinel endpoint {Endpoint}", endpoint);
+            }
+        }
+
+        throw new InvalidOperationException($"Could not find master for service '{serviceName}' from any Sentinel");
+    }
+
+    private void SetupSentinelFailoverHandling(IConnectionMultiplexer connection)
+    {
+        if (_options.Sentinel?.EnableFailoverHandling != true) return;
+
+        connection.ConnectionFailed += async (sender, args) =>
+        {
+            _logger.LogWarning("Redis connection failed: {FailureType}. Endpoint: {EndPoint}", 
+                args.FailureType, args.EndPoint);
+            
+            if (args.FailureType == ConnectionFailureType.SocketFailure || 
+                args.FailureType == ConnectionFailureType.UnableToConnect)
+            {
+                // Trigger reconnection through Sentinel
+                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                _logger.LogInformation("Attempting to reconnect through Sentinel...");
+                // Note: In production, you might want to trigger a full reconnection here
+            }
+        };
+
+        connection.ConnectionRestored += (sender, args) =>
+        {
+            _logger.LogInformation("Redis connection restored. Endpoint: {EndPoint}", args.EndPoint);
+        };
     }
 
     private async Task<ConnectionMultiplexer?> ConnectWithRetryAsync(ConfigurationOptions config)

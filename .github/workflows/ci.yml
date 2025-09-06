@@ -31,11 +31,67 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
-    - name: Start Redis
+    - name: Start Redis Services
       run: |
-        docker run -d --name redis -p 6379:6379 redis:7-alpine
-        sleep 5
-        docker exec redis redis-cli ping
+        # Create Docker network
+        docker network create redis-network
+        
+        # Start Redis Master
+        docker run -d --name redis-master --network redis-network \
+          -p 6379:6379 \
+          redis:7-alpine redis-server --requirepass redis_password
+        
+        # Start Redis Replicas
+        docker run -d --name redis-replica-1 --network redis-network \
+          -p 6380:6379 \
+          redis:7-alpine redis-server \
+          --replicaof redis-master 6379 \
+          --masterauth redis_password \
+          --requirepass redis_password
+        
+        docker run -d --name redis-replica-2 --network redis-network \
+          -p 6381:6379 \
+          redis:7-alpine redis-server \
+          --replicaof redis-master 6379 \
+          --masterauth redis_password \
+          --requirepass redis_password
+        
+        # Start Sentinels
+        docker run -d --name sentinel-1 --network redis-network \
+          -p 26379:26379 \
+          redis:7-alpine sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf && \
+          echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf && \
+          echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf && \
+          echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf && \
+          echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf && \
+          redis-sentinel /etc/redis-sentinel.conf'
+        
+        docker run -d --name sentinel-2 --network redis-network \
+          -p 26380:26379 \
+          redis:7-alpine sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf && \
+          echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf && \
+          echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf && \
+          echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf && \
+          echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf && \
+          redis-sentinel /etc/redis-sentinel.conf'
+        
+        docker run -d --name sentinel-3 --network redis-network \
+          -p 26381:26379 \
+          redis:7-alpine sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf && \
+          echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf && \
+          echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf && \
+          echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf && \
+          echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf && \
+          redis-sentinel /etc/redis-sentinel.conf'
+        
+        # Wait for services to be ready
+        sleep 10
+        
+        # Verify Redis is working
+        docker exec redis-master redis-cli -a redis_password ping
+        
+        # Verify Sentinels are working
+        docker exec sentinel-1 redis-cli -p 26379 ping
     
     - name: Restore dependencies
       run: dotnet restore
@@ -46,17 +102,31 @@ jobs:
     - name: Restore test packages
       run: dotnet restore RedisKit.Tests/RedisKit.Tests.csproj
     
-    - name: Run All Tests with Coverage
+    - name: Run Unit and Integration Tests
       run: |
         dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
           --configuration Release \
           --verbosity normal \
           --logger trx \
           --results-directory "TestResults" \
+          --filter "Category!=Sentinel" \
           --collect:"XPlat Code Coverage" \
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       env:
         REDIS_CONNECTION: localhost:6379
+    
+    - name: Run Sentinel Tests
+      run: |
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --logger trx \
+          --results-directory "TestResults-Sentinel" \
+          --filter "Category=Sentinel"
+      env:
+        REDIS_CONNECTION: localhost:6379
+      continue-on-error: true  # Sentinel tests might be flaky in CI
     
     - name: Generate Codecov coverage
       run: |

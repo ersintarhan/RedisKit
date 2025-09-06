@@ -77,4 +77,55 @@ public class RedisOptions
     ///     Object pooling settings
     /// </summary>
     public PoolingOptions Pooling { get; set; } = new();
+
+    /// <summary>
+    ///     Redis Sentinel configuration settings
+    /// </summary>
+    public SentinelOptions? Sentinel { get; set; }
+}
+
+/// <summary>
+///     Configuration options for Redis Sentinel
+/// </summary>
+public class SentinelOptions
+{
+    /// <summary>
+    ///     List of sentinel endpoints (host:port)
+    /// </summary>
+    public List<string> Endpoints { get; set; } = new();
+
+    /// <summary>
+    ///     Name of the Redis service/master as configured in Sentinel
+    /// </summary>
+    public string ServiceName { get; set; } = "mymaster";
+
+    /// <summary>
+    ///     Password for Sentinel authentication (if required)
+    /// </summary>
+    public string? SentinelPassword { get; set; }
+
+    /// <summary>
+    ///     Password for Redis master/replica authentication
+    /// </summary>
+    public string? RedisPassword { get; set; }
+
+    /// <summary>
+    ///     Timeout for connecting to Sentinel
+    /// </summary>
+    public TimeSpan ConnectTimeout { get; set; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    ///     Enable automatic failover handling
+    /// </summary>
+    public bool EnableFailoverHandling { get; set; } = true;
+
+    /// <summary>
+    ///     Interval for checking Sentinel status
+    /// </summary>
+    public TimeSpan HealthCheckInterval { get; set; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    ///     Enable TLS/SSL connection to Sentinel
+    /// </summary>
+    public bool UseSsl { get; set; } = false;
 }

@@ -16,6 +16,8 @@
       href: stream-processing.md
     - name: Distributed Locking
       href: distributed-locking.md
+    - name: High Availability with Sentinel
+      href: high-availability-sentinel.md
 - name: Advanced Topics
   items:
     - name: Performance Tuning

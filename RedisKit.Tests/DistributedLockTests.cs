@@ -348,7 +348,7 @@ public class DistributedLockTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public async Task WaitForUnlockAsync_WithInvalidResource_ThrowsArgumentException(string resource)
+    public async Task WaitForUnlockAsync_WithInvalidResource_ThrowsArgumentException(string? resource)
     {
         // Arrange
         var timeout = TimeSpan.FromSeconds(1);

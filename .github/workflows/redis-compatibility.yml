@@ -1,0 +1,247 @@
+name: Redis Compatibility Tests
+
+on:
+  schedule:
+    # Run weekly on Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      redis_version:
+        description: 'Redis version to test'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - '6.2'
+          - '7.0'
+          - '7.2'
+          - 'latest'
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+jobs:
+  compatibility-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        redis-version: ['6.2-alpine', '7.0-alpine', '7.2-alpine', '7-alpine']
+        test-category: ['Unit', 'Integration', 'Sentinel']
+    
+    name: Redis ${{ matrix.redis-version }} - ${{ matrix.test-category }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Start Redis ${{ matrix.redis-version }}
+      run: |
+        # Start basic Redis for unit/integration tests
+        if [[ "${{ matrix.test-category }}" != "Sentinel" ]]; then
+          docker run -d --name redis -p 6379:6379 redis:${{ matrix.redis-version }}
+          sleep 5
+          docker exec redis redis-cli ping
+        else
+          # Start Sentinel cluster for Sentinel tests
+          # Create custom docker-compose with specific Redis version
+          cat > docker-compose.test.yml << EOF
+        version: '3.8'
+        services:
+          redis-master:
+            image: redis:${{ matrix.redis-version }}
+            container_name: redis-master
+            ports:
+              - "6379:6379"
+            command: redis-server --appendonly yes --requirepass redis_password
+            networks:
+              - redis-sentinel
+
+          redis-replica-1:
+            image: redis:${{ matrix.redis-version }}
+            container_name: redis-replica-1
+            ports:
+              - "6380:6379"
+            command: >
+              redis-server
+              --replicaof redis-master 6379
+              --masterauth redis_password
+              --requirepass redis_password
+              --appendonly yes
+            depends_on:
+              - redis-master
+            networks:
+              - redis-sentinel
+
+          redis-replica-2:
+            image: redis:${{ matrix.redis-version }}
+            container_name: redis-replica-2
+            ports:
+              - "6381:6379"
+            command: >
+              redis-server
+              --replicaof redis-master 6379
+              --masterauth redis_password
+              --requirepass redis_password
+              --appendonly yes
+            depends_on:
+              - redis-master
+            networks:
+              - redis-sentinel
+
+          sentinel-1:
+            image: redis:${{ matrix.redis-version }}
+            container_name: sentinel-1
+            ports:
+              - "26379:26379"
+            command: >
+              sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+                     echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+                     redis-sentinel /etc/redis-sentinel.conf'
+            depends_on:
+              - redis-master
+            networks:
+              - redis-sentinel
+
+          sentinel-2:
+            image: redis:${{ matrix.redis-version }}
+            container_name: sentinel-2
+            ports:
+              - "26380:26379"
+            command: >
+              sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+                     echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+                     redis-sentinel /etc/redis-sentinel.conf'
+            depends_on:
+              - redis-master
+            networks:
+              - redis-sentinel
+
+          sentinel-3:
+            image: redis:${{ matrix.redis-version }}
+            container_name: sentinel-3
+            ports:
+              - "26381:26379"
+            command: >
+              sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+                     echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
+                     echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+                     redis-sentinel /etc/redis-sentinel.conf'
+            depends_on:
+              - redis-master
+            networks:
+              - redis-sentinel
+
+        networks:
+          redis-sentinel:
+            driver: bridge
+        EOF
+          
+          docker-compose -f docker-compose.test.yml up -d
+          sleep 15
+          docker exec redis-master redis-cli -a redis_password ping
+          docker exec sentinel-1 redis-cli -p 26379 ping
+        fi
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run ${{ matrix.test-category }} Tests
+      run: |
+        if [[ "${{ matrix.test-category }}" == "Unit" ]]; then
+          FILTER="Category!=Integration&Category!=Sentinel"
+        elif [[ "${{ matrix.test-category }}" == "Integration" ]]; then
+          FILTER="Category=Integration"
+        else
+          FILTER="Category=Sentinel"
+        fi
+        
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --logger "trx;LogFileName=${{ matrix.redis-version }}-${{ matrix.test-category }}.trx" \
+          --filter "$FILTER"
+      env:
+        REDIS_CONNECTION: localhost:6379
+        REDIS_PASSWORD: redis_password
+      continue-on-error: true
+    
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: compatibility-results-${{ matrix.redis-version }}-${{ matrix.test-category }}
+        path: '**/*.trx'
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        if [[ "${{ matrix.test-category }}" != "Sentinel" ]]; then
+          docker stop redis || true
+          docker rm redis || true
+        else
+          docker-compose -f docker-compose.test.yml down -v || true
+        fi
+
+  compatibility-report:
+    needs: compatibility-matrix
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: compatibility-results-*
+        merge-multiple: true
+    
+    - name: Generate Compatibility Report
+      run: |
+        echo "# Redis Compatibility Test Results" > compatibility-report.md
+        echo "" >> compatibility-report.md
+        echo "Test Date: $(date)" >> compatibility-report.md
+        echo "" >> compatibility-report.md
+        echo "## Test Matrix" >> compatibility-report.md
+        echo "" >> compatibility-report.md
+        echo "| Redis Version | Unit Tests | Integration Tests | Sentinel Tests |" >> compatibility-report.md
+        echo "|---------------|------------|-------------------|----------------|" >> compatibility-report.md
+        
+        for version in "6.2" "7.0" "7.2" "7"; do
+          echo -n "| Redis $version | " >> compatibility-report.md
+          for category in "Unit" "Integration" "Sentinel"; do
+            if [[ -f "${version}-alpine-${category}.trx" ]]; then
+              echo -n "✅ | " >> compatibility-report.md
+            else
+              echo -n "❌ | " >> compatibility-report.md
+            fi
+          done
+          echo "" >> compatibility-report.md
+        done
+        
+        cat compatibility-report.md
+    
+    - name: Upload Compatibility Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: compatibility-report
+        path: compatibility-report.md

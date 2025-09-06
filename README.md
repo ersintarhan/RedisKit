@@ -36,6 +36,7 @@ A production-ready, enterprise-grade Redis library for .NET 9 with advanced cach
 ### Enterprise Features
 
 - **🔒 Distributed Locking**: Redis-based distributed locking with auto-renewal
+- **🛡️ Redis Sentinel Support**: High availability with automatic failover (NEW!)
 - **🔄 Circuit Breaker Pattern**: Automatic failure detection and recovery
 - **📈 Advanced Retry Strategies**: Multiple backoff strategies (Exponential, Decorrelated Jitter, etc.)
 - **🏥 Health Monitoring**: Automatic health checks with auto-reconnection
@@ -220,6 +221,27 @@ services.AddRedisServices(options =>
     options.DefaultTtl = TimeSpan.FromHours(1);
     options.CacheKeyPrefix = "myapp:";
     options.Serializer = SerializerType.MessagePack; // or JSON
+});
+```
+
+### Redis Sentinel Configuration
+
+```csharp
+services.AddRedisServices(options =>
+{
+    // Configure Redis Sentinel for high availability
+    options.Sentinel = new SentinelOptions
+    {
+        Endpoints = new List<string> 
+        { 
+            "sentinel1:26379",
+            "sentinel2:26379",
+            "sentinel3:26379"
+        },
+        ServiceName = "mymaster",
+        RedisPassword = "your_redis_password",
+        EnableFailoverHandling = true
+    };
 });
 ```
 

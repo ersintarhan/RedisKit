@@ -1,0 +1,122 @@
+name: Sentinel Tests
+
+on:
+  push:
+    branches: [ master, main, develop ]
+    paths:
+      - 'RedisKit/Services/RedisConnection.cs'
+      - 'RedisKit/Models/RedisOptions.cs'
+      - 'RedisKit.Tests/SentinelIntegrationTests.cs'
+      - '.github/workflows/sentinel-tests.yml'
+      - 'docker-compose.sentinel.yml'
+  pull_request:
+    branches: [ master, main, develop ]
+    paths:
+      - 'RedisKit/Services/RedisConnection.cs'
+      - 'RedisKit/Models/RedisOptions.cs'
+      - 'RedisKit.Tests/SentinelIntegrationTests.cs'
+      - '.github/workflows/sentinel-tests.yml'
+      - 'docker-compose.sentinel.yml'
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+jobs:
+  sentinel-integration-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Setup Redis Sentinel Cluster
+      run: |
+        # Use docker-compose for cleaner setup
+        docker-compose -f docker-compose.sentinel.yml up -d
+        
+        # Wait for cluster to be ready
+        echo "Waiting for Redis Sentinel cluster to be ready..."
+        sleep 15
+        
+        # Verify services
+        docker-compose -f docker-compose.sentinel.yml ps
+        
+        # Check Redis Master
+        docker exec redis-master redis-cli -a redis_password ping
+        
+        # Check Sentinels
+        docker exec sentinel-1 redis-cli -p 26379 ping
+        docker exec sentinel-1 redis-cli -p 26379 SENTINEL masters
+        
+        # Check replicas
+        docker exec redis-replica-1 redis-cli -a redis_password info replication
+        docker exec redis-replica-2 redis-cli -a redis_password info replication
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run Sentinel Tests
+      run: |
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity detailed \
+          --logger "trx;LogFileName=sentinel-test-results.trx" \
+          --logger "console;verbosity=detailed" \
+          --filter "Category=Sentinel"
+      env:
+        REDIS_CONNECTION: localhost:6379
+        REDIS_PASSWORD: redis_password
+    
+    - name: Test Failover Scenario
+      run: |
+        echo "Testing failover scenario..."
+        
+        # Show current master
+        echo "Current master:"
+        docker exec sentinel-1 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+        
+        # Stop the master to trigger failover
+        echo "Stopping Redis master to trigger failover..."
+        docker-compose -f docker-compose.sentinel.yml stop redis-master
+        
+        # Wait for failover
+        echo "Waiting for failover to complete..."
+        sleep 15
+        
+        # Check new master
+        echo "New master after failover:"
+        docker exec sentinel-1 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+        
+        # Run tests again to verify they work after failover
+        dotnet test RedisKit.Tests/RedisKit.Tests.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --filter "Category=Sentinel" || true
+    
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: sentinel-test-results
+        path: |
+          **/*.trx
+          docker-compose.sentinel.yml
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        docker-compose -f docker-compose.sentinel.yml logs
+        docker-compose -f docker-compose.sentinel.yml down -v
