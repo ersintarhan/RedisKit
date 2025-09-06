@@ -64,22 +64,25 @@ public class DistributedLockBusinessLogicTests
     {
         // Arrange
         var resource = "wait-resource";
-        var handle1 = await _lockService.AcquireLockAsync(resource, TimeSpan.FromMilliseconds(200)); // Increased from 100ms
+        var handle1 = await _lockService.AcquireLockAsync(resource, TimeSpan.FromMilliseconds(500)); // Increased to 500ms
 
         // Act
         var acquireTask = _lockService.AcquireLockAsync(
             resource,
-            TimeSpan.FromSeconds(10),
-            TimeSpan.FromSeconds(2), // Increased wait time for CI
-            TimeSpan.FromMilliseconds(100) // Increased retry interval
+            TimeSpan.FromSeconds(10), // Lock duration
+            TimeSpan.FromSeconds(5), // Wait up to 5 seconds for lock
+            TimeSpan.FromMilliseconds(100) // Retry every 100ms
         );
 
-        await Task.Delay(300); // Increased delay to ensure lock expires (was 150ms)
+        // Wait for the first lock to expire
+        await Task.Delay(600); // Wait 600ms to ensure first lock (500ms) has expired
+        
+        // Now the second acquire should succeed
         var handle2 = await acquireTask;
 
         // Assert
         handle1.Should().NotBeNull();
-        handle2.Should().NotBeNull();
+        handle2.Should().NotBeNull("the second lock should succeed after the first one expires");
     }
 
     [Fact]

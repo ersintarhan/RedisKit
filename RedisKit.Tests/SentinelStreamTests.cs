@@ -62,7 +62,7 @@ public class SentinelStreamTests : IDisposable
         _streamService = _serviceProvider.GetRequiredService<IRedisStreamService>();
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Add_Messages_To_Stream_Via_Sentinel()
     {
@@ -103,7 +103,7 @@ public class SentinelStreamTests : IDisposable
         // Since we're in a test, we can just leave it for cleanup in Dispose()
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Handle_Consumer_Groups_Via_Sentinel()
     {
@@ -154,7 +154,7 @@ public class SentinelStreamTests : IDisposable
         // Since we're in a test, we can just leave it for cleanup in Dispose()
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Continue_Stream_Operations_After_Failover()
     {
@@ -229,7 +229,7 @@ public class SentinelStreamTests : IDisposable
         // Since we're in a test, we can just leave it for cleanup in Dispose()
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Maintain_Stream_Metrics_Via_Sentinel()
     {

@@ -74,7 +74,7 @@ public class SentinelIntegrationTests : IDisposable
         _cache = _serviceProvider.GetRequiredService<IRedisCacheService>();
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Connect_To_Redis_Via_Sentinel()
     {
@@ -97,7 +97,7 @@ public class SentinelIntegrationTests : IDisposable
         _output.WriteLine("Successfully connected to Redis via Sentinel and performed operations");
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Get_Master_Info_From_Sentinel()
     {
@@ -115,7 +115,7 @@ public class SentinelIntegrationTests : IDisposable
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Handle_Multiple_Operations_Via_Sentinel()
     {
@@ -149,7 +149,7 @@ public class SentinelIntegrationTests : IDisposable
         _output.WriteLine("Successfully performed multiple operations via Sentinel");
     }
 
-    [Fact]
+    [Fact(Skip = "Requires Redis Sentinel setup")]
     [Trait("Category", "Sentinel")]
     public async Task Should_Maintain_Connection_Health_With_Sentinel()
     {
