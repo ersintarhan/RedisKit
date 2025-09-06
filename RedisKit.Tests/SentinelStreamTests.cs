@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RedisKit.Extensions;
@@ -258,10 +259,16 @@ public class SentinelStreamTests : IDisposable
         _serviceProvider?.Dispose();
     }
 
-    private class TestMessage
+    [MessagePackObject]
+    internal class TestMessage
     {
+        [Key(0)]
         public int Id { get; set; }
+        
+        [Key(1)]
         public string Content { get; set; } = string.Empty;
+        
+        [Key(2)]
         public DateTime Timestamp { get; set; }
     }
 }

@@ -101,8 +101,20 @@ public class RedisConnection : IRedisConnection, IDisposable
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
-        // Validate connection string
-        if (string.IsNullOrWhiteSpace(_options.ConnectionString)) throw new ArgumentException("Redis connection string cannot be null or empty", nameof(options));
+        // Validate connection string (not required when using Sentinel)
+        if (_options.Sentinel == null || !_options.Sentinel.Endpoints.Any())
+        {
+            if (string.IsNullOrWhiteSpace(_options.ConnectionString)) 
+                throw new ArgumentException("Redis connection string cannot be null or empty when not using Sentinel", nameof(options));
+        }
+        else
+        {
+            // Validate Sentinel configuration
+            if (!_options.Sentinel.Endpoints.Any())
+                throw new ArgumentException("At least one Sentinel endpoint must be configured", nameof(options));
+            if (string.IsNullOrWhiteSpace(_options.Sentinel.ServiceName))
+                throw new ArgumentException("Sentinel service name cannot be null or empty", nameof(options));
+        }
 
         // Validate timeout settings
         if (_options.TimeoutSettings.ConnectTimeout.TotalMilliseconds < 0 ||
@@ -328,105 +340,51 @@ public class RedisConnection : IRedisConnection, IDisposable
         var sentinel = _options.Sentinel!;
         _logger.LogConnectionCreating($"Sentinel: {string.Join(",", sentinel.Endpoints)}, Service: {sentinel.ServiceName}");
 
+        // StackExchange.Redis automatically handles Sentinel
+        // Just use normal connection with sentinel endpoints
         var config = new ConfigurationOptions
         {
             ServiceName = sentinel.ServiceName,
-            TieBreaker = "",
-            CommandMap = CommandMap.Sentinel,
-            AbortOnConnectFail = false
+            AbortOnConnectFail = false,
+            AllowAdmin = true
         };
 
-        // Add all sentinel endpoints
+        // Add all sentinel endpoints  
         foreach (var endpoint in sentinel.Endpoints)
         {
             config.EndPoints.Add(endpoint);
         }
 
-        // Configure Sentinel authentication if provided
-        if (!string.IsNullOrEmpty(sentinel.SentinelPassword))
+        // Set the Redis password (for master connection)
+        if (!string.IsNullOrEmpty(sentinel.RedisPassword))
         {
-            config.Password = sentinel.SentinelPassword;
+            config.Password = sentinel.RedisPassword;
+        }
+
+        if (sentinel.UseSsl)
+        {
+            config.Ssl = true;
         }
 
         // Apply timeout settings
         ApplyTimeoutSettings(config);
 
-        // Connect to Sentinel
-        var sentinelConnection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
-        if (sentinelConnection == null || !sentinelConnection.IsConnected)
+        // Connect - StackExchange.Redis will automatically discover master via Sentinel
+        var connection = await ConnectWithRetryAsync(config).ConfigureAwait(false);
+        if (connection == null || !connection.IsConnected)
         {
-            throw new InvalidOperationException("Failed to establish Sentinel connection after all retry attempts");
+            throw new InvalidOperationException("Failed to establish connection via Sentinel");
         }
 
-        // Get master endpoint from Sentinel
-        var masterEndpoint = await GetMasterEndpointFromSentinelAsync(sentinelConnection, sentinel.ServiceName).ConfigureAwait(false);
-        sentinelConnection.Dispose();
+        // Setup connection event handlers
+        SetupConnectionEventHandlers(connection);
+        SetupSentinelFailoverHandling(connection);
 
-        // Connect to Redis master
-        var redisConfig = new ConfigurationOptions
-        {
-            AbortOnConnectFail = false
-        };
+        _logger.LogConnectionSuccess($"Connected to Redis via Sentinel");
         
-        redisConfig.EndPoints.Add(masterEndpoint);
-        
-        // Configure Redis authentication if provided
-        if (!string.IsNullOrEmpty(sentinel.RedisPassword))
-        {
-            redisConfig.Password = sentinel.RedisPassword;
-        }
-
-        if (sentinel.UseSsl)
-        {
-            redisConfig.Ssl = true;
-        }
-
-        ApplyTimeoutSettings(redisConfig);
-
-        // Connect to Redis master with retry
-        var redisConnection = await ConnectWithRetryAsync(redisConfig).ConfigureAwait(false);
-        if (redisConnection == null || !redisConnection.IsConnected)
-        {
-            throw new InvalidOperationException($"Failed to establish connection to Redis master at {masterEndpoint}");
-        }
-
-        // Setup connection event handlers including Sentinel failover
-        SetupConnectionEventHandlers(redisConnection);
-        SetupSentinelFailoverHandling(redisConnection);
-
-        _logger.LogConnectionSuccess($"Connected to Redis via Sentinel. Master: {masterEndpoint}");
-        return redisConnection;
+        return connection;
     }
 
-    private async Task<string> GetMasterEndpointFromSentinelAsync(IConnectionMultiplexer sentinelConnection, string serviceName)
-    {
-        foreach (var endpoint in sentinelConnection.GetEndPoints())
-        {
-            var server = sentinelConnection.GetServer(endpoint);
-            if (!server.IsConnected) continue;
-
-            try
-            {
-                var result = await server.ExecuteAsync("SENTINEL", "get-master-addr-by-name", serviceName).ConfigureAwait(false);
-                if (!result.IsNull)
-                {
-                    var masterInfo = (RedisValue[]?)result;
-                    if (masterInfo != null && masterInfo.Length >= 2)
-                    {
-                        var host = masterInfo[0].ToString();
-                        var port = masterInfo[1].ToString();
-                        return $"{host}:{port}";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to get master from Sentinel endpoint {Endpoint}", endpoint);
-            }
-        }
-
-        throw new InvalidOperationException($"Could not find master for service '{serviceName}' from any Sentinel");
-    }
 
     private void SetupSentinelFailoverHandling(IConnectionMultiplexer connection)
     {

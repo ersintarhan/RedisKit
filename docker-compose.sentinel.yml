@@ -52,7 +52,8 @@ services:
     volumes:
       - ./sentinel-1:/data
     command: |
-      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+      sh -c 'sleep 5 &&
+             echo "port 26379" > /etc/redis-sentinel.conf &&
              echo "dir /data" >> /etc/redis-sentinel.conf &&
              echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
@@ -77,7 +78,8 @@ services:
     volumes:
       - ./sentinel-2:/data
     command: |
-      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+      sh -c 'sleep 5 &&
+             echo "port 26379" > /etc/redis-sentinel.conf &&
              echo "dir /data" >> /etc/redis-sentinel.conf &&
              echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
@@ -102,7 +104,8 @@ services:
     volumes:
       - ./sentinel-3:/data
     command: |
-      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+      sh -c 'sleep 5 &&
+             echo "port 26379" > /etc/redis-sentinel.conf &&
              echo "dir /data" >> /etc/redis-sentinel.conf &&
              echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
