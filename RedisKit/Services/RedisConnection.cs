@@ -410,8 +410,8 @@ public class RedisConnection : IRedisConnection, IDisposable
                 var result = await server.ExecuteAsync("SENTINEL", "get-master-addr-by-name", serviceName).ConfigureAwait(false);
                 if (!result.IsNull)
                 {
-                    var masterInfo = (RedisValue[])result;
-                    if (masterInfo.Length >= 2)
+                    var masterInfo = (RedisValue[]?)result;
+                    if (masterInfo != null && masterInfo.Length >= 2)
                     {
                         var host = masterInfo[0].ToString();
                         var port = masterInfo[1].ToString();

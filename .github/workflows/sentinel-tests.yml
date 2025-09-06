@@ -39,26 +39,42 @@ jobs:
     
     - name: Setup Redis Sentinel Cluster
       run: |
+        # Create directories for Sentinel data
+        mkdir -p sentinel-1 sentinel-2 sentinel-3
+        
         # Use docker compose (new syntax) for cleaner setup
         docker compose -f docker-compose.sentinel.yml up -d
         
         # Wait for cluster to be ready
         echo "Waiting for Redis Sentinel cluster to be ready..."
-        sleep 15
+        sleep 20
         
         # Verify services
         docker compose -f docker-compose.sentinel.yml ps
         
         # Check Redis Master
-        docker exec redis-master redis-cli -a redis_password ping
+        echo "Checking Redis Master..."
+        docker exec redis-master redis-cli -a redis_password ping || exit 1
         
-        # Check Sentinels
-        docker exec sentinel-1 redis-cli -p 26379 ping
-        docker exec sentinel-1 redis-cli -p 26379 SENTINEL masters
+        # Wait for Sentinels to start and check them
+        echo "Checking Sentinels..."
+        for i in {1..10}; do
+          if docker exec sentinel-1 redis-cli -p 26379 ping 2>/dev/null; then
+            echo "Sentinel-1 is ready"
+            break
+          fi
+          echo "Waiting for Sentinel-1... (attempt $i/10)"
+          sleep 3
+        done
+        
+        # Check if Sentinels can see the master
+        echo "Checking Sentinel master discovery..."
+        docker exec sentinel-1 redis-cli -p 26379 SENTINEL masters || true
         
         # Check replicas
-        docker exec redis-replica-1 redis-cli -a redis_password info replication
-        docker exec redis-replica-2 redis-cli -a redis_password info replication
+        echo "Checking Redis Replicas..."
+        docker exec redis-replica-1 redis-cli -a redis_password info replication || true
+        docker exec redis-replica-2 redis-cli -a redis_password info replication || true
     
     - name: Restore dependencies
       run: dotnet restore

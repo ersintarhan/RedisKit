@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Redis Master
   redis-master:
@@ -51,12 +49,17 @@ services:
     container_name: sentinel-1
     ports:
       - "26379:26379"
-    command: >
-      sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+    volumes:
+      - ./sentinel-1:/data
+    command: |
+      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+             echo "dir /data" >> /etc/redis-sentinel.conf &&
+             echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
              echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
              echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
              echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+             echo "logfile /data/sentinel.log" >> /etc/redis-sentinel.conf &&
              redis-sentinel /etc/redis-sentinel.conf'
     depends_on:
       - redis-master
@@ -71,12 +74,17 @@ services:
     container_name: sentinel-2
     ports:
       - "26380:26379"
-    command: >
-      sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+    volumes:
+      - ./sentinel-2:/data
+    command: |
+      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+             echo "dir /data" >> /etc/redis-sentinel.conf &&
+             echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
              echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
              echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
              echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+             echo "logfile /data/sentinel.log" >> /etc/redis-sentinel.conf &&
              redis-sentinel /etc/redis-sentinel.conf'
     depends_on:
       - redis-master
@@ -91,12 +99,17 @@ services:
     container_name: sentinel-3
     ports:
       - "26381:26379"
-    command: >
-      sh -c 'echo "sentinel monitor mymaster redis-master 6379 2" > /etc/redis-sentinel.conf &&
+    volumes:
+      - ./sentinel-3:/data
+    command: |
+      sh -c 'echo "port 26379" > /etc/redis-sentinel.conf &&
+             echo "dir /data" >> /etc/redis-sentinel.conf &&
+             echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/redis-sentinel.conf &&
              echo "sentinel auth-pass mymaster redis_password" >> /etc/redis-sentinel.conf &&
              echo "sentinel down-after-milliseconds mymaster 5000" >> /etc/redis-sentinel.conf &&
              echo "sentinel parallel-syncs mymaster 1" >> /etc/redis-sentinel.conf &&
              echo "sentinel failover-timeout mymaster 10000" >> /etc/redis-sentinel.conf &&
+             echo "logfile /data/sentinel.log" >> /etc/redis-sentinel.conf &&
              redis-sentinel /etc/redis-sentinel.conf'
     depends_on:
       - redis-master
